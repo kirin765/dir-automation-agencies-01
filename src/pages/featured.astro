@@ -1,0 +1,128 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Get Featured - AI Automation Agencies Directory">
+  <Header />
+  
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold mb-4">Get Featured</h1>
+      <p class="text-xl text-slate-400">
+        Stand out from the competition. Get premium placement in our directory.
+      </p>
+    </div>
+    
+    <!-- Pricing -->
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+        <h3 class="text-xl font-bold mb-2">Basic</h3>
+        <div class="text-3xl font-bold text-green-400 mb-4">$29<span class="text-lg text-slate-500">/mo</span></div>
+        <ul class="space-y-3 text-slate-400 mb-8">
+          <li>✓ Verified badge</li>
+          <li>✓ Basic listing</li>
+          <li>✓ Contact form</li>
+        </ul>
+        <a href="#inquire" class="block text-center px-6 py-3 border border-slate-600 hover:border-white rounded-xl transition-colors">
+          Get Started
+        </a>
+      </div>
+      
+      <div class="bg-slate-800 border-2 border-green-500 rounded-2xl p-8 relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-green-500 text-black text-sm font-bold rounded-full">
+          POPULAR
+        </div>
+        <h3 class="text-xl font-bold mb-2">Featured</h3>
+        <div class="text-3xl font-bold text-green-400 mb-4">$49<span class="text-lg text-slate-500">/mo</span></div>
+        <ul class="space-y-3 text-slate-400 mb-8">
+          <li>✓ Everything in Basic</li>
+          <li>✓ Top placement</li>
+          <li>✓ Featured badge</li>
+          <li>✓ 3 platform badges</li>
+        </ul>
+        <a href="#inquire" class="block text-center px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl">
+          Get Started
+        </a>
+      </div>
+      
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+        <h3 class="text-xl font-bold mb-2">Premium</h3>
+        <div class="text-3xl font-bold text-green-400 mb-4">$99<span class="text-lg text-slate-500">/mo</span></div>
+        <ul class="space-y-3 text-slate-400 mb-8">
+          <li>✓ Everything in Featured</li>
+          <li>✓ Homepage spotlight</li>
+          <li>✓ Priority support</li>
+          <li>✓ Custom analytics</li>
+        </ul>
+        <a href="#inquire" class="block text-center px-6 py-3 border border-slate-600 hover:border-white rounded-xl transition-colors">
+          Get Started
+        </a>
+      </div>
+    </div>
+    
+    <!-- Inquiry Form -->
+    <div id="inquire" class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+      <h2 class="text-2xl font-bold mb-6">Inquire Now</h2>
+      <form class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm text-slate-400 mb-2">Name *</label>
+            <input 
+              type="text" 
+              required
+              class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-2">Company *</label>
+            <input 
+              type="text" 
+              required
+              class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+            />
+          </div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm text-slate-400 mb-2">Email *</label>
+            <input 
+              type="email" 
+              required
+              class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+            />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-2">Plan Interest</label>
+            <select class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white">
+              <option value="">Select plan</option>
+              <option value="basic">Basic ($29/mo)</option>
+              <option value="featured">Featured ($49/mo)</option>
+              <option value="premium">Premium ($99/mo)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Message</label>
+          <textarea 
+            rows="4"
+            class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+            placeholder="Tell us about your agency..."
+          ></textarea>
+        </div>
+        
+        <button 
+          type="submit"
+          class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl"
+        >
+          Send Inquiry
+        </button>
+      </form>
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>

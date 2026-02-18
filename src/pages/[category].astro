@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getAll, getByCategory } from '../../scripts/process-data';
+
+export function getStaticPaths() {
+  const categories = ['zapier', 'make', 'n8n', 'custom'];
+  return categories.map(category => ({
+    params: { category },
+    props: { category }
+  }));
+}
+
+const { category } = Astro.props;
+const listings = getByCategory(category);
+const pageTitle = `${category.charAt(0).toUpperCase() + category.slice(1)} Experts - AI Automation Agencies`;
+const pageDesc = `Find top-rated ${category} automation experts and agencies. Browse ${listings.length} specialists worldwide.`;
+---
+
+<Layout title={pageTitle} description={pageDesc}>
+  <Header />
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+      <a href="/" class="text-green-400 hover:text-green-300">← Back to Home</a>
+    </div>
+    
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 capitalize">
+      {category} Experts
+    </h1>
+    <p class="text-slate-400 mb-8">
+      {listings.length} automation specialists available
+    </p>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {listings.map(listing => (
+        <a 
+          href={`/listing/${listing.slug}`}
+          class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-semibold text-lg">{listing.name}</h3>
+            {listing.featured && (
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                ★ Featured
+              </span>
+            )}
+          </div>
+          
+          <div class="flex gap-2 mb-3">
+            {listing.platforms.map(p => (
+              <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
+                {p}
+              </span>
+            ))}
+          </div>
+          
+          <p class="text-slate-400 text-sm mb-4 line-clamp-2">
+            {listing.description}
+          </p>
+          
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
+            <span class="text-slate-500">📍 {listing.location}</span>
+          </div>
+          
+          {listing.rating > 0 && (
+            <div class="mt-3 text-yellow-400">
+              {'★'.repeat(Math.floor(listing.rating))}
+              <span class="text-slate-500 text-sm ml-1">({listing.reviewCount})</span>
+            </div>
+          )}
+        </a>
+      ))}
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>

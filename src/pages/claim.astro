@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Claim Your Listing - AI Automation Agencies Directory">
+  <Header />
+  
+  <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-bold mb-4">Claim Your Listing</h1>
+    <p class="text-slate-400 mb-8">
+      Get your agency listed in our directory. It's free!
+    </p>
+    
+    <form class="space-y-6">
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Agency Name *</label>
+        <input 
+          type="text" 
+          required
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Contact Email *</label>
+        <input 
+          type="email" 
+          required
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Website *</label>
+        <input 
+          type="url" 
+          required
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Primary Platform *</label>
+        <select class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white">
+          <option value="">Select platform</option>
+          <option value="zapier">Zapier</option>
+          <option value="make">Make.com</option>
+          <option value="n8n">n8n</option>
+          <option value="custom">Custom Solutions</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Location *</label>
+        <input 
+          type="text" 
+          required
+          placeholder="City, Country"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Description</label>
+        <textarea 
+          rows="4"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+        ></textarea>
+      </div>
+      
+      <button 
+        type="submit"
+        class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl"
+      >
+        Submit Listing Request
+      </button>
+    </form>
+    
+    <p class="text-slate-500 text-sm mt-6 text-center">
+      We'll review your submission within 48 hours.
+    </p>
+  </main>
+  
+  <Footer />
+</Layout>

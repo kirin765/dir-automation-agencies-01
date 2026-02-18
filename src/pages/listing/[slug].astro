@@ -1,0 +1,126 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getAll, getBySlug } from '../scripts/process-data';
+
+export function getStaticPaths() {
+  const listings = getAll();
+  return listings.map(listing => ({
+    params: { slug: listing.slug },
+    props: { listing }
+  }));
+}
+
+const { listing } = Astro.props;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": listing.name,
+  "description": listing.description,
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": listing.location,
+    "addressCountry": listing.country
+  },
+  "priceRange": `$${listing.priceMin}-$${listing.priceMax}`,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": listing.rating,
+    "reviewCount": listing.reviewCount
+  },
+  "url": listing.website
+};
+---
+
+<Layout title={`${listing.name} - AI Automation Expert`} description={listing.description}>
+  <!-- JSON-LD -->
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  
+  <Header />
+  
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <a href="/" class="text-green-400 hover:text-green-300">← Back to Directory</a>
+    
+    <div class="mt-8 bg-slate-800 border border-slate-700 rounded-2xl p-8">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">{listing.name}</h1>
+          <p class="text-slate-400">📍 {listing.location}, {listing.country}</p>
+        </div>
+        {listing.featured && (
+          <span class="px-4 py-2 bg-green-500/20 text-green-400 font-medium rounded-full">
+            ★ Featured Agency
+          </span>
+        )}
+      </div>
+      
+      <div class="flex flex-wrap gap-2 mb-6">
+        {listing.platforms.map(p => (
+          <span class="px-3 py-1 bg-slate-700 text-slate-300 text-sm rounded-full capitalize">
+            {p}
+          </span>
+        ))}
+      </div>
+      
+      <p class="text-slate-300 text-lg mb-8">{listing.description}</p>
+      
+      <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-slate-700/50 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-green-400">${listing.priceMin}-${listing.priceMax}</div>
+          <div class="text-slate-500 text-sm">Project Range</div>
+        </div>
+        <div class="bg-slate-700/50 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-yellow-400">
+            {'★'.repeat(Math.floor(listing.rating))} {listing.rating}
+          </div>
+          <div class="text-slate-500 text-sm">{listing.reviewCount} Reviews</div>
+        </div>
+        <div class="bg-slate-700/50 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-blue-400">{listing.platforms.length}</div>
+          <div class="text-slate-500 text-sm">Platforms</div>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap gap-4">
+        <a 
+          href={listing.website}
+          target="_blank"
+          rel="noopener"
+          class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl text-center transition-colors"
+        >
+          Visit Website
+        </a>
+        <a 
+          href={`/contact?agency=${listing.slug}`}
+          class="flex-1 px-6 py-3 border border-slate-600 hover:border-white text-white font-semibold rounded-xl text-center transition-colors"
+        >
+          Contact Agency
+        </a>
+      </div>
+    </div>
+    
+    <!-- SEO Content -->
+    <div class="mt-12 prose prose-invert max-w-none">
+      <h2>About {listing.name}</h2>
+      <p>{listing.description}</p>
+      
+      <h3>Services Offered</h3>
+      <ul>
+        {listing.platforms.map(p => (
+          <li class="capitalize"><strong>{p}</strong> automation and integration services</li>
+        ))}
+      </ul>
+      
+      <h3>Why Choose {listing.name}?</h3>
+      <ul>
+        <li>Verified ratings and reviews ({listing.reviewCount} reviews)</li>
+        <li>Competitive pricing (${listing.priceMin}-${listing.priceMax} per project)</li>
+        <li>Located in {listing.location}, {listing.country}</li>
+      </ul>
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>

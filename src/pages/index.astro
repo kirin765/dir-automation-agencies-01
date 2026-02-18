@@ -1,0 +1,175 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getAll } from '../scripts/process-data';
+
+const listings = getAll();
+const featuredListings = listings.filter(l => l.featured).slice(0, 6);
+
+const platforms = ['zapier', 'make', 'n8n', 'custom'];
+const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
+---
+
+<Layout title="AI Automation Agencies Directory | Find Zapier, Make.com & n8n Experts">
+  <Header />
+  
+  <!-- Hero -->
+  <section class="relative overflow-hidden py-20 md:py-32">
+    <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-blue-500/10"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/5 rounded-full blur-3xl"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">
+        Find the Best <span class="gradient-text">AI Automation</span> Experts
+      </h1>
+      <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+        Connect with top-rated Zapier, Make.com, and n8n specialists. 
+        Save 20+ hours/week with proven automation solutions.
+      </p>
+      
+      <!-- Search -->
+      <form action="/search" class="max-w-xl mx-auto">
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Search for automation experts..." 
+            class="flex-1 px-5 py-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-green-500"
+          />
+          <button 
+            type="submit"
+            class="px-6 py-4 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl transition-colors"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+      
+      <!-- Stats -->
+      <div class="flex flex-wrap justify-center gap-8 mt-12">
+        <div>
+          <div class="text-3xl font-bold text-green-400">{listings.length}+</div>
+          <div class="text-slate-500">Listed Experts</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-green-400">$500-$10k</div>
+          <div class="text-slate-500">Avg. Project Value</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-green-400">40+</div>
+          <div class="text-slate-500">Countries</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Platforms -->
+  <section class="py-16 bg-slate-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-center mb-10">Browse by Platform</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {platforms.map(platform => (
+          <a 
+            href={`/${platform}`}
+            class="p-6 bg-slate-800 border border-slate-700 rounded-xl text-center card-hover hover:border-green-500"
+          >
+            <div class="text-2xl font-bold capitalize mb-1">{platform}</div>
+            <div class="text-slate-500 text-sm">
+              {listings.filter(l => l.platforms.includes(platform)).length} experts
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- Featured -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between mb-10">
+        <h2 class="text-2xl font-bold">Featured Agencies</h2>
+        <a href="/featured" class="text-green-400 hover:text-green-300">View all →</a>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredListings.map(listing => (
+          <a 
+            href={`/listing/${listing.slug}`}
+            class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-semibold text-lg">{listing.name}</h3>
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                ★ Featured
+              </span>
+            </div>
+            
+            <div class="flex gap-2 mb-3">
+              {listing.platforms.map(p => (
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                  {p}
+                </span>
+              ))}
+            </div>
+            
+            <p class="text-slate-400 text-sm mb-4 line-clamp-2">
+              {listing.description}
+            </p>
+            
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
+              <span class="text-slate-500">📍 {listing.location}, {listing.country}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- Locations -->
+  <section class="py-16 bg-slate-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-center mb-10">Popular Locations</h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        {locations.map(location => (
+          <a 
+            href={`/${location}`}
+            class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-full hover:border-green-500 transition-colors capitalize"
+          >
+            {location}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- Monetization CTA -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-slate-700 rounded-2xl p-8 md:p-12 text-center">
+        <h2 class="text-2xl font-bold mb-4">Are You an Automation Expert?</h2>
+        <p class="text-slate-400 mb-8 max-w-xl mx-auto">
+          Join 100+ agencies already listed on our directory. 
+          Get leads, build your brand, and grow your business.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="/claim"
+            class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl transition-colors"
+          >
+            Claim Your Listing
+          </a>
+          <a 
+            href="/featured"
+            class="px-6 py-3 border border-slate-600 hover:border-white text-white font-semibold rounded-xl transition-colors"
+          >
+            Get Featured
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer />
+</Layout>

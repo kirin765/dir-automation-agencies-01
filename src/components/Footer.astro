@@ -1,0 +1,67 @@
+---
+const footerLinks = [
+  {
+    title: "Platforms",
+    links: [
+      { href: '/zapier', label: 'Zapier Experts' },
+      { href: '/make', label: 'Make.com Experts' },
+      { href: '/n8n', label: 'n8n Experts' },
+      { href: '/custom', label: 'Custom Solutions' },
+    ]
+  },
+  {
+    title: "Locations",
+    links: [
+      { href: '/usa', label: 'USA' },
+      { href: '/uk', label: 'UK' },
+      { href: '/germany', label: 'Germany' },
+      { href: '/india', label: 'India' },
+    ]
+  },
+  {
+    title: "Company",
+    links: [
+      { href: '/about', label: 'About' },
+      { href: '/contact', label: 'Contact' },
+      { href: '/privacy', label: 'Privacy' },
+      { href: '/terms', label: 'Terms' },
+    ]
+  }
+];
+---
+
+<footer class="border-t border-slate-800 bg-slate-900/30 mt-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {footerLinks.map(section => (
+        <div>
+          <h3 class="font-semibold text-white mb-4">{section.title}</h3>
+          <ul class="space-y-2">
+            {section.links.map(link => (
+              <li>
+                <a href={link.href} class="text-slate-400 hover:text-white transition-colors text-sm">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    
+    <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-blue-500 rounded flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-semibold">AutomationHub</span>
+      </div>
+      
+      <p class="text-slate-500 text-sm">
+        © {new Date().getFullYear()} AI Automation Agencies Directory. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,226 @@
+# AI Automation Agencies Directory
+
+A production-ready, SEO-focused directory website for AI automation agencies and experts (Zapier, Make.com, n8n).
+
+## 🚀 Live Site
+
+**URL:** https://automation-agencies.com
+
+## 📋 Features
+
+- **105+ Seed Listings** with real agency data
+- **Platform Categories:** Zapier, Make.com, n8n, Custom Solutions
+- **Location Pages:** USA, UK, Germany, India, Australia, and 40+ countries
+- **Programmatic SEO Pages:**
+  - `/[category]/` - Category pages (e.g., /zapier, /make, /n8n)
+  - `/[location]/` - Location pages (e.g., /usa, /uk)
+  - `/listing/[slug]` - Individual listing pages
+- **Fast Client-Side Search** with filters
+- **SEO Optimized:**
+  - sitemap.xml
+  - robots.txt
+  - Canonical URLs
+  - OpenGraph meta tags
+  - JSON-LD Schema (ProfessionalService, LocalBusiness)
+- **Monetization MVP:**
+  - Claim Listing form
+  - Featured Placement inquiry
+
+## 🛠️ Tech Stack
+
+- **Framework:** Astro 4.x (Static Site Generation)
+- **Styling:** Tailwind CSS
+- **Data:** CSV → JSON transformation at build time
+- **TypeScript:** Full type safety
+- **Deploy:** Cloudflare Pages
+
+## 📁 Project Structure
+
+```
+/
+├── data/
+│   ├── listings.csv          # Raw seed data (105 listings)
+│   └── processed.json        # Transformed data (generated)
+├── src/
+│   ├── components/           # Astro components
+│   │   ├── Header.astro
+│   │   └── Footer.astro
+│   ├── layouts/
+│   │   └── Layout.astro      # Base layout with SEO
+│   ├── pages/
+│   │   ├── index.astro       # Homepage
+│   │   ├── search.astro     # Search page
+│   │   ├── claim.astro      # Claim listing form
+│   │   ├── featured.astro   # Featured placement
+│   │   ├── [category].astro # Category pages
+│   │   ├── [location].astro # Location pages
+│   │   ├── listing/[slug].astro
+│   │   ├── sitemap.xml.ts
+│   │   └── robots.txt.ts
+│   └── scripts/
+│       └── process-data.ts   # Data pipeline
+├── public/
+│   ├── favicon.svg
+│   └── og-image.png
+├── .github/workflows/
+│   └── deploy.yml           # CI/CD to Cloudflare
+├── astro.config.mjs
+├── tailwind.config.mjs
+└── package.json
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+# Clone the repo
+git clone https://github.com/kirin765/dir-automation-agencies-01.git
+cd dir-automation-agencies-01
+
+# Install dependencies
+npm install
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Visit http://localhost:4321
+
+### Build
+
+```bash
+npm run build
+```
+
+Output will be in the `dist/` directory.
+
+### Preview
+
+```bash
+npm run preview
+```
+
+## 📊 Data Management
+
+### Adding New Listings
+
+1. Edit `data/listings.csv`
+2. Add a new row with the following columns:
+
+```csv
+id,name,platforms,location,country,description,price_min,price_max,rating,review_count,featured,website,email
+```
+
+3. Rebuild the site:
+
+```bash
+npm run build
+```
+
+### Data Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | number | Unique identifier |
+| name | string | Agency name |
+| platforms | string | Comma-separated (zapier,make,n8n) |
+| location | string | City name |
+| country | string | Country name |
+| description | string | Agency description |
+| price_min | number | Minimum project price ($) |
+| price_max | number | Maximum project price ($) |
+| rating | number | Average rating (0-5) |
+| review_count | number | Number of reviews |
+| featured | boolean | Featured listing (true/false) |
+| website | string | Agency website URL |
+| email | string | Contact email |
+
+### Data Processing
+
+The `scripts/process-data.ts` script:
+- Normalizes platform names
+- Creates URL-friendly slugs
+- Deduplicates entries
+- Validates data
+
+## 🌐 Deployment
+
+### Cloudflare Pages (Recommended)
+
+1. Fork this repo
+2. Go to Cloudflare Dashboard → Pages
+3. Connect to GitHub
+4. Select the repo
+5. Build settings:
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+6. Add secrets:
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+7. Deploy!
+
+### Vercel (Alternative)
+
+```bash
+npm i -g vercel
+vercel
+```
+
+## 💰 Monetization
+
+### Current MVP Features
+
+1. **Claim Listing** - Free basic listing for agencies
+2. **Featured Placement** - Paid premium placement
+   - Basic: $29/month
+   - Featured: $49/month
+   - Premium: $99/month
+
+### Future Ideas
+
+- **Lead Generation** - $10-50 per qualified lead
+- **Banner Ads** - $199-499/month
+- **Newsletter Sponsorship** - $500/month
+- **API Access** - $99/month for data access
+
+## 📈 Analytics
+
+Currently includes placeholder for:
+- Google Analytics
+- Plausible Analytics
+- Custom event tracking
+
+## 🔧 Maintenance
+
+### Update Listings
+
+1. Edit CSV
+2. Rebuild
+3. Deploy
+
+### Add New Categories
+
+1. Add platform to CSV data
+2. The category page `/[category].astro` will auto-generate
+
+### Add New Locations
+
+1. Add location to CSV data
+2. The location page will auto-generate
+
+## 📄 License
+
+MIT License
+
+## 🙏 Credits
+
+Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)

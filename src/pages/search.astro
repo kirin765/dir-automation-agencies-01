@@ -1,0 +1,131 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getAll } from '../scripts/process-data';
+
+const q = Astro.url.searchParams.get('q') || '';
+const platform = Astro.url.searchParams.get('platform') || '';
+const location = Astro.url.searchParams.get('location') || '';
+
+let listings = getAll();
+
+// Filter
+if (q) {
+  const searchTerm = q.toLowerCase();
+  listings = listings.filter(l => 
+    l.name.toLowerCase().includes(searchTerm) ||
+    l.description.toLowerCase().includes(searchTerm) ||
+    l.platforms.some(p => p.includes(searchTerm)) ||
+    l.location.toLowerCase().includes(searchTerm) ||
+    l.country.toLowerCase().includes(searchTerm)
+  );
+}
+
+if (platform) {
+  listings = listings.filter(l => l.platforms.includes(platform.toLowerCase()));
+}
+
+if (location) {
+  listings = listings.filter(l => 
+    l.location.toLowerCase().includes(location.toLowerCase()) ||
+    l.country.toLowerCase().includes(location.toLowerCase())
+  );
+}
+
+const platforms = ['zapier', 'make', 'n8n', 'custom'];
+const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
+---
+
+<Layout title={q ? `Search: ${q} - AI Automation Experts` : "Search AI Automation Experts"}>
+  <Header />
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-bold mb-8">Search Automation Experts</h1>
+    
+    <!-- Filters -->
+    <form action="/search" class="mb-8 p-6 bg-slate-800 border border-slate-700 rounded-xl">
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm text-slate-400 mb-2">Search</label>
+          <input 
+            type="text" 
+            name="q" 
+            value={q}
+            placeholder="Name, skill, or keyword..." 
+            class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Platform</label>
+          <select name="platform" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white">
+            <option value="">All Platforms</option>
+            {platforms.map(p => (
+              <option value={p} selected={platform === p} class="capitalize">{p}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Location</label>
+          <select name="location" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white">
+            <option value="">All Locations</option>
+            {countries.map(c => (
+              <option value={c.toLowerCase()} selected={location === c.toLowerCase()}>{c}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <button 
+        type="submit"
+        class="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-lg"
+      >
+        Search
+      </button>
+    </form>
+    
+    <!-- Results -->
+    <p class="text-slate-400 mb-6">{listings.length} results found</p>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {listings.map(listing => (
+        <a 
+          href={`/listing/${listing.slug}`}
+          class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-semibold text-lg">{listing.name}</h3>
+            {listing.featured && (
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                ★
+              </span>
+            )}
+          </div>
+          
+          <div class="flex gap-2 mb-3">
+            {listing.platforms.map(p => (
+              <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
+                {p}
+              </span>
+            ))}
+          </div>
+          
+          <p class="text-slate-400 text-sm mb-4 line-clamp-2">{listing.description}</p>
+          
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
+            <span class="text-slate-500">{listing.location}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+    
+    {listings.length === 0 && (
+      <div class="text-center py-12">
+        <p class="text-slate-400 mb-4">No results found for your search.</p>
+        <a href="/search" class="text-green-400 hover:text-green-300">Clear filters</a>
+      </div>
+    )}
+  </main>
+  
+  <Footer />
+</Layout>
