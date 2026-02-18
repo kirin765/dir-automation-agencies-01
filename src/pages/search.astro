@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getAll } from '../scripts/process-data';
+import { getAll } from '../../scripts/process-data';
 
 const q = Astro.url.searchParams.get('q') || '';
 const platform = Astro.url.searchParams.get('platform') || '';
@@ -94,7 +94,7 @@ const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
         >
           <div class="flex items-start justify-between mb-3">
             <h3 class="font-semibold text-lg">{listing.name}</h3>
-            {listing.featured && (
+            {listing.isFeaturedActive && (
               <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
                 ★
               </span>

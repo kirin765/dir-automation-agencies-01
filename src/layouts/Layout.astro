@@ -4,13 +4,15 @@ interface Props {
   description?: string;
   canonical?: string;
   ogImage?: string;
+  noindex?: boolean;
 }
 
-const { 
-  title, 
-  description = "Find the best AI automation experts - Zapier, Make.com, and n8n specialists. Get quotes from top-rated agencies worldwide.", 
+const {
+  title,
+  description = "Find the best AI automation experts - Zapier, Make.com, and n8n specialists. Get quotes from top-rated agencies worldwide.",
   canonical,
-  ogImage = "/og-image.png"
+  ogImage = "/og-image.png",
+  noindex = false
 } = Astro.props;
 
 const siteUrl = "https://kirin765.github.io/dir-automation-agencies-01";
@@ -24,6 +26,7 @@ const pageUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
   <link rel="canonical" href={pageUrl} />
   
   <!-- OpenGraph -->

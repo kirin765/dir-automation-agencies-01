@@ -1,8 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
-import { getAll, getByCategory } from '../../scripts/process-data';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getByCategory } from '../../scripts/process-data';
 
 export function getStaticPaths() {
   const categories = ['zapier', 'make', 'n8n', 'custom'];
@@ -41,7 +41,7 @@ const pageDesc = `Find top-rated ${category} automation experts and agencies. Br
         >
           <div class="flex items-start justify-between mb-3">
             <h3 class="font-semibold text-lg">{listing.name}</h3>
-            {listing.featured && (
+            {listing.isFeaturedActive && (
               <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
                 ★ Featured
               </span>

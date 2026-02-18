@@ -1,11 +1,11 @@
----
 export const GET = () => {
   const robots = `User-agent: *
 Allow: /
+Disallow: /claim
+Disallow: /contact
+Disallow: /api/
 
 Sitemap: https://kirin765.github.io/dir-automation-agencies-01/sitemap.xml
-
-# Crawl-delay: 1
 `;
 
   return new Response(robots, {
@@ -14,4 +14,3 @@ Sitemap: https://kirin765.github.io/dir-automation-agencies-01/sitemap.xml
     }
   });
 };
----
