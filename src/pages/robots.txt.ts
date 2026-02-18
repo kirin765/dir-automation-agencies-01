@@ -3,7 +3,7 @@ export const GET = () => {
   const robots = `User-agent: *
 Allow: /
 
-Sitemap: https://automation-agencies.com/sitemap.xml
+Sitemap: https://kirin765.github.io/dir-automation-agencies-01/sitemap.xml
 
 # Crawl-delay: 1
 `;

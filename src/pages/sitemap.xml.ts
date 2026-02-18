@@ -2,7 +2,7 @@
 import { getAll, getCategories, getLocations } from '../scripts/process-data';
 
 export async function GET() {
-  const siteUrl = 'https://automation-agencies.com';
+  const siteUrl = 'https://kirin765.github.io/dir-automation-agencies-01';
   const listings = getAll();
   const categories = getCategories();
   const locations = getLocations();
