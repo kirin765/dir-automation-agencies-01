@@ -4,7 +4,7 @@ A production-ready, SEO-focused directory website for AI automation agencies and
 
 ## 🚀 Live Site
 
-**URL:** https://automation-agencies.com
+**URL:** https://kirin765.github.io/dir-automation-agencies-01
 
 ## 📋 Features
 
