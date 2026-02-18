@@ -2,10 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getAll } from '../scripts/process-data';
+import { getAll } from '../../scripts/process-data';
 
 const listings = getAll();
-const featuredListings = listings.filter(l => l.featured).slice(0, 6);
+const featuredListings = listings.filter(l => l.isFeaturedActive).slice(0, 6);
 
 const platforms = ['zapier', 'make', 'n8n', 'custom'];
 const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
