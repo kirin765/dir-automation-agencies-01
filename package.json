@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "deploy:pages": "npm run build && npx wrangler pages deploy dist --project-name=dir-automation-agencies-01 --commit-dirty=true",
     "preview": "astro preview",
     "test": "node scripts/test-pages-workflow.mjs",
     "astro": "astro"

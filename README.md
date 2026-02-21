@@ -180,7 +180,8 @@ The `scripts/process-data.ts` script:
 5. Build settings:
    - Build command: `npm run build`
    - Build output directory: `dist`
-6. Set environment values:
+6. Leave "Deploy command" empty (this is a Pages project, do **not** use `wrangler deploy`).
+7. Set environment values:
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID`
    - `PUBLIC_SITE_URL`
@@ -189,7 +190,19 @@ The `scripts/process-data.ts` script:
    - `CLOUDFLARE_D1_DATABASE_ID`
    - `TURNSTILE_SECRET_KEY` (optional, anti-bot validation)
    - `TURNSTILE_SITE_KEY` (optional, pair with TURNSTILE_SECRET_KEY)
-7. Deploy!
+8. Deploy!
+
+If you deploy from CLI instead, use:
+
+```bash
+npm run deploy:pages
+```
+
+`npm run deploy:pages` is equivalent to:
+
+```bash
+npx wrangler pages deploy dist --project-name=dir-automation-agencies-01
+```
 
 ### API behavior (Cloudflare Pages Functions)
 
