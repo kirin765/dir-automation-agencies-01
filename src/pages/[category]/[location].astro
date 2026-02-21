@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getByCategoryAndLocation, getCountries, getCategories } from '../../../../scripts/process-data';
+
+export function getStaticPaths() {
+  const categories = getCategories();
+  const countries = getCountries();
+  const paths = [];
+
+  for (const category of categories) {
+    for (const country of countries) {
+      paths.push({
+        params: {
+          category,
+          location: country.slug,
+        },
+        props: {
+          category,
+          country,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { category, country } = Astro.props;
+const categories = getCategories();
+const isValidCategory = categories.includes(category);
+const listings = isValidCategory ? getByCategoryAndLocation(category, country.slug) : [];
+
+const titleCategory = `${category.charAt(0).toUpperCase() + category.slice(1)}`;
+const pageTitle = `${titleCategory} in ${country.name} - AI Automation Agencies`;
+const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
+---
+
+<Layout title={pageTitle} description={pageDesc}>
+  <Header />
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+      <a href={`/${category}`} class="text-green-400 hover:text-green-300">← Back to {titleCategory}</a>
+    </div>
+    
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 capitalize">
+      {titleCategory} in {country.name}
+    </h1>
+    <p class="text-slate-400 mb-8">
+      {listings.length} listing(s) found.
+    </p>
+
+    {listings.length === 0 ? (
+      <p class="text-slate-400">No listings yet for this combination.</p>
+    ) : (
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {listings.map(listing => (
+          <a 
+            href={`/listing/${listing.slug}`}
+            data-track="listing_click"
+            data-listing-slug={listing.slug}
+            class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-semibold text-lg">{listing.name}</h3>
+              {listing.isFeaturedActive && (
+                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                  ★ Featured
+                </span>
+              )}
+            </div>
+            <div class="flex gap-2 mb-3">
+              {listing.platforms.map(p => (
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
+                  {p}
+                </span>
+              ))}
+            </div>
+            <p class="text-slate-400 text-sm mb-4 line-clamp-2">
+              {listing.description}
+            </p>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
+              <span class="text-slate-500">📍 {listing.location}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </main>
+  
+  <Footer />
+</Layout>

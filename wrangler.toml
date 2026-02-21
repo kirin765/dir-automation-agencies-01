@@ -1,0 +1,15 @@
+name = "dir-automation-agencies-01"
+compatibility_date = "2026-02-21"
+pages_build_output_dir = "dist"
+compatibility_flags = ["nodejs_compat"]
+[vars]
+PUBLIC_SITE_URL = "https://automationagencydirectory.com"
+PUBLIC_BASE_PATH = "/"
+ADMIN_API_KEY = "REPLACE_WITH_ADMIN_API_KEY"
+TURNSTILE_SECRET_KEY = ""
+TURNSTILE_SITE_KEY = ""
+
+[[d1_databases]]
+binding = "DB"
+database_name = "automation_agencies"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

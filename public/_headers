@@ -1,0 +1,23 @@
+/*
+  Cache-Control: public, max-age=86400
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/api/*
+  Cache-Control: no-store, max-age=0, must-revalidate
+
+/api/contact
+/api/claim
+/api/contact/
+/api/claim/
+  Cache-Control: no-store
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/listing/*
+  Cache-Control: public, max-age=1800

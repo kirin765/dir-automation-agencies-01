@@ -2,7 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { getAll, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
+import { getAll, getByCountry, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
+import { GUIDE_DATA } from '../../lib/guides';
 
 export function getStaticPaths() {
   const listings = getAll();
@@ -15,6 +16,14 @@ export function getStaticPaths() {
 const { listing } = Astro.props;
 const requestStatus = getOwnershipRequestStatusBySlug(listing.slug);
 const leadSuccess = Astro.url.searchParams.get('lead') === 'ok';
+const sameCountryListings = getByCountry(listing.country)
+  .filter((entry) => entry.slug !== listing.slug)
+  .slice(0, 4);
+const guideLinks = GUIDE_DATA
+  .filter((guide) =>
+    guide.relatedCategories.some((category) => listing.platforms.includes(category))
+  )
+  .slice(0, 2);
 
 const schema = {
   '@context': 'https://schema.org',
@@ -32,7 +41,8 @@ const schema = {
     ratingValue: listing.rating,
     reviewCount: listing.reviewCount
   },
-  url: listing.website
+  url: listing.website,
+  mainEntityOfPage: listing.website,
 };
 ---
 
@@ -88,19 +98,25 @@ const schema = {
         <a
           href={listing.website}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
+          data-track="listing_click"
+          data-listing-slug={listing.slug}
           class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl text-center transition-colors"
         >
           Visit Website
         </a>
         <a
           href={`/contact?agency=${listing.slug}`}
+          data-track="cta_click"
+          data-listing-slug={listing.slug}
           class="px-6 py-3 border border-slate-600 hover:border-white text-white font-semibold rounded-xl text-center transition-colors"
         >
           Contact Agency
         </a>
         <a
           href={`/claim?listing=${listing.slug}`}
+          data-track="cta_click"
+          data-listing-slug={listing.slug}
           class="px-6 py-3 border border-green-500 text-green-300 hover:bg-green-500/10 font-semibold rounded-xl text-center transition-colors"
         >
           Claim this Listing
@@ -120,7 +136,14 @@ const schema = {
 
       {leadSuccess && <p class="mb-4 text-green-400">Thanks! Your inquiry was submitted.</p>}
 
-      <form method="POST" action="/api/contact" class="space-y-4">
+      <form
+        method="POST"
+        action="/api/contact"
+        class="space-y-4"
+        data-track-form="lead_form_submit"
+        data-listing={listing.slug}
+      >
+        <input type="hidden" name="cf-turnstile-response" value="" />
         <input type="hidden" name="listingSlug" value={listing.slug} />
         <div class="grid md:grid-cols-2 gap-4">
           <input name="name" required placeholder="Your name" class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white" />
@@ -128,8 +151,57 @@ const schema = {
         </div>
         <input name="budget" placeholder="Budget (optional)" class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white" />
         <textarea name="message" required rows="4" placeholder="What do you need automated?" class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"></textarea>
-        <button type="submit" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl">Send Inquiry</button>
+        <button
+          type="submit"
+          data-track="lead_form_submit"
+          data-listing-slug={listing.slug}
+          class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl"
+        >
+          Send Inquiry
+        </button>
       </form>
+    </div>
+
+    <div class="mt-10 grid md:grid-cols-2 gap-6">
+      <section class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-3">More {listing.location} agencies</h2>
+        <div class="space-y-3">
+          {sameCountryListings.map((entry) => (
+            <a
+              href={`/listing/${entry.slug}`}
+              data-track="listing_click"
+              data-listing-slug={entry.slug}
+              class="flex justify-between items-center text-sm text-slate-300 hover:text-white"
+            >
+              <span>{entry.name}</span>
+              <span>${entry.priceMin}-${entry.priceMax}</span>
+            </a>
+          ))}
+          {!sameCountryListings.length && (
+            <p class="text-slate-400 text-sm">No additional listings found in this location yet.</p>
+          )}
+        </div>
+      </section>
+
+      <section class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-3">Related guide pages</h2>
+        <div class="space-y-3">
+          {guideLinks.map((guide) => (
+            <a
+              href={`/guides/${guide.slug}`}
+              data-track="guide_click"
+              class="block text-sm text-slate-300 hover:text-green-300"
+            >
+              {guide.title}
+            </a>
+          ))}
+          {!guideLinks.length && (
+            <a href="/guides" data-track="guide_click" class="text-sm text-slate-300 hover:text-green-300">
+              Explore all guides
+            </a>
+          )}
+        </div>
+      </section>
     </div>
 
     <div class="mt-12 prose prose-invert max-w-none">

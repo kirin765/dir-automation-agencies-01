@@ -2,13 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getAll } from '../../scripts/process-data';
+import { getAll, getCountries } from '../../scripts/process-data';
 
 const listings = getAll();
 const featuredListings = listings.filter(l => l.isFeaturedActive).slice(0, 6);
 
 const platforms = ['zapier', 'make', 'n8n', 'custom'];
-const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
+const locations = getCountries();
 ---
 
 <Layout title="AI Automation Agencies Directory | Find Zapier, Make.com & n8n Experts">
@@ -29,7 +29,7 @@ const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
       </p>
       
       <!-- Search -->
-      <form action="/search" class="max-w-xl mx-auto">
+      <form action="/search" class="max-w-xl mx-auto" data-track-form="search_submit">
         <div class="flex gap-2">
           <input 
             type="text" 
@@ -72,6 +72,7 @@ const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
         {platforms.map(platform => (
           <a 
             href={`/${platform}`}
+            data-track="category_click"
             class="p-6 bg-slate-800 border border-slate-700 rounded-xl text-center card-hover hover:border-green-500"
           >
             <div class="text-2xl font-bold capitalize mb-1">{platform}</div>
@@ -134,10 +135,11 @@ const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
       <div class="flex flex-wrap justify-center gap-4">
         {locations.map(location => (
           <a 
-            href={`/${location}`}
+            href={`/location/${location.slug}`}
+            data-track="location_click"
             class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-full hover:border-green-500 transition-colors capitalize"
           >
-            {location}
+            {location.name}
           </a>
         ))}
       </div>
@@ -154,17 +156,19 @@ const locations = ['usa', 'uk', 'germany', 'india', 'canada', 'australia'];
           Get leads, build your brand, and grow your business.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a 
-            href="/claim"
-            class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl transition-colors"
-          >
-            Claim Your Listing
-          </a>
-          <a 
-            href="/featured"
-            class="px-6 py-3 border border-slate-600 hover:border-white text-white font-semibold rounded-xl transition-colors"
-          >
-            Get Featured
+        <a 
+          href="/claim"
+          data-track="cta_click"
+          class="px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl transition-colors"
+        >
+          Claim Your Listing
+        </a>
+        <a 
+          href="/featured"
+          data-track="cta_click"
+          class="px-6 py-3 border border-slate-600 hover:border-white text-white font-semibold rounded-xl transition-colors"
+        >
+          Get Featured
           </a>
         </div>
       </div>

@@ -1,0 +1,65 @@
+---
+import { GUIDE_DATA } from '../../lib/guides';
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+
+export function getStaticPaths() {
+  return GUIDE_DATA.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+
+const relatedLinks = guide.relatedCategories.map((category) => ({
+  label: `${category} experts`,
+  href: `/${category}`,
+}));
+
+---
+
+<Layout title={guide.title} description={guide.summary}>
+  <Header />
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <a href="/guides" class="text-green-400 hover:text-green-300 mb-6 inline-block">← Back to Guides</a>
+
+    <p class="text-xs uppercase text-green-400 mb-2">{guide.category}</p>
+    <h1 class="text-4xl font-bold mb-4">{guide.bodyTitle}</h1>
+    <p class="text-slate-300 mb-10">{guide.summary}</p>
+
+    <section class="space-y-8">
+      {guide.sections.map((section) => (
+        <article class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+          <h2 class="text-2xl font-semibold mb-3">{section.heading}</h2>
+          <p class="text-slate-300 leading-relaxed">{section.text}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold mb-4">Explore related pages</h2>
+      <div class="flex flex-wrap gap-3">
+        {relatedLinks.map((link) => (
+          <a
+            href={link.href}
+            class="px-4 py-2 border border-slate-700 hover:border-green-400 rounded-full"
+          >
+            {link.label}
+          </a>
+        ))}
+        <a
+          href="/contact"
+          data-track="guide-cta-contact"
+          class="px-4 py-2 border border-slate-700 hover:border-green-400 rounded-full"
+        >
+          Start a project inquiry
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

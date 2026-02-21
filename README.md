@@ -4,7 +4,8 @@ A production-ready, SEO-focused directory website for AI automation agencies and
 
 ## 🚀 Live Site
 
-**URL:** https://kirin765.github.io/dir-automation-agencies-01
+**URL:** https://automationagencydirectory.com
+**Deployment URL:** Set `PUBLIC_SITE_URL` in Cloudflare deployment environment.
 
 ## 📋 Features
 
@@ -13,7 +14,8 @@ A production-ready, SEO-focused directory website for AI automation agencies and
 - **Location Pages:** USA, UK, Germany, India, Australia, and 40+ countries
 - **Programmatic SEO Pages:**
   - `/[category]/` - Category pages (e.g., /zapier, /make, /n8n)
-  - `/[location]/` - Location pages (e.g., /usa, /uk)
+  - `/location/[location]` - Location pages (e.g., /location/usa, /location/uk)
+  - `/[category]/[location]` - Category + country matrix pages (e.g., /zapier/usa)
   - `/listing/[slug]` - Individual listing pages
 - **Fast Client-Side Search** with filters
 - **SEO Optimized:**
@@ -48,22 +50,37 @@ A production-ready, SEO-focused directory website for AI automation agencies and
 │   ├── layouts/
 │   │   └── Layout.astro      # Base layout with SEO
 │   ├── pages/
-│   │   ├── index.astro       # Homepage
-│   │   ├── search.astro     # Search page
-│   │   ├── claim.astro      # Claim listing form
-│   │   ├── featured.astro   # Featured placement
-│   │   ├── [category].astro # Category pages
-│   │   ├── [location].astro # Location pages
+│   │   ├── index.astro           # Homepage
+│   │   ├── search.astro          # Search page
+│   │   ├── claim.astro           # Claim listing form
+│   │   ├── featured.astro        # Featured placement
+│   │   ├── [category].astro      # Category pages
+│   │   ├── [location].astro      # Location pages
+│   │   ├── [category]/[location].astro # Category + location pages
 │   │   ├── listing/[slug].astro
 │   │   ├── sitemap.xml.ts
 │   │   └── robots.txt.ts
-│   └── scripts/
-│       └── process-data.ts   # Data pipeline
+├── scripts/
+│   └── process-data.ts      # Data pipeline
+├── functions/
+│   ├── api/
+│   │   ├── contact.ts
+│   │   ├── claim.ts
+│   │   ├── listings.ts
+│   │   ├── admin/
+│   │   │   ├── leads.ts
+│   │   │   └── ownership-requests.ts
+│   │   └── sitemap-refresh.ts
+│   └── api/_shared/           # Shared validation/storage helpers
+│       ├── validation.ts
+│       └── storage.ts
+├── docs/
+│   └── d1-schema.sql           # D1 schema
 ├── public/
 │   ├── favicon.svg
 │   └── og-image.png
 ├── .github/workflows/
-│   └── deploy.yml           # CI/CD to Cloudflare
+│   └── deploy-cloudflare-pages.yml  # CI/CD to Cloudflare Pages
 ├── astro.config.mjs
 ├── tailwind.config.mjs
 └── package.json
@@ -163,10 +180,30 @@ The `scripts/process-data.ts` script:
 5. Build settings:
    - Build command: `npm run build`
    - Build output directory: `dist`
-6. Add secrets:
+6. Set environment values:
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID`
+   - `PUBLIC_SITE_URL`
+   - `PUBLIC_BASE_PATH` (optional)
+   - `ADMIN_API_KEY` (admin endpoints)
+   - `CLOUDFLARE_D1_DATABASE_ID`
+   - `TURNSTILE_SECRET_KEY` (optional, anti-bot validation)
+   - `TURNSTILE_SITE_KEY` (optional, pair with TURNSTILE_SECRET_KEY)
 7. Deploy!
+
+### API behavior (Cloudflare Pages Functions)
+
+- `/api/contact` (POST): write into `lead_submissions`
+- `/api/claim` (POST): write into `ownership_requests`
+- `/api/listings` (GET): optional listing feed with query filters
+- `/api/admin/leads` (GET): admin-only list of leads using `x-admin-key`
+- `/api/admin/ownership-requests` (GET): admin-only list using `x-admin-key`
+- `/api/admin/update-lead` (POST): admin-only update lead status (`new|contacted|closed`)
+- `/api/admin/update-ownership` (POST): admin-only update ownership request status (`pending|approved|rejected`)
+- `/api/admin/listings` (POST): admin-only update listing flags (`featured`, `verified`, `featuredUntil`)
+- `/api/admin/metrics` (GET): admin-only dashboard counters for lead/ownership/events
+- `/api/events` (POST): internal behavior tracking endpoint (`listing_view`, `cta_click`, etc.)
+- `/api/health` (GET): basic operational health and database status
 
 ### Vercel (Alternative)
 
@@ -199,6 +236,11 @@ Currently includes placeholder for:
 - Plausible Analytics
 - Custom event tracking
 
+## 🧰 Operations
+
+Runbook: [docs/ops-runbook.md](docs/ops-runbook.md)
+Phase 5 운영 체크리스트: [docs/phase5-completion-checklist.md](docs/phase5-completion-checklist.md)
+
 ## 🔧 Maintenance
 
 ### Update Listings
@@ -215,7 +257,7 @@ Currently includes placeholder for:
 ### Add New Locations
 
 1. Add location to CSV data
-2. The location page will auto-generate
+2. `/location/{slug}` and `/{category}/{slug}` pages auto-generate
 
 ## 📄 License
 

@@ -28,7 +28,15 @@ const success = Astro.url.searchParams.get('submitted') === '1';
       </p>
     )}
 
-    <form method="POST" action="/api/claim" class="space-y-6">
+    <form
+      method="POST"
+      action="/api/claim"
+      class="space-y-6"
+      data-track-form="claim_form_submit"
+      data-listing={selectedSlug || ''}
+    >
+      <input type="text" name="hp" tabindex="-1" autocomplete="off" class="absolute -left-[9999px]" />
+      <input type="hidden" name="cf-turnstile-response" value="" />
       <div>
         <label class="block text-sm text-slate-400 mb-2">Listing *</label>
         <select name="listingSlug" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white">

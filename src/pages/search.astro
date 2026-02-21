@@ -2,11 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getAll } from '../../scripts/process-data';
+import { getAll, getCountries } from '../../scripts/process-data';
 
 const q = Astro.url.searchParams.get('q') || '';
 const platform = Astro.url.searchParams.get('platform') || '';
 const location = Astro.url.searchParams.get('location') || '';
+const countries = getCountries();
+const normalizeCountryKey = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 let listings = getAll();
 
@@ -27,14 +29,11 @@ if (platform) {
 }
 
 if (location) {
-  listings = listings.filter(l => 
-    l.location.toLowerCase().includes(location.toLowerCase()) ||
-    l.country.toLowerCase().includes(location.toLowerCase())
-  );
+  const target = normalizeCountryKey(location);
+  listings = listings.filter(l => normalizeCountryKey(l.country) === target);
 }
 
 const platforms = ['zapier', 'make', 'n8n', 'custom'];
-const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
 ---
 
 <Layout title={q ? `Search: ${q} - AI Automation Experts` : "Search AI Automation Experts"}>
@@ -44,8 +43,12 @@ const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
     <h1 class="text-3xl font-bold mb-8">Search Automation Experts</h1>
     
     <!-- Filters -->
-    <form action="/search" class="mb-8 p-6 bg-slate-800 border border-slate-700 rounded-xl">
-      <div class="grid md:grid-cols-4 gap-4">
+    <form
+      action="/search"
+      class="mb-8 p-6 bg-slate-800 border border-slate-700 rounded-xl"
+      data-track-form="search_submit"
+    >
+    <div class="grid md:grid-cols-4 gap-4">
         <div class="md:col-span-2">
           <label class="block text-sm text-slate-400 mb-2">Search</label>
           <input 
@@ -69,8 +72,8 @@ const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
           <label class="block text-sm text-slate-400 mb-2">Location</label>
           <select name="location" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white">
             <option value="">All Locations</option>
-            {countries.map(c => (
-              <option value={c.toLowerCase()} selected={location === c.toLowerCase()}>{c}</option>
+            {countries.map(country => (
+              <option value={country.slug} selected={location === country.slug}>{country.name}</option>
             ))}
           </select>
         </div>
@@ -88,10 +91,12 @@ const countries = ['USA', 'UK', 'Germany', 'India', 'Canada', 'Australia'];
     
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {listings.map(listing => (
-        <a 
-          href={`/listing/${listing.slug}`}
-          class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
-        >
+      <a 
+        href={`/listing/${listing.slug}`}
+        data-track="listing_click"
+        data-listing-slug={listing.slug}
+        class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+      >
           <div class="flex items-start justify-between mb-3">
             <h3 class="font-semibold text-lg">{listing.name}</h3>
             {listing.isFeaturedActive && (

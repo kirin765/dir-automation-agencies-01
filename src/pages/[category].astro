@@ -2,10 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getByCategory } from '../../scripts/process-data';
+import { getByCategory, getCategories } from '../../scripts/process-data';
 
 export function getStaticPaths() {
-  const categories = ['zapier', 'make', 'n8n', 'custom'];
+  const categories = getCategories();
   return categories.map(category => ({
     params: { category },
     props: { category }
@@ -34,11 +34,13 @@ const pageDesc = `Find top-rated ${category} automation experts and agencies. Br
     </p>
     
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {listings.map(listing => (
-        <a 
-          href={`/listing/${listing.slug}`}
-          class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
-        >
+        {listings.map(listing => (
+          <a 
+            href={`/listing/${listing.slug}`}
+            data-track="listing_click"
+            data-listing-slug={listing.slug}
+            class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
+          >
           <div class="flex items-start justify-between mb-3">
             <h3 class="font-semibold text-lg">{listing.name}</h3>
             {listing.isFeaturedActive && (
@@ -74,6 +76,14 @@ const pageDesc = `Find top-rated ${category} automation experts and agencies. Br
         </a>
       ))}
     </div>
+
+    <section class="mt-10 bg-slate-800 border border-slate-700 rounded-2xl p-6">
+      <h2 class="text-2xl font-bold mb-3">Need location-specific results?</h2>
+      <p class="text-slate-400 mb-4">Narrow down by browsing location pages for this category.</p>
+      <a href={`/search?platform=${category}`} class="inline-block px-4 py-2 bg-green-500 rounded-lg text-black font-semibold">
+        Search by location
+      </a>
+    </section>
   </main>
   
   <Footer />
