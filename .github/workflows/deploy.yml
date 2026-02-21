@@ -1,12 +1,13 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
+  # Disabled: production deployment is managed only via Cloudflare Pages.
+  # Keep this workflow for local reference, but it is intentionally turned off.
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
