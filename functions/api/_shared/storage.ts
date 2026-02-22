@@ -211,6 +211,17 @@ export async function queryOwnershipRequests(db, filters = {}) {
   return rows.results || [];
 }
 
+export async function getOwnershipRequestById(db, id) {
+  assertDbAvailable(db, 'ownership request lookup');
+
+  const row = await db
+    .prepare('SELECT * FROM ownership_requests WHERE id = ?1 LIMIT 1')
+    .bind(id)
+    .first();
+
+  return row || null;
+}
+
 export async function updateLeadStatus(db, id, status) {
   assertDbAvailable(db, 'lead status update');
 
@@ -263,6 +274,26 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
     params.push(fields.verified ? 1 : 0);
   }
 
+  if (typeof fields.source === 'string') {
+    updates.push(`source = ?${updates.length + 1}`);
+    params.push(fields.source);
+  }
+
+  if (typeof fields.sourceRef === 'string') {
+    updates.push(`source_ref = ?${updates.length + 1}`);
+    params.push(fields.sourceRef || null);
+  }
+
+  if (typeof fields.verificationMethod === 'string') {
+    updates.push(`verification_method = ?${updates.length + 1}`);
+    params.push(fields.verificationMethod || 'none');
+  }
+
+  if (typeof fields.verifiedAt === 'string') {
+    updates.push(`verified_at = ?${updates.length + 1}`);
+    params.push(fields.verifiedAt || null);
+  }
+
   if (typeof fields.featuredUntil === 'string') {
     updates.push(`featured_until = ?${updates.length + 1}`);
     params.push(fields.featuredUntil || null);
@@ -277,9 +308,21 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
     return;
   }
 
-  const featuredClauseIndex = params.length + 1;
-  updates.push(`featured_active = ?${featuredClauseIndex}`);
-  params.push(fields.featuredActive ? 1 : fields.featured ? 1 : 0);
+  const shouldUpdateFeaturedActive =
+    typeof fields.featuredActive === 'boolean' ||
+    typeof fields.featured === 'boolean' ||
+    typeof fields.featuredUntil === 'string';
+  if (shouldUpdateFeaturedActive) {
+    const featuredClauseIndex = params.length + 1;
+    updates.push(`featured_active = ?${featuredClauseIndex}`);
+    if (typeof fields.featuredActive === 'boolean') {
+      params.push(fields.featuredActive ? 1 : 0);
+    } else if (typeof fields.featured === 'boolean') {
+      params.push(fields.featured ? 1 : 0);
+    } else {
+      params.push(fields.featuredUntil ? 1 : 0);
+    }
+  }
 
   params.push(slug);
 

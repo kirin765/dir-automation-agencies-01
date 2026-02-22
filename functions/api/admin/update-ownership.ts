@@ -1,4 +1,4 @@
-import { getDb, updateOwnershipRequestStatus } from '../_shared/storage';
+import { getDb, getOwnershipRequestById, updateOwnershipRequestStatus, upsertListingBySlug } from '../_shared/storage';
 
 function isAuthorized(request, env) {
   const authHeader = request.headers.get('x-admin-key');
@@ -35,7 +35,45 @@ export async function onRequestPost(context) {
 
   const db = getDb(env);
   try {
+    const requestRow = await getOwnershipRequestById(db, id);
+    if (!requestRow) {
+      throw new Error('Ownership request not found.');
+    }
+
+    const listingSlug = String(requestRow.listing_slug || '').trim();
+
     await updateOwnershipRequestStatus(db, id, status);
+
+    const trySetVerification = async (payload) => {
+      try {
+        await upsertListingBySlug(db, listingSlug, payload);
+      } catch (error) {
+        const message = String(error instanceof Error ? error.message : '').toLowerCase();
+        if (!message.includes('no such column')) {
+          throw error;
+        }
+        await upsertListingBySlug(db, listingSlug, {
+          verified: Boolean(payload.verified),
+        });
+      }
+    };
+
+    if (status === 'approved' && listingSlug) {
+      await trySetVerification({
+        verified: true,
+        source: 'verified_manual',
+        sourceRef: String(requestRow.requester_email || requestRow.website || ''),
+        verificationMethod: 'manual_review',
+        verifiedAt: new Date().toISOString(),
+      });
+    } else if (status === 'rejected' && listingSlug) {
+      await trySetVerification({
+        verified: false,
+        verificationMethod: 'none',
+        verifiedAt: '',
+      });
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
