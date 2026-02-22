@@ -4,6 +4,13 @@ import { parse } from 'csv-parse/sync';
 import slugify from 'slugify';
 
 export type OwnershipRequestStatus = 'pending' | 'approved' | 'rejected';
+export type ListingSource = 'seed_generated' | 'user_submitted' | 'verified_manual' | 'public_api';
+export type VerificationMethod =
+  | 'none'
+  | 'email'
+  | 'phone'
+  | 'manual_review'
+  | 'api_match';
 
 export interface Listing {
   id: number;
@@ -25,6 +32,10 @@ export interface Listing {
   website: string;
   email: string;
   slug: string;
+  source: ListingSource;
+  sourceRef: string;
+  verificationMethod: VerificationMethod;
+  verifiedAt: string;
   verified: boolean;
 }
 
@@ -138,6 +149,38 @@ function parseFloatSafe(value: string | undefined, fallback = 0): number {
   return Number.isNaN(parsed) ? fallback : parsed;
 }
 
+function parseBoolean(value: string | undefined, fallback = false): boolean {
+  const normalized = normalizeText((value || '').toLowerCase());
+  if (!normalized) return fallback;
+  return ['1', 'true', 'yes', 'y', 'on'].includes(normalized);
+}
+
+function normalizeSource(value: string | undefined): ListingSource {
+  const normalized = normalizeText((value || '').toLowerCase());
+  if (
+    normalized === 'seed_generated' ||
+    normalized === 'user_submitted' ||
+    normalized === 'verified_manual' ||
+    normalized === 'public_api'
+  ) {
+    return normalized;
+  }
+  return 'seed_generated';
+}
+
+function normalizeVerificationMethod(value: string | undefined): VerificationMethod {
+  const normalized = normalizeText((value || '').toLowerCase());
+  if (
+    normalized === 'email' ||
+    normalized === 'phone' ||
+    normalized === 'manual_review' ||
+    normalized === 'api_match'
+  ) {
+    return normalized;
+  }
+  return 'none';
+}
+
 function priorityScoreFor(listing: Omit<Listing, 'priorityScore'>): number {
   const featuredBoost = listing.isFeaturedActive ? 1_000_000 : 0;
   const ratingBoost = Math.round(listing.rating * 10_000);
@@ -189,8 +232,12 @@ function processData(): Listing[] {
       isFeaturedActive: isFeaturedActive(featured, featuredUntil),
       website: normalizeText(record.website),
       email: normalizeText(record.email),
+      source: normalizeSource(record.source),
+      sourceRef: normalizeText(record.source_ref),
+      verificationMethod: normalizeVerificationMethod(record.verification_method),
+      verifiedAt: normalizeText(record.verified_at),
+      verified: parseBoolean(record.verified, false),
       slug,
-      verified: false,
     };
 
     return {
@@ -301,6 +348,14 @@ export function getBySlugOrFail(slug: string): Listing | null {
 
 export function getAll(): Listing[] {
   return processData();
+}
+
+export function getVerified(): Listing[] {
+  return getAll().filter((listing) => listing.verified);
+}
+
+export function getPublished(): Listing[] {
+  return getAll().filter((listing) => listing.verified || listing.source === 'seed_generated');
 }
 
 if (process.argv[1]?.includes('process-data')) {
