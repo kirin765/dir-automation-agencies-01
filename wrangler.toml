@@ -12,4 +12,4 @@ TURNSTILE_SITE_KEY = ""
 [[d1_databases]]
 binding = "DB"
 database_name = "automation_agencies"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "0bf830b5-85cd-4c04-9a09-03265eb579b3"
