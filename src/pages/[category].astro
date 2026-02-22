@@ -16,9 +16,10 @@ const { category } = Astro.props;
 const listings = getByCategory(category);
 const pageTitle = `${category.charAt(0).toUpperCase() + category.slice(1)} Experts - AI Automation Agencies`;
 const pageDesc = `Find top-rated ${category} automation experts and agencies. Browse ${listings.length} specialists worldwide.`;
+const hasListings = listings.length > 0;
 ---
 
-<Layout title={pageTitle} description={pageDesc}>
+<Layout title={pageTitle} description={pageDesc} noindex={!hasListings}>
   <Header />
   
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -33,7 +34,8 @@ const pageDesc = `Find top-rated ${category} automation experts and agencies. Br
       {listings.length} automation specialists available
     </p>
     
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {hasListings ? (
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map(listing => (
           <a 
             href={`/listing/${listing.slug}`}
@@ -41,41 +43,54 @@ const pageDesc = `Find top-rated ${category} automation experts and agencies. Br
             data-listing-slug={listing.slug}
             class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
           >
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="font-semibold text-lg">{listing.name}</h3>
-            {listing.isFeaturedActive && (
-              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
-                ★ Featured
-              </span>
-            )}
-          </div>
-          
-          <div class="flex gap-2 mb-3">
-            {listing.platforms.map(p => (
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
-                {p}
-              </span>
-            ))}
-          </div>
-          
-          <p class="text-slate-400 text-sm mb-4 line-clamp-2">
-            {listing.description}
-          </p>
-          
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
-            <span class="text-slate-500">📍 {listing.location}</span>
-          </div>
-          
-          {listing.rating > 0 && (
-            <div class="mt-3 text-yellow-400">
-              {'★'.repeat(Math.floor(listing.rating))}
-              <span class="text-slate-500 text-sm ml-1">({listing.reviewCount})</span>
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-semibold text-lg">{listing.name}</h3>
+              {listing.isFeaturedActive && (
+                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                  ★ Featured
+                </span>
+              )}
             </div>
-          )}
-        </a>
-      ))}
-    </div>
+            
+            <div class="flex gap-2 mb-3">
+              {listing.platforms.map(p => (
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
+                  {p}
+                </span>
+              ))}
+            </div>
+            
+            <p class="text-slate-400 text-sm mb-4 line-clamp-2">
+              {listing.description}
+            </p>
+            
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-green-400">${listing.priceMin}-${listing.priceMax}</span>
+              <span class="text-slate-500">📍 {listing.location}</span>
+            </div>
+            
+            {listing.rating > 0 && (
+              <div class="mt-3 text-yellow-400">
+                {'★'.repeat(Math.floor(listing.rating))}
+                <span class="text-slate-500 text-sm ml-1">({listing.reviewCount})</span>
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    ) : (
+      <section class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+        <h2 class="text-2xl font-bold mb-3">No verified listing yet in this category</h2>
+        <p class="text-slate-400 mb-4">
+          This section is open for invited verification. If your team offers verified {category} automation services,
+          request a listing and get featured opportunities after review.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="/claim" class="px-4 py-2 bg-green-500 text-black rounded-lg font-semibold">Claim this category</a>
+          <a href="/contact" class="px-4 py-2 border border-slate-600 rounded-lg hover:border-white">Talk to us</a>
+        </div>
+      </section>
+    )}
 
     <section class="mt-10 bg-slate-800 border border-slate-700 rounded-2xl p-6">
       <h2 class="text-2xl font-bold mb-3">Need location-specific results?</h2>

@@ -19,6 +19,9 @@ const success = Astro.url.searchParams.get('submitted') === '1';
     <p class="text-slate-400 mb-8">
       Already listed? Submit an ownership request and we will verify your account.
     </p>
+    <p class="text-slate-500 mb-8 text-sm">
+      This directory displays only verified agencies. Reviews are available once your ownership is approved.
+    </p>
 
     {success && <p class="mb-4 text-green-400">Claim request received. We will review it within 2 business days.</p>}
 

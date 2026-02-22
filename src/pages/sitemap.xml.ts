@@ -1,4 +1,4 @@
-import { getVerified, getCategories, getCountries } from '../../scripts/process-data';
+import { getByCategoryAndCountry, getVerified, getCategories, getCountries } from '../../scripts/process-data';
 import { GUIDE_INDEX } from '../lib/guides';
 import { SITE_URL } from '../lib/site';
 
@@ -6,6 +6,11 @@ export async function GET() {
   const listings = getVerified();
   const categories = getCategories();
   const countries = getCountries();
+  const categoryCountryPages = categories.flatMap((category) =>
+    countries
+      .filter((country) => getByCategoryAndCountry(category, country.slug).length > 0)
+      .map((country) => `/${category}/${country.slug}`)
+  );
 
   const pages = [
     '',
@@ -19,7 +24,7 @@ export async function GET() {
     '/featured',
     ...categories.map((category) => `/${category}`),
     ...countries.map((country) => `/location/${country.slug}`),
-    ...categories.flatMap((category) => countries.map((country) => `/${category}/${country.slug}`)),
+    ...categoryCountryPages,
     ...listings.map((listing) => `/listing/${listing.slug}`),
     '/guides',
     ...GUIDE_INDEX.map((guide) => `/guides/${guide.slug}`),
