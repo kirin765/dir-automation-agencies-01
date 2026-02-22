@@ -2,11 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { getAll, getByCountry, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
+import { getVerified, getByCountry, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
 import { GUIDE_DATA } from '../../lib/guides';
 
 export function getStaticPaths() {
-  const listings = getAll();
+  const listings = getVerified();
   return listings.map(listing => ({
     params: { slug: listing.slug },
     props: { listing }

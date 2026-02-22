@@ -1,9 +1,9 @@
-import { getAll, getCategories, getCountries } from '../../scripts/process-data';
+import { getVerified, getCategories, getCountries } from '../../scripts/process-data';
 import { GUIDE_INDEX } from '../lib/guides';
 import { SITE_URL } from '../lib/site';
 
 export async function GET() {
-  const listings = getAll();
+  const listings = getVerified();
   const categories = getCategories();
   const countries = getCountries();
 

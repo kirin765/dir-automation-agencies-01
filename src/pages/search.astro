@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getAll, getCountries } from '../../scripts/process-data';
+import { getCountries, getVerified } from '../../scripts/process-data';
 
 const q = Astro.url.searchParams.get('q') || '';
 const platform = Astro.url.searchParams.get('platform') || '';
@@ -10,7 +10,7 @@ const location = Astro.url.searchParams.get('location') || '';
 const countries = getCountries();
 const normalizeCountryKey = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-let listings = getAll();
+let listings = getVerified();
 
 // Filter
 if (q) {

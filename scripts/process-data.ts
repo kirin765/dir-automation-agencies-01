@@ -277,14 +277,14 @@ export function getLeadSubmissionsCount(): number {
 }
 
 export function getCategories(): string[] {
-  const listings = processData();
+  const listings = getVerified();
   const categories = new Set<string>();
   listings.forEach((listing) => listing.platforms.forEach((platform) => categories.add(platform)));
   return Array.from(categories).sort();
 }
 
 export function getCountries(): LocationPage[] {
-  const listings = processData();
+  const listings = getVerified();
   const countries = new Map<string, string>();
   listings.forEach((listing) => {
     const slug = normalizeCountryKey(listing.country);
@@ -306,13 +306,13 @@ export function getLocations(): string[] {
 }
 
 export function getByCategory(category: string): Listing[] {
-  const listings = processData();
+  const listings = getVerified();
   const target = category.toLowerCase().trim();
   return listings.filter((listing) => listing.platforms.includes(target));
 }
 
 export function getByCountry(location: string): Listing[] {
-  const listings = processData();
+  const listings = getVerified();
   const target = normalizeCountryKey(location);
   return listings.filter((listing) => normalizeCountryKey(listing.country) === target);
 }
@@ -323,7 +323,7 @@ export function getByLocation(location: string): Listing[] {
 }
 
 export function getByCategoryAndCountry(category: string, country: string): Listing[] {
-  const listings = processData();
+  const listings = getVerified();
   const targetCategory = category.toLowerCase().trim();
   const targetCountry = normalizeCountryKey(country);
   return listings.filter(
@@ -338,7 +338,7 @@ export function getByCategoryAndLocation(category: string, location: string): Li
 }
 
 export function getBySlug(slug: string): Listing | undefined {
-  const listings = processData();
+  const listings = getVerified();
   return listings.find((listing) => listing.slug === slug);
 }
 
