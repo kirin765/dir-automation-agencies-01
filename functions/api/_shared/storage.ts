@@ -1,3 +1,5 @@
+import slugify from 'slugify';
+
 const rateBuckets = new Map();
 const ONE_MINUTE = 60_000;
 
@@ -13,6 +15,51 @@ function assertDbAvailable(db, action = 'database') {
   if (!db?.prepare) {
     throw new Error(`No D1 database bound. Configure DB binding for ${action}.`);
   }
+}
+
+function normalizePlatformCsv(platforms) {
+  if (!Array.isArray(platforms)) return '';
+
+  return [...new Set(platforms.map((value) => String(value || '').trim().toLowerCase()).filter(Boolean))].join(
+    ','
+  );
+}
+
+function normalizeSlugText(value) {
+  return slugify(String(value || '').trim(), {
+    lower: true,
+    strict: true,
+  });
+}
+
+export async function isListingSlugTaken(db, slug) {
+  assertDbAvailable(db, 'listing lookup');
+  const row = await db
+    .prepare('SELECT id, website, slug FROM listings WHERE slug = ?1 LIMIT 1')
+    .bind(String(slug || '').trim())
+    .first();
+
+  return row || null;
+}
+
+export async function findUniqueListingSlug(db, baseSlug) {
+  const normalizedBase = normalizeSlugText(baseSlug || 'agency');
+
+  if (!normalizedBase) {
+    return `agency-${crypto.randomUUID().slice(0, 8)}`;
+  }
+
+  let candidate = normalizedBase;
+  for (let index = 1; index <= 20; index += 1) {
+    const existing = await isListingSlugTaken(db, candidate);
+    if (!existing) {
+      return candidate;
+    }
+
+    candidate = `${normalizedBase}-${index + 1}`;
+  }
+
+  return `${normalizedBase}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 export function isRateLimited(ip, limitPerMinute = 15) {
@@ -81,6 +128,34 @@ export async function insertClaim(db, data, sourcePage = '/') {
       'pending',
       new Date().toISOString(),
       sourcePage
+    )
+  .run();
+}
+
+export async function insertJoinAgencyRequest(db, data, sourcePage = '/') {
+  assertDbAvailable(db, 'join request insertion');
+
+  return db
+    .prepare(`
+      INSERT INTO join_agency_requests
+        (id, company_name, city, country, platforms, website, contact_name, contact_email, contact_phone, verification_evidence, message, status, source_page, created_at)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)
+    `)
+    .bind(
+      crypto.randomUUID(),
+      data.companyName,
+      data.city,
+      data.country,
+      normalizePlatformCsv(data.platforms),
+      data.website,
+      data.contactName,
+      data.contactEmail,
+      data.contactPhone,
+      data.verificationEvidence,
+      data.message,
+      'pending',
+      sourcePage,
+      new Date().toISOString()
     )
     .run();
 }
@@ -211,6 +286,36 @@ export async function queryOwnershipRequests(db, filters = {}) {
   return rows.results || [];
 }
 
+export async function queryJoinAgencyRequests(db, filters = {}) {
+  assertDbAvailable(db, 'join request query');
+
+  const where = [];
+  const params = [];
+
+  if (filters.status) {
+    params.push(filters.status);
+    where.push(`status = ?${params.length}`);
+  }
+
+  if (filters.website) {
+    params.push(filters.website);
+    where.push(`website = ?${params.length}`);
+  }
+
+  if (filters.contactEmail) {
+    params.push(filters.contactEmail);
+    where.push(`contact_email = ?${params.length}`);
+  }
+
+  const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const statement = db.prepare(
+    `SELECT * FROM join_agency_requests ${whereClause} ORDER BY created_at DESC LIMIT 500`
+  );
+  const statementWithBindings = params.length ? statement.bind(...params) : statement;
+  const rows = await statementWithBindings.all();
+  return rows.results || [];
+}
+
 export async function getOwnershipRequestById(db, id) {
   assertDbAvailable(db, 'ownership request lookup');
 
@@ -220,6 +325,51 @@ export async function getOwnershipRequestById(db, id) {
     .first();
 
   return row || null;
+}
+
+export async function getJoinAgencyRequestById(db, id) {
+  assertDbAvailable(db, 'join request lookup');
+
+  const row = await db
+    .prepare('SELECT * FROM join_agency_requests WHERE id = ?1 LIMIT 1')
+    .bind(id)
+    .first();
+
+  return row || null;
+}
+
+export async function getJoinAgencyRequestByContactOrWebsite(db, contactEmail, website) {
+  assertDbAvailable(db, 'join request lookup');
+
+  const normalizedWebsite = String(website || '').trim().toLowerCase();
+  const normalizedEmail = String(contactEmail || '').trim().toLowerCase();
+
+  const row = await db
+    .prepare(
+      `SELECT * FROM join_agency_requests\n       WHERE (LOWER(contact_email) = ?1 OR LOWER(website) = ?2)\n         AND created_at >= datetime('now', '-7 day')\n       ORDER BY created_at DESC\n       LIMIT 1`
+    )
+    .bind(normalizedEmail, normalizedWebsite)
+    .first();
+
+  return row || null;
+}
+
+export async function updateJoinAgencyRequestStatus(db, id, status) {
+  assertDbAvailable(db, 'join request status update');
+
+  const valid = new Set(['pending', 'approved', 'rejected']);
+  if (!valid.has(status)) {
+    throw new Error(`Invalid join status: ${status}`);
+  }
+
+  const result = await db
+    .prepare('UPDATE join_agency_requests SET status = ?1, reviewed_at = ?2 WHERE id = ?3')
+    .bind(status, new Date().toISOString(), id)
+    .run();
+
+  if (result.meta && result.meta.changes === 0) {
+    throw new Error('Join request not found.');
+  }
 }
 
 export async function updateLeadStatus(db, id, status) {
@@ -338,6 +488,62 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
   }
 }
 
+export async function getListingBySlug(db, slug) {
+  assertDbAvailable(db, 'listing lookup');
+
+  const row = await db
+    .prepare('SELECT * FROM listings WHERE slug = ?1 LIMIT 1')
+    .bind(String(slug || '').trim())
+    .first();
+
+  return row || null;
+}
+
+export async function insertListing(db, data) {
+  assertDbAvailable(db, 'listing insert');
+
+  const platformCsv = normalizePlatformCsv(data.platforms);
+  const city = String(data.city || '').trim();
+  const country = String(data.country || '').trim();
+  const slug = normalizeSlugText(data.slug || `${data.name || ''} ${city}`);
+  const safeSlug = await findUniqueListingSlug(db, slug);
+  const citySlug = normalizeSlugText(city);
+  const countrySlug = normalizeSlugText(country);
+
+  await db
+    .prepare(`
+      INSERT INTO listings
+        (slug, city, city_country_key, country, platforms, description, price_min, price_max, rating, review_count, featured, featured_until, featured_score, featured_active, verified, source, source_ref, verification_method, verified_at, priority_score, website, email, created_at, updated_at)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `)
+    .bind(
+      safeSlug,
+      city,
+      `${citySlug}__${countrySlug || 'global'}`,
+      country,
+      platformCsv,
+      String(data.description || 'Pending review description'),
+      Number.isFinite(Number(data.priceMin)) ? Number(data.priceMin) : 0,
+      Number.isFinite(Number(data.priceMax)) ? Number(data.priceMax) : 0,
+      0,
+      0,
+      0,
+      null,
+      0,
+      0,
+      1,
+      'user_submitted',
+      String(data.sourceRef || ''),
+      'manual_review',
+      new Date().toISOString(),
+      0,
+      String(data.website || '').trim(),
+      String(data.contactEmail || '').trim()
+    )
+    .run();
+
+  return safeSlug;
+}
 export async function queryLeadStatusCounts(db) {
   assertDbAvailable(db, 'lead status metrics');
   const rows = await db

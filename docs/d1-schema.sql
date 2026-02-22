@@ -51,6 +51,24 @@ CREATE TABLE IF NOT EXISTS ownership_requests (
   reviewed_at TEXT
 );
 
+CREATE TABLE IF NOT EXISTS join_agency_requests (
+  id TEXT PRIMARY KEY,
+  company_name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  country TEXT NOT NULL,
+  platforms TEXT NOT NULL,
+  website TEXT NOT NULL,
+  contact_name TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  verification_evidence TEXT,
+  message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  source_page TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at TEXT
+);
+
 CREATE TABLE IF NOT EXISTS tracking_events (
   id TEXT PRIMARY KEY,
   event_type TEXT NOT NULL,
@@ -67,4 +85,7 @@ CREATE INDEX IF NOT EXISTS idx_listings_featured ON listings(featured, featured_
 CREATE INDEX IF NOT EXISTS idx_listings_featured_active ON listings(featured_active, featured_until);
 CREATE INDEX IF NOT EXISTS idx_lead_status ON lead_submissions(status, created_at);
 CREATE INDEX IF NOT EXISTS idx_ownership_status ON ownership_requests(status, created_at);
+CREATE INDEX IF NOT EXISTS idx_join_request_status ON join_agency_requests(status, created_at);
+CREATE INDEX IF NOT EXISTS idx_join_request_website ON join_agency_requests(website);
+CREATE INDEX IF NOT EXISTS idx_join_request_contact_email ON join_agency_requests(contact_email);
 CREATE INDEX IF NOT EXISTS idx_tracking_event_type ON tracking_events(event_type, created_at);

@@ -15,6 +15,20 @@ function isEmail(value) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value || '');
 }
 
+function normalizePlatforms(raw) {
+  const allowed = new Set(['zapier', 'make', 'n8n', 'custom', 'ai']);
+  return (raw || '')
+    .toString()
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .map((value) => {
+      if (value === 'make.com') return 'make';
+      if (value === 'chatgpt') return 'ai';
+      return value;
+    })
+    .filter((value, index, list) => value && allowed.has(value) && list.indexOf(value) === index);
+}
+
 export function parseFormField(formData, field, required = false) {
   const value = normalizeText(formData.get(field));
   if (required && !value) {
@@ -91,6 +105,67 @@ export function parseClaimPayload(formData) {
       requesterEmail: clamp(requesterEmail.value, 500),
       website: parsedWebsite,
       message: clamp(message.value, 2000),
+    },
+  };
+}
+
+export function parseJoinPayload(formData) {
+  const botField = normalizeText(formData.get('hp'));
+  const companyName = parseFormField(formData, 'companyName', true);
+  const city = parseFormField(formData, 'city', true);
+  const country = parseFormField(formData, 'country', true);
+  const platformList = [
+    ...formData.getAll('platforms'),
+    ...(formData.get('platforms') ? [String(formData.get('platforms'))] : []),
+  ]
+    .filter(Boolean)
+    .map((value) => String(value))
+    .join(',');
+
+  const platformField = normalizeText(platformList);
+  const website = parseFormField(formData, 'website', true);
+  const contactName = parseFormField(formData, 'contactName', true);
+  const contactEmail = parseFormField(formData, 'contactEmail', true);
+  const message = parseFormField(formData, 'message', true);
+  const contactPhone = parseFormField(formData, 'contactPhone');
+  const verificationEvidence = parseFormField(formData, 'verificationEvidence');
+
+  if (botField) {
+    return { ok: false, errors: ['Spam detected'] };
+  }
+
+  const errors = [companyName, city, country, website, contactName, contactEmail, message].filter((field) => !field.ok);
+
+  const platforms = normalizePlatforms(platformField);
+  if (!platforms.length) {
+    errors.push({ reason: 'At least one platform is required.' });
+  }
+
+  const parsedWebsite = normalizeUrl(website.value);
+  if (!errors.length && !isEmail(contactEmail.value)) {
+    errors.push({ reason: 'Invalid email format' });
+  }
+  if (!errors.length && !/^https?:\\/\\//.test(parsedWebsite)) {
+    errors.push({ reason: 'Invalid website URL' });
+  }
+
+  if (errors.length) {
+    return { ok: false, errors: errors.map((error) => error.reason) };
+  }
+
+  return {
+    ok: true,
+    data: {
+      companyName: clamp(companyName.value),
+      city: clamp(city.value),
+      country: clamp(country.value),
+      platforms,
+      website: parsedWebsite,
+      contactName: clamp(contactName.value),
+      contactEmail: clamp(contactEmail.value, 500),
+      contactPhone: clamp(contactPhone.value, 200),
+      verificationEvidence: clamp(verificationEvidence.value, 1000),
+      message: clamp(message.value, 3000),
     },
   };
 }

@@ -9,6 +9,7 @@ const selectedSlug = Astro.url.searchParams.get('listing') || '';
 const selectedListing = listings.find(l => l.slug === selectedSlug);
 const status = selectedSlug ? getOwnershipRequestStatusBySlug(selectedSlug) : null;
 const success = Astro.url.searchParams.get('submitted') === '1';
+const hasListings = listings.length > 0;
 ---
 
 <Layout title="Claim Your Listing - AI Automation Agencies Directory" noindex={true}>
@@ -17,13 +18,18 @@ const success = Astro.url.searchParams.get('submitted') === '1';
   <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <h1 class="text-3xl font-bold mb-4">Claim Your Listing</h1>
     <p class="text-slate-400 mb-8">
-      Already listed? Submit an ownership request and we will verify your account.
+      This is for existing listings only. If your agency is not listed yet, submit a new application first.
     </p>
     <p class="text-slate-500 mb-8 text-sm">
       This directory displays only verified agencies. Reviews are available once your ownership is approved.
     </p>
 
     {success && <p class="mb-4 text-green-400">Claim request received. We will review it within 2 business days.</p>}
+    {!hasListings && (
+      <p class="mb-6 text-slate-500 text-sm">
+        No verified listings are currently available for selection. Use <a href="/join" class="text-green-400 underline">Apply to join</a> to get onboarded.
+      </p>
+    )}
 
     {status && (
       <p class="mb-6 text-sm text-slate-400">
@@ -31,49 +37,56 @@ const success = Astro.url.searchParams.get('submitted') === '1';
       </p>
     )}
 
-    <form
-      method="POST"
-      action="/api/claim"
-      class="space-y-6"
-      data-track-form="claim_form_submit"
-      data-listing={selectedSlug || ''}
-    >
-      <input type="text" name="hp" tabindex="-1" autocomplete="off" class="absolute -left-[9999px]" />
-      <input type="hidden" name="cf-turnstile-response" value="" />
-      <div>
-        <label class="block text-sm text-slate-400 mb-2">Listing *</label>
-        <select name="listingSlug" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white">
-          <option value="">Select your listing</option>
-          {listings.map(listing => (
-            <option value={listing.slug} selected={selectedSlug === listing.slug}>{listing.name} ({listing.location})</option>
-          ))}
-        </select>
-      </div>
+    {hasListings ? (
+      <form
+        method="POST"
+        action="/api/claim"
+        class="space-y-6"
+        data-track-form="claim_form_submit"
+        data-listing={selectedSlug || ''}
+      >
+        <input type="text" name="hp" tabindex="-1" autocomplete="off" class="absolute -left-[9999px]" />
+        <input type="hidden" name="cf-turnstile-response" value="" />
 
-      <div>
-        <label class="block text-sm text-slate-400 mb-2">Requester Name *</label>
-        <input name="requesterName" type="text" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
-      </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Listing *</label>
+          <select name="listingSlug" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white">
+            <option value="">Select your listing</option>
+            {listings.map(listing => (
+              <option value={listing.slug} selected={selectedSlug === listing.slug}>{listing.name} ({listing.location})</option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <label class="block text-sm text-slate-400 mb-2">Contact Email *</label>
-        <input name="requesterEmail" type="email" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
-      </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Requester Name *</label>
+          <input name="requesterName" type="text" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
+        </div>
 
-      <div>
-        <label class="block text-sm text-slate-400 mb-2">Official Website *</label>
-        <input name="website" type="url" required value={selectedListing?.website || ''} class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
-      </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Contact Email *</label>
+          <input name="requesterEmail" type="email" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
+        </div>
 
-      <div>
-        <label class="block text-sm text-slate-400 mb-2">Verification Details *</label>
-        <textarea name="message" rows="4" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" placeholder="Share your role and proof you own this listing"></textarea>
-      </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Official Website *</label>
+          <input name="website" type="url" required value={selectedListing?.website || ''} class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
+        </div>
 
-      <button type="submit" class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl">
-        Submit Ownership Request
-      </button>
-    </form>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Verification Details *</label>
+          <textarea name="message" rows="4" required class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" placeholder="Share your role and proof you own this listing"></textarea>
+        </div>
+
+        <button type="submit" class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl">
+          Submit Ownership Request
+        </button>
+      </form>
+    ) : (
+      <a href="/join" class="inline-block px-6 py-3 bg-green-500 hover:bg-green-600 text-black rounded-xl font-semibold">
+        Apply to Join
+      </a>
+    )}
   </main>
 
   <Footer />
