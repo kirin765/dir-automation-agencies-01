@@ -9,10 +9,11 @@ const selectedSlug = Astro.url.searchParams.get('listing') || '';
 const selectedListing = listings.find(l => l.slug === selectedSlug);
 const status = selectedSlug ? getOwnershipRequestStatusBySlug(selectedSlug) : null;
 const success = Astro.url.searchParams.get('submitted') === '1';
+const error = Astro.url.searchParams.get('error');
 const hasListings = listings.length > 0;
 ---
 
-<Layout title="Claim Your Listing - AI Automation Agencies Directory" noindex={true}>
+<Layout title="Claim Your Listing - AI Automation Agencies Directory">
   <Header />
 
   <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -21,13 +22,14 @@ const hasListings = listings.length > 0;
       This is for existing listings only. If your agency is not listed yet, submit a new application first.
     </p>
     <p class="text-slate-500 mb-8 text-sm">
-      This directory displays only verified agencies. Reviews are available once your ownership is approved.
+      This directory displays only verified agencies. If your agency is not listed, apply first from the join page.
     </p>
 
+    {error && <p class="mb-4 text-red-400">Submission failed: {error}</p>}
     {success && <p class="mb-4 text-green-400">Claim request received. We will review it within 2 business days.</p>}
     {!hasListings && (
       <p class="mb-6 text-slate-500 text-sm">
-        No verified listings are currently available for selection. Use <a href="/join" class="text-green-400 underline">Apply to join</a> to get onboarded.
+        No verified listings are currently available for selection. Use <a href="/join" class="text-green-400 underline">Apply to join</a> so your listing can be reviewed and then claimed.
       </p>
     )}
 

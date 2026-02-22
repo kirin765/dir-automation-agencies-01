@@ -139,7 +139,7 @@ export async function insertJoinAgencyRequest(db, data, sourcePage = '/') {
     .prepare(`
       INSERT INTO join_agency_requests
         (id, company_name, city, country, platforms, website, contact_name, contact_email, contact_phone, verification_evidence, message, status, source_page, created_at)
-      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
     `)
     .bind(
       crypto.randomUUID(),

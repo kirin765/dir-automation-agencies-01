@@ -1,5 +1,5 @@
 function clamp(value = '', maxLength = 2000) {
-  return String(value || '').trim().slice(0, maxLength);
+  return sanitizeText(String(value || '').trim()).slice(0, maxLength);
 }
 
 function normalizeText(value) {
@@ -9,6 +9,13 @@ function normalizeText(value) {
 function normalizeUrl(value) {
   const raw = normalizeText(value);
   return raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
+}
+
+function sanitizeText(value = '') {
+  return String(value || '')
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .trim();
 }
 
 function isEmail(value) {
@@ -58,6 +65,11 @@ export function parseContactPayload(formData) {
     return { ok: false, errors: errors.map((error) => error.reason) };
   }
 
+  const trimmedMessage = clamp(message.value, 2000);
+  if (trimmedMessage.length < 12) {
+    return { ok: false, errors: ['Message must be at least 12 characters long'] };
+  }
+
   return {
     ok: true,
     data: {
@@ -65,7 +77,7 @@ export function parseContactPayload(formData) {
       name: clamp(name.value),
       email: clamp(email.value, 500),
       budget: clamp(budget.value, 200),
-      message: clamp(message.value, 2000),
+      message: trimmedMessage,
     },
   };
 }
@@ -97,6 +109,11 @@ export function parseClaimPayload(formData) {
     return { ok: false, errors: errors.map((error) => error.reason) };
   }
 
+  const trimmedMessage = clamp(message.value, 2000);
+  if (trimmedMessage.length < 12) {
+    return { ok: false, errors: ['Message must be at least 12 characters long'] };
+  }
+
   return {
     ok: true,
     data: {
@@ -104,7 +121,7 @@ export function parseClaimPayload(formData) {
       requesterName: clamp(requesterName.value),
       requesterEmail: clamp(requesterEmail.value, 500),
       website: parsedWebsite,
-      message: clamp(message.value, 2000),
+      message: trimmedMessage,
     },
   };
 }
@@ -153,6 +170,11 @@ export function parseJoinPayload(formData) {
     return { ok: false, errors: errors.map((error) => error.reason) };
   }
 
+  const trimmedMessage = clamp(message.value, 3000);
+  if (trimmedMessage.length < 20) {
+    return { ok: false, errors: ['Message must be at least 20 characters long'] };
+  }
+
   return {
     ok: true,
     data: {
@@ -165,7 +187,7 @@ export function parseJoinPayload(formData) {
       contactEmail: clamp(contactEmail.value, 500),
       contactPhone: clamp(contactPhone.value, 200),
       verificationEvidence: clamp(verificationEvidence.value, 1000),
-      message: clamp(message.value, 3000),
+      message: trimmedMessage,
     },
   };
 }

@@ -1,25 +1,35 @@
 import { readFileSync } from 'node:fs';
 import { strict as assert } from 'node:assert';
 
-const workflowPath = new URL('../.github/workflows/deploy.yml', import.meta.url);
-const workflow = readFileSync(workflowPath, 'utf8');
+const cloudflareWorkflowPath = new URL('../.github/workflows/deploy-cloudflare-pages.yml', import.meta.url);
+const workflowContent = readFileSync(cloudflareWorkflowPath, 'utf8');
 
 assert.match(
-  workflow,
-  /uses:\s*actions\/configure-pages@v4/,
-  'deploy workflow must configure GitHub Pages'
-);
-
-assert.doesNotMatch(
-  workflow,
-  /enablement:\s*true/,
-  'deploy workflow must not use configure-pages enablement:true (requires admin and breaks with GITHUB_TOKEN)'
+  workflowContent,
+  /wrangler\s+pages\s+deploy\s+dist/, 
+  'Cloudflare Pages deploy command must exist'
 );
 
 assert.match(
-  workflow,
-  /uses:\s*actions\/deploy-pages@v4/,
-  'deploy workflow must deploy with actions/deploy-pages@v4'
+  workflowContent,
+  /npx\s+wrangler\s+pages\s+deploy\s+dist/, 
+  'Cloudflare Pages deploy should use wrangler CLI pages deploy dist'
 );
 
-console.log('pages workflow checks passed');
+assert.match(
+  workflowContent,
+  /on:\s*[\s\S]*?push:/,
+  'Cloudflare Pages workflow should be trigger-driven'
+);
+
+const githubWorkflowPath = new URL('../.github/workflows/deploy.yml', import.meta.url);
+const githubWorkflow = readFileSync(githubWorkflowPath, 'utf8');
+
+assert.match(
+  githubWorkflow,
+  /workflow_dispatch:/,
+  'legacy GitHub Pages workflow should remain intentionally limited'
+);
+
+console.log('cloudflare deployment workflow checks passed');
+

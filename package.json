@@ -8,7 +8,12 @@
     "build": "astro build",
     "deploy:pages": "npm run build && npx wrangler pages deploy dist --project-name=dir-automation-agencies-01 --commit-dirty=true",
     "preview": "astro preview",
-    "test": "node scripts/test-pages-workflow.mjs",
+    "test": "node scripts/quality/test-all.mjs",
+    "test:smoke": "node scripts/quality/test-smoke.mjs",
+    "test:seo": "node scripts/quality/test-seo.mjs",
+    "test:routes": "node scripts/quality/test-routes.mjs",
+    "test:api": "node scripts/quality/test-api.mjs",
+    "test:workflow": "node scripts/test-pages-workflow.mjs",
     "astro": "astro"
   },
   "dependencies": {

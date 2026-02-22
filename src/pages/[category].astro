@@ -2,10 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getByCategory, getCategories } from '../../scripts/process-data';
+import { getByCategory, getDirectoryCategories } from '../../scripts/process-data';
 
 export function getStaticPaths() {
-  const categories = getCategories();
+  const categories = getDirectoryCategories();
   return categories.map(category => ({
     params: { category },
     props: { category }
@@ -31,7 +31,7 @@ const hasListings = listings.length > 0;
       {category} Experts
     </h1>
     <p class="text-slate-400 mb-8">
-      {listings.length} automation specialists available
+      {listings.length} verified automation specialists available
     </p>
     
     {hasListings ? (
@@ -82,8 +82,8 @@ const hasListings = listings.length > 0;
       <section class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
         <h2 class="text-2xl font-bold mb-3">No verified listing yet in this category</h2>
         <p class="text-slate-400 mb-4">
-          This section is open for invited verification. If your team offers verified {category} automation services,
-          submit an application and get featured opportunities after review.
+          This section does not have verified agencies yet. If your team offers {category} automation services,
+          submit a new application to get exposed.
         </p>
         <div class="flex flex-wrap gap-3">
           <a href="/join" class="px-4 py-2 bg-green-500 text-black rounded-lg font-semibold">Apply to join</a>

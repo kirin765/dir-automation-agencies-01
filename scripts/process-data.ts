@@ -63,6 +63,8 @@ export interface LocationPage {
   name: string;
 }
 
+const DIRECTORY_CATEGORIES = ['ai', 'custom', 'make', 'n8n', 'zapier'];
+
 function normalizeText(value: string | undefined): string {
   return (value || '').trim();
 }
@@ -281,6 +283,16 @@ export function getCategories(): string[] {
   const categories = new Set<string>();
   listings.forEach((listing) => listing.platforms.forEach((platform) => categories.add(platform)));
   return Array.from(categories).sort();
+}
+
+export function getDirectoryCategories(): string[] {
+  const verifiedCategories = new Set(getCategories());
+
+  DIRECTORY_CATEGORIES.forEach((category) => {
+    verifiedCategories.add(category);
+  });
+
+  return Array.from(verifiedCategories).sort();
 }
 
 export function getCountries(): LocationPage[] {

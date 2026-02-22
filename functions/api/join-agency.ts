@@ -34,21 +34,39 @@ function getRedirectTarget() {
   return '/join?submitted=1';
 }
 
+function getRedirectErrorTarget(error) {
+  return `/join?error=${encodeURIComponent(error)}`;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const ip = getIp(request);
 
   if (!isTrustedOrigin(request, env)) {
+    const errorMessage = 'Invalid request origin.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
     return new Response(
-      JSON.stringify({ error: 'Invalid request origin.' }),
-      { status: 403, headers: { 'content-type': 'application/json' } }
+      null,
+      { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } }
     );
   }
 
   if (isRateLimited(ip, 20)) {
-    return new Response(JSON.stringify({ error: 'Too many requests. Please retry in a minute.' }), {
-      status: 429,
-      headers: { 'content-type': 'application/json' },
+    const errorMessage = 'Too many requests. Please retry in a minute.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        status: 429,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(errorMessage) },
     });
   }
 
@@ -56,17 +74,25 @@ export async function onRequestPost(context) {
   const parsed = parseJoinPayload(form);
 
   if (!(await validateTurnstile(request, env, form))) {
+    const errorMessage = 'Anti-bot verification failed. Please retry.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
     return new Response(
-      JSON.stringify({ error: 'Anti-bot verification failed. Please retry.' }),
-      { status: 403, headers: { 'content-type': 'application/json' } }
+      null,
+      { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } }
     );
   }
 
   if (!parsed.ok) {
-    return new Response(
-      JSON.stringify({ error: parsed.errors.join(', ') }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    );
+    const errorMessage = parsed.errors.join(', ');
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: errorMessage }), { status: 400, headers: { 'content-type': 'application/json' } });
+    }
+    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } });
   }
 
   const db = getDb(env);
@@ -74,19 +100,27 @@ export async function onRequestPost(context) {
   const normalizedWebsite = String(parsed.data.website || '').toLowerCase().trim();
   const exists = await getJoinAgencyRequestByContactOrWebsite(db, normalizedEmail, normalizedWebsite);
   if (exists && exists.status === 'pending') {
-    return new Response(JSON.stringify({ error: 'We already received a recent request for this contact or website.' }), {
-      status: 409,
-      headers: { 'content-type': 'application/json' },
-    });
+    const errorMessage = 'We already received a recent request for this contact or website.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        status: 409,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } });
   }
 
   try {
     await insertJoinAgencyRequest(db, parsed.data, request.headers.get('referer') || '/join');
   } catch {
-    return new Response(
-      JSON.stringify({ error: 'Join request submission is temporarily unavailable. Please try again later.' }),
-      { status: 500, headers: { 'content-type': 'application/json' } }
-    );
+    const errorMessage = 'Join request submission is temporarily unavailable. Please try again later.';
+    if (wantsJson(request)) {
+      return new Response(
+        JSON.stringify({ error: errorMessage }),
+        { status: 500, headers: { 'content-type': 'application/json' } }
+      );
+    }
+    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } });
   }
 
   const redirectTarget = wantsJson(request) ? null : getRedirectTarget();
@@ -96,4 +130,3 @@ export async function onRequestPost(context) {
 
   return Response.redirect(redirectTarget, 303);
 }
-
