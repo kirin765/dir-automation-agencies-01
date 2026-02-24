@@ -1,6 +1,5 @@
-import { getDb, getIp, insertLead, isRateLimited } from './_shared/storage';
+import { getDb, getIp, getListingBySlug, insertLead, isRateLimited } from './_shared/storage';
 import { isTurnstileEnabled, isTrustedOrigin, parseContactPayload } from './_shared/validation';
-import { getBySlug } from '../../scripts/process-data';
 
 function wantsJson(request) {
   return request.headers.get('accept')?.includes('application/json');
@@ -108,8 +107,23 @@ export async function onRequestPost(context) {
     });
   }
 
-  const verifiedListing = getBySlug(parsed.data.listingSlug);
-  if (!verifiedListing?.slug) {
+  const db = getDb(env);
+  if (!db || !db.prepare) {
+    const message = 'Lead submission is temporarily unavailable. Please try again later.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: message }), {
+        status: 503,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(form, message) },
+    });
+  }
+
+  const verifiedListing = await getListingBySlug(db, parsed.data.listingSlug);
+  if (!verifiedListing?.slug || !verifiedListing.verified) {
     const message = 'Listing not found or not verified yet.';
     if (wantsJson(request)) {
       return new Response(JSON.stringify({ error: message }), { status: 404, headers: { 'content-type': 'application/json' } });
@@ -120,7 +134,6 @@ export async function onRequestPost(context) {
     });
   }
 
-  const db = getDb(env);
   try {
     await insertLead(db, parsed.data, request.headers.get('referer') || '/');
   } catch (error) {

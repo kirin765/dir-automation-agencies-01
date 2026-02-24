@@ -1,7 +1,5 @@
-import { getDb, getIp, insertClaim, isRateLimited } from './_shared/storage';
+import { getDb, getIp, insertClaim, isRateLimited, getListingBySlug } from './_shared/storage';
 import { isTurnstileEnabled, isTrustedOrigin, parseClaimPayload } from './_shared/validation';
-import { getBySlug } from '../../scripts/process-data';
-
 function wantsJson(request) {
   return request.headers.get('accept')?.includes('application/json');
 }
@@ -104,8 +102,23 @@ export async function onRequestPost(context) {
     });
   }
 
-  const verifiedListing = getBySlug(parsed.data.listingSlug);
-  if (!verifiedListing?.slug) {
+  const db = getDb(env);
+  if (!db || !db.prepare) {
+    const message = 'Claim submission is temporarily unavailable. Please try again later.';
+    if (wantsJson(request)) {
+      return new Response(JSON.stringify({ error: message }), {
+        status: 503,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(parsed, message) },
+    });
+  }
+
+  const listing = await getListingBySlug(db, parsed.data.listingSlug);
+  if (!listing?.slug || !Number(listing.verified) || listing.verified === 0) {
     const message = 'Listing not found or not verified yet.';
     if (wantsJson(request)) {
       return new Response(JSON.stringify({ error: message }), { status: 404, headers: { 'content-type': 'application/json' } });
@@ -115,8 +128,6 @@ export async function onRequestPost(context) {
       headers: { Location: getRedirectErrorTarget(parsed, message) },
     });
   }
-
-  const db = getDb(env);
   try {
     await insertClaim(db, parsed.data, request.headers.get('referer') || '/');
   } catch (error) {
