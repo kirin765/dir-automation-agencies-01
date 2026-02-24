@@ -7,7 +7,6 @@ const LISTINGS_CSV = path.join(process.cwd(), 'data', 'listings.csv');
 const D1_QUERY = `
 SELECT
   slug,
-  name,
   COALESCE(city, '') AS city,
   COALESCE(country, '') AS country,
   COALESCE(platforms, '') AS platforms,
@@ -30,7 +29,7 @@ ORDER BY
   COALESCE(priority_score, 0) DESC,
   COALESCE(rating, 0) DESC,
   COALESCE(review_count, 0) DESC,
-  name ASC;
+  slug ASC;
 `;
 
 const HEADERS = [
@@ -102,6 +101,17 @@ function normalizeFeatured(value) {
   return Number(value || 0) === 1 ? 'true' : 'false';
 }
 
+function slugToTitle(value = '') {
+  const slug = String(value || '');
+  if (!slug) return '';
+
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 function csvEscape(value = '') {
   const text = String(value ?? '');
   if (text.includes('"') || text.includes(',') || text.includes('\n') || text.includes('\r')) {
@@ -113,9 +123,11 @@ function csvEscape(value = '') {
 
 function formatRows(rows) {
   return rows.map((row, index) => {
+    const name = String(row.name || row.slug || '').trim() || row.slug || '';
+    const resolvedName = name === row.slug && row.slug ? slugToTitle(row.slug) : name;
     const record = [
       index + 1,
-      row.name || '',
+      resolvedName,
       row.platforms || '',
       row.city || '',
       row.country || '',
