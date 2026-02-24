@@ -109,19 +109,22 @@ export async function onRequestPost(context) {
 
   const normalizedEmail = String(parsed.data.contactEmail || '').toLowerCase().trim();
   const normalizedWebsite = String(parsed.data.website || '').toLowerCase().trim();
-  const exists = await getJoinAgencyRequestByContactOrWebsite(db, normalizedEmail, normalizedWebsite);
-  if (exists && exists.status === 'pending') {
-    const errorMessage = 'We already received a recent request for this contact or website.';
-    if (wantsJson(request)) {
-      return new Response(JSON.stringify({ error: errorMessage }), {
-        status: 409,
-        headers: { 'content-type': 'application/json' },
+  try {
+    const exists = await getJoinAgencyRequestByContactOrWebsite(db, normalizedEmail, normalizedWebsite);
+    if (exists && exists.status === 'pending') {
+      const errorMessage = 'We already received a recent request for this contact or website.';
+      if (wantsJson(request)) {
+        return new Response(JSON.stringify({ error: errorMessage }), {
+          status: 409,
+          headers: { 'content-type': 'application/json' },
+        });
+      }
+      return new Response(null, {
+        status: 302,
+        headers: { Location: getRedirectErrorTarget(errorMessage) },
       });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } });
-  }
 
-  try {
     await insertJoinAgencyRequest(db, parsed.data, request.headers.get('referer') || '/join');
   } catch {
     const errorMessage = 'Join request submission is temporarily unavailable. Please try again later.';
