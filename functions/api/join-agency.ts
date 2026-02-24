@@ -96,6 +96,17 @@ export async function onRequestPost(context) {
   }
 
   const db = getDb(env);
+  if (!db || !db.prepare) {
+    const errorMessage = 'Join request submission is temporarily unavailable. Please try again later.';
+    if (wantsJson(request)) {
+      return new Response(
+        JSON.stringify({ error: errorMessage }),
+        { status: 503, headers: { 'content-type': 'application/json' } }
+      );
+    }
+    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(errorMessage) } });
+  }
+
   const normalizedEmail = String(parsed.data.contactEmail || '').toLowerCase().trim();
   const normalizedWebsite = String(parsed.data.website || '').toLowerCase().trim();
   const exists = await getJoinAgencyRequestByContactOrWebsite(db, normalizedEmail, normalizedWebsite);
