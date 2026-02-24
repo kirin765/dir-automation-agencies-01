@@ -11,6 +11,36 @@ function normalizeUrl(value) {
   return raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
 }
 
+function normalizeCountry(value = '') {
+  const original = normalizeText(value);
+  const normalized = original.toLowerCase().replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+  if (!normalized) return original;
+
+  const aliasMap = {
+    us: 'United States',
+    usa: 'United States',
+    usaa: 'United States',
+    'u s a': 'United States',
+    'united states of america': 'United States',
+    uk: 'United Kingdom',
+    uae: 'United Arab Emirates',
+    emirates: 'United Arab Emirates',
+    'south korea': 'South Korea',
+    korea: 'South Korea',
+  };
+
+  if (aliasMap[normalized]) {
+    return aliasMap[normalized];
+  }
+
+  return original
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(' ');
+}
+
 function sanitizeText(value = '') {
   return String(value || '')
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -159,6 +189,7 @@ export function parseJoinPayload(formData) {
   }
 
   const parsedWebsite = normalizeUrl(website.value);
+  const normalizedCountry = country.ok ? normalizeCountry(country.value) : '';
   if (!errors.length && !isEmail(contactEmail.value)) {
     errors.push({ reason: 'Invalid email format' });
   }
@@ -180,7 +211,7 @@ export function parseJoinPayload(formData) {
     data: {
       companyName: clamp(companyName.value),
       city: clamp(city.value),
-      country: clamp(country.value),
+      country: clamp(normalizedCountry),
       platforms,
       website: parsedWebsite,
       contactName: clamp(contactName.value),
