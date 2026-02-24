@@ -162,7 +162,7 @@ export function parseJoinPayload(formData) {
   if (!errors.length && !isEmail(contactEmail.value)) {
     errors.push({ reason: 'Invalid email format' });
   }
-  if (!errors.length && !/^https?:\\/\\//.test(parsedWebsite)) {
+  if (!errors.length && !/^https?:\/\/.*/.test(parsedWebsite)) {
     errors.push({ reason: 'Invalid website URL' });
   }
 

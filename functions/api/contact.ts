@@ -60,7 +60,10 @@ export async function onRequestPost(context) {
         headers: { 'content-type': 'application/json' },
       });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget({}, errorMessage) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget({}, errorMessage) },
+    });
   }
 
   if (isRateLimited(ip, 20)) {
@@ -71,7 +74,10 @@ export async function onRequestPost(context) {
         headers: { 'content-type': 'application/json' },
       });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget({}, errorMessage) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget({}, errorMessage) },
+    });
   }
 
   const form = await request.formData();
@@ -85,7 +91,10 @@ export async function onRequestPost(context) {
         headers: { 'content-type': 'application/json' },
       });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(form, errorMessage) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(form, errorMessage) },
+    });
   }
 
   if (!parsed.ok) {
@@ -93,7 +102,10 @@ export async function onRequestPost(context) {
     if (wantsJson(request)) {
       return new Response(JSON.stringify({ error: message }), { status: 400, headers: { 'content-type': 'application/json' } });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(form, message) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(form, message) },
+    });
   }
 
   const verifiedListing = getBySlug(parsed.data.listingSlug);
@@ -102,7 +114,10 @@ export async function onRequestPost(context) {
     if (wantsJson(request)) {
       return new Response(JSON.stringify({ error: message }), { status: 404, headers: { 'content-type': 'application/json' } });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(form, message) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(form, message) },
+    });
   }
 
   const db = getDb(env);
@@ -113,7 +128,10 @@ export async function onRequestPost(context) {
     if (wantsJson(request)) {
       return new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'content-type': 'application/json' } });
     }
-    return new Response(null, { status: 302, headers: { Location: getRedirectErrorTarget(form, message) });
+    return new Response(null, {
+      status: 302,
+      headers: { Location: getRedirectErrorTarget(form, message) },
+    });
   }
 
   if (wantsJson(request)) {
