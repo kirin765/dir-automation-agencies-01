@@ -39,14 +39,24 @@ const mergedCountries = [...new Set([...countryOptions, ...fallbackCountries].so
       This directory shows only verified agencies. Submit your information first, and our team will review it within 48 hours.
     </p>
 
-    {error && <p class="mb-4 text-red-400">Submission failed: {error}</p>}
-    {success && <p class="mb-4 text-green-400">Your application is submitted. We will review and contact you soon.</p>}
+    <div
+      id="join-feedback"
+      role="status"
+      aria-live="polite"
+      class={`mb-4 px-4 py-3 rounded-xl border ${
+        error ? 'text-red-300 border-red-500/40 bg-red-900/20' : success ? 'text-green-300 border-green-500/40 bg-green-900/20' : 'hidden'
+      }`}
+    >
+      {error && <p>Submission failed: {error}</p>}
+      {success && <p>Your application is submitted. We will review and contact you soon.</p>}
+    </div>
 
     <form
       method="POST"
       action="/api/join-agency"
       class="space-y-6"
       data-track-form="join_form_submit"
+      id="join-form"
     >
       <input type="text" name="hp" tabindex="-1" autocomplete="off" class="absolute -left-[9999px]" />
       <input type="hidden" name="cf-turnstile-response" value="" />
@@ -146,4 +156,56 @@ const mergedCountries = [...new Set([...countryOptions, ...fallbackCountries].so
   </main>
 
   <Footer />
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('join-form');
+      const feedback = document.getElementById('join-feedback');
+      if (!form || !feedback) return;
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const originalText = submitButton ? submitButton.textContent : '';
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Submitting...';
+        }
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              Accept: 'application/json',
+            },
+          });
+
+          const payload = await response.json().catch(() => ({ error: 'Unknown response format.' }));
+
+          if (response.ok && payload?.ok) {
+            feedback.className =
+              'mb-4 px-4 py-3 rounded-xl border text-green-300 border-green-500/40 bg-green-900/20';
+            feedback.textContent = 'Your application is submitted. We will review and contact you soon.';
+            form.reset();
+          } else {
+            feedback.className =
+              'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
+            feedback.textContent = `Submission failed: ${payload?.error || 'Unknown error. Please try again.'}`;
+            if (submitButton) submitButton.disabled = false;
+            if (submitButton && originalText) submitButton.textContent = originalText;
+          }
+        } catch (error) {
+          feedback.className =
+            'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
+          feedback.textContent = 'Submission failed. Network issue or server error. Please try again.';
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText || 'Submit Application';
+          }
+        }
+      });
+    })();
+  </script>
 </Layout>
