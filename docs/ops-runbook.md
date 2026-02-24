@@ -28,11 +28,41 @@
 공통 요청 예시:
 
 ```bash
-curl -X POST "https://<your-domain>/api/admin/update-lead" \
+  curl -X POST "https://<your-domain>/api/admin/update-lead" \
   -H "x-admin-key: $ADMIN_API_KEY" \
   -H "content-type: application/json" \
   -d '{"id":"<lead-id>","status":"contacted"}'
 ```
+
+## 3-1) 업체 등록 승인(Join) 운영
+
+### 1. 환경변수/시크릿
+
+- `PUBLIC_SITE_URL=https://automationagencydirectory.com`
+- `TURNSTILE_SECRET_KEY`(선택)
+- `ADMIN_API_KEY=admin-key` 를 Pages Secret으로 등록:
+  ```bash
+  echo "$ADMIN_API_KEY" | wrangler pages secret put ADMIN_API_KEY --project-name=dir-automation-agencies-01
+  ```
+
+### 2. 승인 절차
+
+1. 신규 신청 수신:
+   - `GET /api/admin/join-agencies?status=pending`  
+   - 헤더: `x-admin-key: $ADMIN_API_KEY`
+2. 승인/거부:
+   - 승인: `POST /api/admin/update-join`
+   - 바디: `{"id":"<request-id>","status":"approved"}`
+3. 즉시 확인:
+   - 동일 id를 `status=approved`로 재조회해 상태 전환 확인
+4. 승인 완료 시:
+   - `listings`에 verified 레코드가 생성/갱신됨(`verified=1`)
+   - 승인된 slug는 `/listing/{slug}` 노출 대상이 됨
+
+### 3. 권한 실패 대응
+
+- `401` 응답이 오면 `x-admin-key` 누락/오입력 또는 Pages Secret 미배치 상태
+- 응답이 계속 실패하면 Functions 로그에서 `ADMIN_API_KEY` 바인딩(Secret) 상태와 엔드포인트 배포 상태를 확인
 
 ## 4) 이벤트 추적
 

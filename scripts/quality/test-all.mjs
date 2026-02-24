@@ -7,6 +7,7 @@ const scripts = [
   'node scripts/quality/test-seo.mjs',
   'node scripts/quality/test-routes.mjs',
   'node scripts/quality/test-api.mjs',
+  'node scripts/quality/test-journey.mjs',
 ];
 
 for (const script of scripts) {
@@ -15,4 +16,3 @@ for (const script of scripts) {
 
 assert(scripts.length > 0);
 console.log('quality gate passed');
-
