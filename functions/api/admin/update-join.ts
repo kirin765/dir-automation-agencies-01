@@ -9,6 +9,23 @@ function toSlug(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
+function safeInt(value, fallback = 0) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  if (Number.isNaN(parsed)) return fallback;
+  return Math.max(0, Math.min(1_000_000, parsed));
+}
+
+function normalizeDescription(value) {
+  return String(value || '').trim();
+}
+
+function getOwnerToken(listingRow) {
+  const token = String(listingRow?.owner_token || '').trim();
+  if (token) return token;
+
+  return crypto.randomUUID().replace(/-/g, '');
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   if (!isAuthorized(request, env)) {
@@ -51,37 +68,59 @@ export async function onRequestPost(context) {
       const preferredSlug = toSlug(baseSlug) || `agency-${crypto.randomUUID().slice(0, 8)}`;
       const existing = await getListingBySlug(db, preferredSlug);
       const slug = existing ? await findUniqueListingSlug(db, preferredSlug) : preferredSlug;
+      const requestedDescription = normalizeDescription(requestRow.description || '');
+      const requestedPriceMin = safeInt(requestRow.price_min, 0);
+      const requestedPriceMax = safeInt(requestRow.price_max, 0);
+      const token = getOwnerToken(existing || {});
+
+      const approvedPayload = {
+        verified: true,
+        source: 'verified_manual',
+        sourceRef: requestRow.company_name || requestRow.id,
+        verificationMethod: 'manual_review',
+        verifiedAt: new Date().toISOString(),
+        description: requestedDescription,
+        priceMin: requestedPriceMin,
+        priceMax: Math.max(requestedPriceMin, requestedPriceMax),
+        ownerToken: token,
+      };
 
       if (existing) {
-        await upsertListingBySlug(db, slug, {
-          verified: true,
-          source: 'verified_manual',
-          sourceRef: requestRow.company_name || requestRow.id,
-          verificationMethod: 'manual_review',
-          verifiedAt: new Date().toISOString(),
-        });
+        await upsertListingBySlug(db, slug, approvedPayload);
       } else {
         const createdSlug = await insertListing(db, {
           name: requestRow.company_name || 'Pending name',
           city: requestRow.city,
           country: requestRow.country,
           platforms: String(requestRow.platforms || '').split(','),
-          description: 'Manual onboarding request from /join. Please update profile details.',
-          priceMin: 0,
-          priceMax: 0,
+          description: requestedDescription,
+          priceMin: requestedPriceMin,
+          priceMax: Math.max(requestedPriceMin, requestedPriceMax),
           website: requestRow.website,
           contactEmail: requestRow.contact_email,
-          slug,
+          source: 'verified_manual',
           sourceRef: requestRow.contact_email || requestRow.website || '',
+          verificationMethod: 'manual_review',
+          verifiedAt: new Date().toISOString(),
+          slug,
+          ownerToken: token,
         });
 
         await upsertListingBySlug(db, createdSlug, {
-          verified: true,
-          source: 'verified_manual',
-          verificationMethod: 'manual_review',
-          verifiedAt: new Date().toISOString(),
+          ...approvedPayload,
         });
       }
+      const updatedListing = await getListingBySlug(db, slug);
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          id,
+          status,
+          ownerToken: updatedListing?.owner_token || token,
+          slug,
+        }),
+        { headers: { 'content-type': 'application/json' } }
+      );
     }
 
     return new Response(JSON.stringify({ ok: true, id, status }), {
@@ -96,4 +135,3 @@ export async function onRequestPost(context) {
     });
   }
 }
-

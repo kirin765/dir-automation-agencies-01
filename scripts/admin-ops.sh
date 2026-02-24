@@ -78,16 +78,20 @@ pick_join_requests() {
   JOIN_TMP_FILE="${tmp_file}.join.tsv"
   node - "$tmp_file" > "$JOIN_TMP_FILE" <<'NODE'
 const fs = require('fs');
-const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8') || '{}');
-const items = Array.isArray(data.items) ? data.items : [];
-for (let i = 0; i < items.length; i += 1) {
-  const it = items[i];
-  const id = String(it.id || '');
-  const name = String(it.company_name || it.companyName || '-');
-  const city = String(it.city || '-');
-  const country = String(it.country || '-');
-  process.stdout.write(`${i + 1}\t${id}\t${name}\t${city}\t${country}\n`);
-}
+  const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8') || '{}');
+  const items = Array.isArray(data.items) ? data.items : [];
+  for (let i = 0; i < items.length; i += 1) {
+    const it = items[i];
+    const id = String(it.id || '');
+    const name = String(it.company_name || it.companyName || '-');
+    const city = String(it.city || '-');
+    const country = String(it.country || '-');
+    const description = String((it.description || '').replace(/\r?\n/g, ' ').slice(0, 180));
+    const priceMin = String(it.price_min ?? '-');
+    const priceMax = String(it.price_max ?? '-');
+    const platforms = String(it.platforms || '-');
+    process.stdout.write(`${i + 1}\t${id}\t${name}\t${city}\t${country}\t${platforms}\t${priceMin}\t${priceMax}\t${description}\n`);
+  }
 NODE
 
   rm -f "$tmp_file"
@@ -97,6 +101,23 @@ NODE
   else
     JOIN_ITEM_COUNT=0
   fi
+}
+
+extract_json_value() {
+  local json="$1"
+  local key="$2"
+
+  node - "$key" <<'NODE'
+const key = process.argv[2];
+const raw = require('fs').readFileSync(0, 'utf8');
+try {
+  const parsed = JSON.parse(raw || '{}');
+  const value = parsed?.[key] ?? '';
+  process.stdout.write(String(value));
+} catch {
+  process.exit(0);
+}
+NODE
 }
 
 pick_listings() {
@@ -160,8 +181,10 @@ approve_join() {
   fi
 
   echo "[신규 업체 신청 승인]"
-  while IFS=$'\t' read -r idx id name city country; do
-    printf "%2s) %-12s %-28s %s / %s\n" "$idx" "${id:0:12}" "$name" "$city/$country"
+  while IFS=$'\t' read -r idx id name city country platforms priceMin priceMax description; do
+    printf "%2s) %-12s %-28s %s / %s (price: %s~%s)\n" "$idx" "${id:0:12}" "$name" "$city/$country" "$priceMin" "$priceMax"
+    printf "   Platforms: %s\n" "$platforms"
+    printf "   Desc: %s\n" "$description"
   done < "$JOIN_TMP_FILE"
 
   echo -n "선택 번호 (빈 값 입력 시 종료): "
@@ -175,9 +198,11 @@ approve_join() {
     return 1
   fi
 
-  local selected_line request_id req_name
+  local selected_line request_id req_name req_city req_country
   selected_line="$(get_nth_line "$choice" "$JOIN_TMP_FILE")"
-  IFS=$'\t' read -r _ request_id req_name _ <<< "$selected_line"
+  IFS=$'\t' read -r _ request_id req_name req_city req_country _ _ _ _ <<< "$selected_line"
+  echo "요청 상세: $req_name (${req_city}/${req_country})"
+  echo "  슬러그 승인/등록 ID: $request_id"
 
   echo "요청: $req_name ($request_id)"
   echo "1) approve   2) reject"
@@ -191,8 +216,38 @@ approve_join() {
     *) echo "취소됨"; return 1 ;;
   esac
 
-  if api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"${status}\"}" >/dev/null; then
+  if [[ "$status" == "rejected" ]]; then
+    echo -n "반려 사유(선택): "
+    local reason
+    read -r reason
+    if [[ -n "$reason" ]]; then
+      echo "사유: $reason"
+    fi
+  fi
+
+  local response
+  response="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"${status}\"}")"
+
+  if [[ -n "$response" ]]; then
     echo "적용 완료: ${status}"
+
+    if [[ "$status" == "approved" ]]; then
+      local approved_slug
+      local owner_token
+      approved_slug="$(extract_json_value "$response" slug)"
+      owner_token="$(extract_json_value "$response" ownerToken)"
+
+      if [[ -n "$approved_slug" ]]; then
+        echo "  Listing slug: $approved_slug"
+      fi
+
+      if [[ -n "$owner_token" ]]; then
+        echo "  Owner token: $owner_token"
+        echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
+      else
+        echo "  Owner token: (미생성)"
+      fi
+    fi
   else
     return 1
   fi

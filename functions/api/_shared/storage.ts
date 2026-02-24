@@ -2,6 +2,15 @@ import slugify from 'slugify';
 
 const rateBuckets = new Map();
 const ONE_MINUTE = 60_000;
+const tableColumnsCache = new Map();
+
+function makeColumnCacheKey(table) {
+  return `table:${table}`;
+}
+
+function normalizeValue(value) {
+  return String(value || '').trim();
+}
 
 export function getIp(request) {
   const headerIp =
@@ -23,6 +32,24 @@ function normalizePlatformCsv(platforms) {
   return [...new Set(platforms.map((value) => String(value || '').trim().toLowerCase()).filter(Boolean))].join(
     ','
   );
+}
+
+async function getTableColumns(db, table) {
+  const key = makeColumnCacheKey(table);
+  const cached = tableColumnsCache.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const rows = await db.prepare(`PRAGMA table_info(${table});`).all();
+  const columns = new Set((rows.results || []).map((row) => String(row?.name || '').toLowerCase()));
+  tableColumnsCache.set(key, columns);
+  return columns;
+}
+
+async function hasTableColumn(db, table, column) {
+  const columns = await getTableColumns(db, table);
+  return columns.has(String(column || '').toLowerCase());
 }
 
 function normalizeSlugText(value) {
@@ -134,30 +161,68 @@ export async function insertClaim(db, data, sourcePage = '/') {
 
 export async function insertJoinAgencyRequest(db, data, sourcePage = '/') {
   assertDbAvailable(db, 'join request insertion');
+  const hasDescription = await hasTableColumn(db, 'join_agency_requests', 'description');
+  const hasPriceMin = await hasTableColumn(db, 'join_agency_requests', 'price_min');
+  const hasPriceMax = await hasTableColumn(db, 'join_agency_requests', 'price_max');
+
+  const columns = [
+    'id',
+    'company_name',
+    'city',
+    'country',
+    'platforms',
+    'website',
+    'contact_name',
+    'contact_email',
+    'contact_phone',
+    'verification_evidence',
+    'message',
+    'status',
+    'source_page',
+    'created_at',
+    'reviewed_at',
+  ];
+  const values = [
+    crypto.randomUUID(),
+    data.companyName,
+    data.city,
+    data.country,
+    normalizePlatformCsv(data.platforms),
+    data.website,
+    data.contactName,
+    data.contactEmail,
+    data.contactPhone,
+    data.verificationEvidence,
+    data.message,
+    'pending',
+    sourcePage,
+    new Date().toISOString(),
+    null,
+  ];
+
+  if (hasDescription) {
+    columns.push('description');
+    values.push(data.description || null);
+  }
+  if (hasPriceMin) {
+    columns.push('price_min');
+    values.push(Number.isFinite(Number(data.priceMin)) ? Number(data.priceMin) : 0);
+  }
+  if (hasPriceMax) {
+    columns.push('price_max');
+    values.push(Number.isFinite(Number(data.priceMax)) ? Number(data.priceMax) : 0);
+  }
+
+  const placeholders = columns.map((_, index) => `?${index + 1}`).join(', ');
+  const assignment = columns.join(', ');
 
   return db
     .prepare(`
       INSERT INTO join_agency_requests
-        (id, company_name, city, country, platforms, website, contact_name, contact_email, contact_phone, verification_evidence, message, status, source_page, created_at, reviewed_at)
-      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)
+        (${assignment})
+      VALUES (${placeholders})
     `)
-    .bind(
-      crypto.randomUUID(),
-      data.companyName,
-      data.city,
-      data.country,
-      normalizePlatformCsv(data.platforms),
-      data.website,
-      data.contactName,
-      data.contactEmail,
-      data.contactPhone,
-      data.verificationEvidence,
-      data.message,
-      'pending',
-      sourcePage,
-      new Date().toISOString(),
-      null
-    )
+    .bind(...values)
     .run();
 }
 
@@ -411,6 +476,7 @@ export async function updateOwnershipRequestStatus(db, id, status) {
 
 export async function upsertListingBySlug(db, slug, fields = {}) {
   assertDbAvailable(db, 'listing upsert');
+  const hasOwnerToken = await hasTableColumn(db, 'listings', 'owner_token');
 
   const updates = [];
   const params = [];
@@ -445,9 +511,29 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
     params.push(fields.verifiedAt || null);
   }
 
+  if (typeof fields.description === 'string') {
+    updates.push(`description = ?${updates.length + 1}`);
+    params.push(fields.description.trim());
+  }
+
+  if (Number.isFinite(fields.priceMin)) {
+    updates.push(`price_min = ?${updates.length + 1}`);
+    params.push(Math.max(0, Math.min(1_000_000, Number(fields.priceMin))));
+  }
+
+  if (Number.isFinite(fields.priceMax)) {
+    updates.push(`price_max = ?${updates.length + 1}`);
+    params.push(Math.max(0, Math.min(1_000_000, Number(fields.priceMax))));
+  }
+
   if (typeof fields.featuredUntil === 'string') {
     updates.push(`featured_until = ?${updates.length + 1}`);
     params.push(fields.featuredUntil || null);
+  }
+
+  if (hasOwnerToken && typeof fields.ownerToken === 'string') {
+    updates.push(`owner_token = ?${updates.length + 1}`);
+    params.push(fields.ownerToken.trim());
   }
 
   if (typeof fields.priorityScore === 'number') {
@@ -500,8 +586,36 @@ export async function getListingBySlug(db, slug) {
   return row || null;
 }
 
+export async function getListingByOwnerToken(db, token) {
+  assertDbAvailable(db, 'listing lookup');
+  const hasOwnerToken = await hasTableColumn(db, 'listings', 'owner_token');
+  if (!hasOwnerToken) {
+    return null;
+  }
+
+  const normalized = normalizeValue(token);
+  if (!normalized) {
+    return null;
+  }
+
+  const row = await db
+    .prepare('SELECT * FROM listings WHERE owner_token = ?1 LIMIT 1')
+    .bind(normalized)
+    .first();
+
+  return row || null;
+}
+
 export async function insertListing(db, data) {
   assertDbAvailable(db, 'listing insert');
+  const hasOwnerToken = await hasTableColumn(db, 'listings', 'owner_token');
+  const hasDescription = await hasTableColumn(db, 'listings', 'description');
+  const hasPriceMin = await hasTableColumn(db, 'listings', 'price_min');
+  const hasPriceMax = await hasTableColumn(db, 'listings', 'price_max');
+  const hasSource = await hasTableColumn(db, 'listings', 'source');
+  const hasSourceRef = await hasTableColumn(db, 'listings', 'source_ref');
+  const hasVerificationMethod = await hasTableColumn(db, 'listings', 'verification_method');
+  const hasVerifiedAt = await hasTableColumn(db, 'listings', 'verified_at');
 
   const platformCsv = normalizePlatformCsv(data.platforms);
   const city = String(data.city || '').trim();
@@ -511,36 +625,91 @@ export async function insertListing(db, data) {
   const citySlug = normalizeSlugText(city);
   const countrySlug = normalizeSlugText(country);
 
+  const columns = [
+    'slug',
+    'city',
+    'city_country_key',
+    'country',
+    'platforms',
+    'rating',
+    'review_count',
+    'featured',
+    'featured_until',
+    'featured_score',
+    'featured_active',
+    'verified',
+    'priority_score',
+    'website',
+    'email',
+    'created_at',
+    'updated_at',
+  ];
+  const values = [
+    safeSlug,
+    city,
+    `${citySlug}__${countrySlug || 'global'}`,
+    country,
+    platformCsv,
+    0,
+    0,
+    0,
+    null,
+    0,
+    0,
+    1,
+    0,
+    String(data.website || '').trim(),
+    String(data.contactEmail || '').trim(),
+    'CURRENT_TIMESTAMP',
+    'CURRENT_TIMESTAMP',
+  ];
+
+  if (hasDescription) {
+    columns.push('description');
+    values.push(String(data.description || '').trim());
+  }
+
+  if (hasPriceMin) {
+    columns.push('price_min');
+    values.push(Number.isFinite(Number(data.priceMin)) ? Number(data.priceMin) : 0);
+  }
+
+  if (hasPriceMax) {
+    columns.push('price_max');
+    values.push(Number.isFinite(Number(data.priceMax)) ? Number(data.priceMax) : 0);
+  }
+
+  if (hasSource) {
+    columns.push('source');
+    values.push(String(data.source || 'user_submitted'));
+  }
+  if (hasSourceRef) {
+    columns.push('source_ref');
+    values.push(String(data.sourceRef || ''));
+  }
+  if (hasVerificationMethod) {
+    columns.push('verification_method');
+    values.push(String(data.verificationMethod || 'none'));
+  }
+  if (hasVerifiedAt) {
+    columns.push('verified_at');
+    values.push(String(data.verifiedAt || ''));
+  }
+  if (hasOwnerToken) {
+    columns.push('owner_token');
+    values.push(String(data.ownerToken || '').trim() || null);
+  }
+
+  const placeholders = values.map((value, index) => (String(value) === 'CURRENT_TIMESTAMP' ? `CURRENT_TIMESTAMP` : `?${index + 1}`));
+  const preparedValues = values.filter((value) => String(value) !== 'CURRENT_TIMESTAMP');
+
   await db
     .prepare(`
       INSERT INTO listings
-        (slug, city, city_country_key, country, platforms, description, price_min, price_max, rating, review_count, featured, featured_until, featured_score, featured_active, verified, source, source_ref, verification_method, verified_at, priority_score, website, email, created_at, updated_at)
-      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        (${columns.join(', ')})
+      VALUES (${placeholders.join(', ')})
     `)
-    .bind(
-      safeSlug,
-      city,
-      `${citySlug}__${countrySlug || 'global'}`,
-      country,
-      platformCsv,
-      String(data.description || 'Pending review description'),
-      Number.isFinite(Number(data.priceMin)) ? Number(data.priceMin) : 0,
-      Number.isFinite(Number(data.priceMax)) ? Number(data.priceMax) : 0,
-      0,
-      0,
-      0,
-      null,
-      0,
-      0,
-      1,
-      'user_submitted',
-      String(data.sourceRef || ''),
-      'manual_review',
-      new Date().toISOString(),
-      0,
-      String(data.website || '').trim(),
-      String(data.contactEmail || '').trim()
-    )
+    .bind(...preparedValues)
     .run();
 
   return safeSlug;

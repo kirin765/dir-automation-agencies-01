@@ -149,6 +149,29 @@ const mergedCountries = [...new Set([...countryOptions, ...fallbackCountries].so
         ></textarea>
       </div>
 
+      <div>
+        <label class="block text-sm text-slate-400 mb-2">Service Description *</label>
+        <textarea
+          name="description"
+          required
+          rows="6"
+          maxlength="1200"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white"
+          placeholder="Describe your agency, target industries, and service scope in detail."
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Minimum Project Budget (USD) *</label>
+          <input name="priceMin" type="number" required min="0" max="1000000" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-400 mb-2">Maximum Project Budget (USD) *</label>
+          <input name="priceMax" type="number" required min="0" max="1000000" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white" />
+        </div>
+      </div>
+
       <button type="submit" class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-xl">
         Submit Application
       </button>

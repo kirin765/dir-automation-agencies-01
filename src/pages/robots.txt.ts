@@ -4,6 +4,7 @@ export const GET = () => {
 const robots = `User-agent: *
 Allow: /
 Disallow: /claim
+Disallow: /owner
 Disallow: /api/
 Disallow: /admin/
 

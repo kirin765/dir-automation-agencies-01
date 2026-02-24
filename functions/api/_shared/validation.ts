@@ -48,6 +48,19 @@ function sanitizeText(value = '') {
     .trim();
 }
 
+function parseIntegerInRange(raw, min = 0, max = 1_000_000) {
+  const value = Number.parseInt(String(raw || ''), 10);
+  if (Number.isNaN(value)) {
+    return null;
+  }
+
+  if (value < min || value > max) {
+    return null;
+  }
+
+  return value;
+}
+
 function isEmail(value) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value || '');
 }
@@ -173,6 +186,9 @@ export function parseJoinPayload(formData) {
   const website = parseFormField(formData, 'website', true);
   const contactName = parseFormField(formData, 'contactName', true);
   const contactEmail = parseFormField(formData, 'contactEmail', true);
+  const description = parseFormField(formData, 'description', true);
+  const priceMin = parseIntegerInRange(formData.get('priceMin'), 0, 1_000_000);
+  const priceMax = parseIntegerInRange(formData.get('priceMax'), 0, 1_000_000);
   const message = parseFormField(formData, 'message', true);
   const contactPhone = parseFormField(formData, 'contactPhone');
   const verificationEvidence = parseFormField(formData, 'verificationEvidence');
@@ -181,7 +197,22 @@ export function parseJoinPayload(formData) {
     return { ok: false, errors: ['Spam detected'] };
   }
 
-  const errors = [companyName, city, country, website, contactName, contactEmail, message].filter((field) => !field.ok);
+  const errors = [
+    companyName,
+    city,
+    country,
+    website,
+    contactName,
+    contactEmail,
+    description,
+    message,
+  ].filter((field) => !field.ok);
+  if (typeof priceMin !== 'number') {
+    errors.push({ reason: 'priceMin is required and must be a number between 0 and 1000000.' });
+  }
+  if (typeof priceMax !== 'number') {
+    errors.push({ reason: 'priceMax is required and must be a number between 0 and 1000000.' });
+  }
 
   const platforms = normalizePlatforms(platformField);
   if (!platforms.length) {
@@ -206,9 +237,19 @@ export function parseJoinPayload(formData) {
     return { ok: false, errors: ['Message must be at least 20 characters long'] };
   }
 
+  const trimmedDescription = clamp(description.value, 1200);
+  if (trimmedDescription.length < 50) {
+    return { ok: false, errors: ['Description must be at least 50 characters long'] };
+  }
+
+  if (priceMax < priceMin) {
+    return { ok: false, errors: ['priceMax must be greater than or equal to priceMin'] };
+  }
+
   return {
     ok: true,
     data: {
+      description: trimmedDescription,
       companyName: clamp(companyName.value),
       city: clamp(city.value),
       country: clamp(normalizedCountry),
@@ -218,6 +259,8 @@ export function parseJoinPayload(formData) {
       contactEmail: clamp(contactEmail.value, 500),
       contactPhone: clamp(contactPhone.value, 200),
       verificationEvidence: clamp(verificationEvidence.value, 1000),
+      priceMin,
+      priceMax,
       message: trimmedMessage,
     },
   };

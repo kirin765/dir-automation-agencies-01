@@ -72,6 +72,9 @@ async function run() {
     contactName: 'Ops Test',
     contactEmail: 'not-an-email',
     contactPhone: '+8210',
+    description: 'Short desc',
+    priceMin: '1000',
+    priceMax: '500',
     message: 'short message',
   };
 
@@ -101,6 +104,10 @@ async function run() {
     contactName: 'Ops Test',
     contactEmail: uniqueEmail,
     contactPhone: '+8210',
+    description:
+      'We design custom automation workflows, integrations, and operation dashboards for B2B teams with enterprise-grade reliability.',
+    priceMin: '1000',
+    priceMax: '9000',
     message: 'We provide automation and workflow consulting for startups and enterprise teams.',
   };
 
@@ -197,6 +204,7 @@ async function run() {
   const approvedJson = assertOkJsonResponse(approved, 200, 'admin approve request');
   assert.equal(approvedJson.ok, true, 'approve response should be ok=true');
   assert.equal(approvedJson.status, 'approved', 'approve response should return status approved');
+  assert.ok(approvedJson.ownerToken, 'approved response should include ownerToken');
 
   const approvedLookup = await request(`/api/admin/join-agencies?status=approved&contactEmail=${encodeURIComponent(uniqueEmail)}`, {
     method: 'GET',
@@ -207,6 +215,20 @@ async function run() {
   const approvedLookupJson = assertOkJsonResponse(approvedLookup, 200, 'admin approved request lookup');
   const approvedMatch = approvedLookupJson.items.find((item) => item.id === matched.id);
   assert(approvedMatch && approvedMatch.status === 'approved', 'join request status should be approved after admin action');
+
+  const ownerLeads = await request(`/api/owner/leads?token=${encodeURIComponent(approvedJson.ownerToken)}`, {
+    method: 'GET',
+  });
+  const ownerLeadsJson = assertOkJsonResponse(ownerLeads, 200, 'owner lead endpoint should work with valid token');
+  assert.equal(ownerLeadsJson.ok, true, 'owner lead response should be ok');
+  assert.equal(ownerLeadsJson.listing?.slug?.length > 0, true, 'owner lead response should include listing slug');
+  assert(ownerLeadsJson.listing.description, 'owner lead listing should include description');
+  assert(ownerLeadsJson.listing.priceMin >= 1000, 'owner lead listing should keep priceMin');
+
+  const invalidOwnerLeads = await request('/api/owner/leads', {
+    method: 'GET',
+  });
+  assert.equal(invalidOwnerLeads.status, 400, 'owner lead endpoint should require token');
 
   console.log('journey smoke passed');
 }
