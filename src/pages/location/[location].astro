@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { getByCountry, getCountries } from '../../../scripts/process-data';
+import { getByCountry, getCountries, getPlatformLabel } from '../../../scripts/process-data';
 
 export function getStaticPaths() {
   return getCountries().map((country) => ({
@@ -63,8 +63,8 @@ const pageDesc = `Find top-rated ${country.name} automation agencies and experts
 
             <div class="flex gap-2 mb-3">
               {listing.platforms.map((platform) => (
-                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
-                  {platform}
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                  {getPlatformLabel(platform)}
                 </span>
               ))}
             </div>

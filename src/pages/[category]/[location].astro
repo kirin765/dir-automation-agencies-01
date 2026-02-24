@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { getByCategoryAndLocation, getCategories, getCountries, getDirectoryCategories } from '../../../scripts/process-data';
+import { getByCategoryAndLocation, getCategories, getCountries, getDirectoryCategories, getPlatformLabel } from '../../../scripts/process-data';
 
 export function getStaticPaths() {
   const categories = getDirectoryCategories();
@@ -33,7 +33,7 @@ const isValidCategory = categories.includes(category);
 const listings = isValidCategory ? getByCategoryAndLocation(category, country.slug) : [];
 const hasListings = listings.length > 0;
 
-const titleCategory = `${category.charAt(0).toUpperCase() + category.slice(1)}`;
+const titleCategory = getPlatformLabel(category);
 const pageTitle = `${titleCategory} in ${country.name} - AI Automation Agencies`;
 const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
 ---
@@ -46,7 +46,7 @@ const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
       <a href={`/${category}`} class="text-green-400 hover:text-green-300">← Back to {titleCategory}</a>
     </div>
     
-    <h1 class="text-3xl md:text-4xl font-bold mb-4 capitalize">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">
       {titleCategory} in {country.name}
     </h1>
     <p class="text-slate-400 mb-8">
@@ -82,8 +82,8 @@ const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
             </div>
             <div class="flex gap-2 mb-3">
               {listing.platforms.map(p => (
-                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
-                  {p}
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                  {getPlatformLabel(p)}
                 </span>
               ))}
             </div>

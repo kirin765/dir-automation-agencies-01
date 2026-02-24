@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getCountries, getVerified } from '../../scripts/process-data';
+import { getCountries, getPlatformLabel, getVerified } from '../../scripts/process-data';
 
 const q = Astro.url.searchParams.get('q') || '';
 const platform = Astro.url.searchParams.get('platform') || '';
@@ -64,7 +64,7 @@ const platforms = ['zapier', 'make', 'n8n', 'custom'];
           <select name="platform" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white">
             <option value="">All Platforms</option>
             {platforms.map(p => (
-              <option value={p} selected={platform === p} class="capitalize">{p}</option>
+              <option value={p} selected={platform === p}>{getPlatformLabel(p)}</option>
             ))}
           </select>
         </div>
@@ -108,8 +108,8 @@ const platforms = ['zapier', 'make', 'n8n', 'custom'];
           
           <div class="flex gap-2 mb-3">
             {listing.platforms.map(p => (
-              <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
-                {p}
+              <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                {getPlatformLabel(p)}
               </span>
             ))}
           </div>

@@ -4,6 +4,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getVerified, getByCountry, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
 import { GUIDE_DATA } from '../../lib/guides';
+import { getPlatformLabel } from '../../../scripts/process-data';
 
 export function getStaticPaths() {
   const listings = getVerified();
@@ -69,8 +70,8 @@ const schema = {
 
       <div class="flex flex-wrap gap-2 mb-6">
         {listing.platforms.map(p => (
-          <span class="px-3 py-1 bg-slate-700 text-slate-300 text-sm rounded-full capitalize">
-            {p}
+          <span class="px-3 py-1 bg-slate-700 text-slate-300 text-sm rounded-full">
+            {getPlatformLabel(p)}
           </span>
         ))}
       </div>

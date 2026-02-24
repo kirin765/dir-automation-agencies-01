@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getCountries, getVerified } from '../../scripts/process-data';
+import { getCountries, getPlatformLabel, getVerified } from '../../scripts/process-data';
 
 const listings = getVerified();
 const featuredListings = listings.filter(l => l.isFeaturedActive).slice(0, 6);
@@ -80,7 +80,7 @@ const locations = getCountries();
             data-track="category_click"
             class="p-6 bg-slate-800 border border-slate-700 rounded-xl text-center card-hover hover:border-green-500"
           >
-            <div class="text-2xl font-bold capitalize mb-1">{platform}</div>
+            <div class="text-2xl font-bold mb-1">{getPlatformLabel(platform)}</div>
             <div class="text-slate-500 text-sm">
               {listings.filter(l => l.platforms.includes(platform)).length} experts
             </div>
@@ -114,7 +114,7 @@ const locations = getCountries();
             <div class="flex gap-2 mb-3">
               {listing.platforms.map(p => (
                 <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
-                  {p}
+                  {getPlatformLabel(p)}
                 </span>
               ))}
             </div>

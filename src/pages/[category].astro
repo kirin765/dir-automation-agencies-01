@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getByCategory, getDirectoryCategories } from '../../scripts/process-data';
+import { getByCategory, getDirectoryCategories, getPlatformLabel } from '../../scripts/process-data';
 
 export function getStaticPaths() {
   const categories = getDirectoryCategories();
@@ -14,8 +14,9 @@ export function getStaticPaths() {
 
 const { category } = Astro.props;
 const listings = getByCategory(category);
-const pageTitle = `${category.charAt(0).toUpperCase() + category.slice(1)} Experts - AI Automation Agencies`;
-const pageDesc = `Find top-rated ${category} automation experts and agencies. Browse ${listings.length} specialists worldwide.`;
+const categoryLabel = getPlatformLabel(category);
+const pageTitle = `${categoryLabel} Experts - AI Automation Agencies`;
+const pageDesc = `Find top-rated ${categoryLabel} automation experts and agencies. Browse ${listings.length} specialists worldwide.`;
 const hasListings = listings.length > 0;
 ---
 
@@ -27,8 +28,8 @@ const hasListings = listings.length > 0;
       <a href="/" class="text-green-400 hover:text-green-300">← Back to Home</a>
     </div>
     
-    <h1 class="text-3xl md:text-4xl font-bold mb-4 capitalize">
-      {category} Experts
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">
+      {categoryLabel} Experts
     </h1>
     <p class="text-slate-400 mb-8">
       {listings.length} verified automation specialists available
@@ -54,8 +55,8 @@ const hasListings = listings.length > 0;
             
             <div class="flex gap-2 mb-3">
               {listing.platforms.map(p => (
-                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded capitalize">
-                  {p}
+                <span class="px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                  {getPlatformLabel(p)}
                 </span>
               ))}
             </div>

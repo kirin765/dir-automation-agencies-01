@@ -57,6 +57,13 @@ const LEADS_PATH = path.join(process.cwd(), 'data', 'leads.json');
 type CsvRecord = Record<string, string>;
 
 const DEFAULT_COUNTRY = 'united-states';
+const PLATFORM_LABEL_MAP: Record<string, string> = {
+  zapier: 'Zapier',
+  make: 'Make',
+  n8n: 'n8n',
+  custom: 'Custom',
+  ai: 'AI',
+};
 
 export interface LocationPage {
   slug: string;
@@ -80,6 +87,12 @@ function normalizePlatform(value: string): string {
   };
 
   return map[value.toLowerCase()] || value.toLowerCase();
+}
+
+export function getPlatformLabel(value = ''): string {
+  const normalized = normalizePlatform(String(value).trim());
+  if (!normalized) return '';
+  return PLATFORM_LABEL_MAP[normalized] || normalized;
 }
 
 function normalizePlatforms(platforms: string): string[] {
