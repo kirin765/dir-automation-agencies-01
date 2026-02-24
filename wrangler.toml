@@ -5,7 +5,6 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 PUBLIC_SITE_URL = "https://automationagencydirectory.com"
 PUBLIC_BASE_PATH = "/"
-ADMIN_API_KEY = "REPLACE_WITH_ADMIN_API_KEY"
 TURNSTILE_SECRET_KEY = ""
 TURNSTILE_SITE_KEY = ""
 
