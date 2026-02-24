@@ -14,6 +14,10 @@
     "test:seo": "node scripts/quality/test-seo.mjs",
     "test:routes": "node scripts/quality/test-routes.mjs",
     "test:api": "node scripts/quality/test-api.mjs",
+    "sync:d1:listings": "node scripts/sync-d1-listings.mjs",
+    "sync-and-build": "npm run sync:d1:listings && npm run build",
+    "sync-and-deploy": "npm run sync:d1:listings && npm run build && npx wrangler pages deploy dist --project-name=dir-automation-agencies-01 --commit-dirty=true",
+    "admin:tui": "bash scripts/admin-ops.sh",
     "test:workflow": "node scripts/test-pages-workflow.mjs",
     "astro": "astro"
   },

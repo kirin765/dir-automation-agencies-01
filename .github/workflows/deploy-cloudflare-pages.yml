@@ -29,6 +29,13 @@ jobs:
           SITE_URL: https://automationagencydirectory.com
         run: npm run test
 
+      - name: Sync verified listings from D1
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_DATABASE_NAME: automation_agencies
+        run: npm run sync:d1:listings
+
       - name: Build
         run: npm run build
 

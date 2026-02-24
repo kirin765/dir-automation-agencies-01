@@ -64,6 +64,25 @@
 - `401` 응답이 오면 `x-admin-key` 누락/오입력 또는 Pages Secret 미배치 상태
 - 응답이 계속 실패하면 Functions 로그에서 `ADMIN_API_KEY` 바인딩(Secret) 상태와 엔드포인트 배포 상태를 확인
 
+### 3-2) 운영자 TUI 스크립트(권장)
+
+- 파일: `scripts/admin-ops.sh`
+- 실행:
+  - `BASE_URL=https://automationagencydirectory.com ADMIN_API_KEY=<KEY> ./scripts/admin-ops.sh`
+- 기능:
+  - `1) 신규 신청 승인/거절`: `join` 대기 목록에서 항목을 골라 `update-join` 처리
+  - `2) 기존 목록 verified 토글`: `/api/listings` 미검증 목록에서 `verified` 토글 (`/api/admin/listings`)
+
+### 3-3) D1 → 정적 데이터 동기화 (자동화)
+
+- 수동:
+  - `npm run sync:d1:listings`
+  - `npm run sync-and-build`
+  - `npm run sync-and-deploy` (동일 명령으로 동기화 + 빌드 + 배포)
+- 자동:
+  - `.github/workflows/sync-d1-listings.yml`를 통해 30분 간격 동기화
+  - D1(`verified=1`)을 조회해 `data/listings.csv`를 재생성하고 빌드/배포 수행
+
 ## 4) 이벤트 추적
 
 - 폼/CTA/클릭 추적: `POST /api/events`
