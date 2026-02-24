@@ -38,8 +38,13 @@ function getRedirectErrorTarget(error) {
   return `/join?error=${encodeURIComponent(error)}`;
 }
 
+function isDebugEnabled(request, env) {
+  return request.headers.get('x-debug-token') && env?.ADMIN_API_KEY && request.headers.get('x-debug-token') === env.ADMIN_API_KEY;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const debugEnabled = isDebugEnabled(request, env);
   const ip = getIp(request);
 
   if (!isTrustedOrigin(request, env)) {
@@ -126,11 +131,15 @@ export async function onRequestPost(context) {
     }
 
     await insertJoinAgencyRequest(db, parsed.data, request.headers.get('referer') || '/join');
-  } catch {
+  } catch (error) {
+    console.error('join-agency submit failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     const errorMessage = 'Join request submission is temporarily unavailable. Please try again later.';
+    const responseMessage = debugEnabled && error instanceof Error ? error.message : errorMessage;
     if (wantsJson(request)) {
       return new Response(
-        JSON.stringify({ error: errorMessage }),
+        JSON.stringify({ error: responseMessage }),
         { status: 500, headers: { 'content-type': 'application/json' } }
       );
     }
@@ -142,5 +151,5 @@ export async function onRequestPost(context) {
     return new Response(JSON.stringify({ ok: true }), { status: 201, headers: { 'content-type': 'application/json' } });
   }
 
-  return Response.redirect(redirectTarget, 303);
+  return new Response(null, { status: 303, headers: { Location: redirectTarget || '/join' } });
 }
