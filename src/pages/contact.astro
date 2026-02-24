@@ -16,8 +16,17 @@ const error = Astro.url.searchParams.get('error');
   <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <h1 class="text-3xl font-bold mb-4">Contact an Agency</h1>
     <p class="text-slate-400 mb-8">Send your project details. We will forward this lead to the right team.</p>
-    {error && <p class="mb-4 text-red-400">Submission failed: {error}</p>}
-    {success && <p class="mb-4 text-green-400">Thanks! Your message was sent.</p>}
+    <div
+      id="contact-feedback"
+      role="status"
+      aria-live="polite"
+      class={`mb-4 px-4 py-3 rounded-xl border ${
+        error ? 'text-red-300 border-red-500/40 bg-red-900/20' : success ? 'text-green-300 border-green-500/40 bg-green-900/20' : 'hidden'
+      }`}
+    >
+      {error && <p>Submission failed: {error}</p>}
+      {success && <p>Thanks! Your message was sent.</p>}
+    </div>
 
     {listings.length > 0 ? (
       <>
@@ -28,6 +37,7 @@ const error = Astro.url.searchParams.get('error');
           class="space-y-6"
           data-track-form="lead_form_submit"
           data-listing={selectedListing?.slug || ''}
+          id="contact-form"
         >
           <input type="hidden" name="cf-turnstile-response" value="" />
           <div>
@@ -60,4 +70,54 @@ const error = Astro.url.searchParams.get('error');
     )}
   </main>
   <Footer />
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('contact-form');
+      const feedback = document.getElementById('contact-feedback');
+      if (!form || !feedback) return;
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const originalText = submitButton ? submitButton.textContent : '';
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Submitting...';
+        }
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          const payload = await response.json().catch(() => ({ error: 'Unknown response format.' }));
+
+          if (response.ok && payload?.ok) {
+            feedback.className =
+              'mb-4 px-4 py-3 rounded-xl border text-green-300 border-green-500/40 bg-green-900/20';
+            feedback.textContent = 'Thanks! Your message was sent.';
+            form.reset();
+          } else {
+            feedback.className =
+              'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
+            feedback.textContent = `Submission failed: ${payload?.error || 'Unknown error. Please try again.'}`;
+            if (submitButton && originalText) {
+              submitButton.disabled = false;
+              submitButton.textContent = originalText;
+            }
+          }
+        } catch (error) {
+          feedback.className =
+            'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
+          feedback.textContent = 'Submission failed. Network issue or server error. Please try again.';
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText || 'Send Inquiry';
+          }
+        }
+      });
+    })();
+  </script>
 </Layout>
