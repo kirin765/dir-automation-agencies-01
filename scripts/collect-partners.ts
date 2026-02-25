@@ -93,7 +93,7 @@ function usage(): void {
   console.log(`
 collect-partners usage:
 
-  --source <name,...>            source adapters: duckduckgo, bing, seed (default: duckduckgo)
+  --source <name,...>            source adapters: duckduckgo(HTML), bing(Brave Web Search API), seed (default: duckduckgo)
   --query-file <path>            query template file (default: ${DEFAULT_QUERY_FILE})
   --max-results <n>              total max candidates (default: 5000)
   --limit-per-source <n>         per source cap (default: 2000)
@@ -244,7 +244,9 @@ function makeTimestamp(): string {
   const d = `${now.getUTCDate()}`.padStart(2, '0');
   const hh = `${now.getUTCHours()}`.padStart(2, '0');
   const mm = `${now.getUTCMinutes()}`.padStart(2, '0');
-  return `${y}${m}${d}${hh}${mm}`;
+  const ss = `${now.getUTCSeconds()}`.padStart(2, '0');
+  const ms = `${now.getUTCMilliseconds()}`.padStart(3, '0');
+  return `${y}${m}${d}${hh}${mm}${ss}${ms}`;
 }
 
 async function runDiscoveries(

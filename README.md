@@ -151,7 +151,7 @@ Use `collect:partners` to generate partner candidates from public web discovery 
 2. Run discovery (dry run first):
 
 ```bash
-npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source duckduckgo --verification-mode strict --min-score 45
+npm run collect:partners:dry-run -- --source bing --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
 ```
 
 3. Inspect generated staging files:
@@ -171,8 +171,36 @@ ls data/staging/partners_*
 4. Merge accepted candidates into `data/listings.csv`:
 
 ```bash
-npm run collect:partners:ingest -- --append-to-listings --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45
+npm run collect:partners:ingest -- --source bing --append-to-listings --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
 ```
+
+### 파트너 메일링 발송(accepted 기반)
+
+1. 드라이런 후 생성된 `data/staging/partners_*.csv`에서 `verification_status=accepted`만 선별 발송 대상으로 사용합니다.
+2. 관리자 API를 통해 dry-run 또는 실제 발송을 실행:
+
+```bash
+curl -X POST https://<your-domain>/api/admin/send-partner-mail \
+  -H "x-admin-key: $ADMIN_API_KEY" \
+  -H "content-type: application/json" \
+  -d '{"mode":"dry_run","sourceFile":"partners_202602250847.csv","campaignKey":"campaign_2026_02"}'
+```
+
+- 참고: `sourceFile` 모드는 런타임이 Node 기반으로 실행되는 환경에서만 동작합니다.
+- Pages/Workers 운영에서는 `candidates` 배열 입력으로 즉시 발송 대상을 전달하는 방식이 안전합니다.
+
+3. 실발송:
+
+```bash
+curl -X POST https://<your-domain>/api/admin/send-partner-mail \
+  -H "x-admin-key: $ADMIN_API_KEY" \
+  -H "content-type: application/json" \
+  -d '{"mode":"send","sourceFile":"partners_202602250847.csv","campaignKey":"campaign_2026_02"}'
+```
+
+- 운영 권장: `candidates`로 전달한 동일 배치 내 중복(`email`/`website`)은 API 레이어에서 1회로 축소되어 중복 발송을 방지합니다.
+
+4. 응답의 `sendSummary` 항목(`alreadySent`, `queued`, `sent`, `failed`, `skippedInvalidEmail`)으로 결과 확인.
 
 Notes:
 - Candidates are written as `source=public_api`, `verified=false`, `verification_method=api_match`.
@@ -227,6 +255,17 @@ The `scripts/process-data.ts` script:
    - `CLOUDFLARE_D1_DATABASE_ID`
    - `TURNSTILE_SECRET_KEY` (optional, anti-bot validation)
    - `TURNSTILE_SITE_KEY` (optional, pair with TURNSTILE_SECRET_KEY)
+   - `BRAVE_WEB_SEARCH_API_KEY` (required for `collect:partners --source bing` after Bing retirement migration)
+   - `BRAVE_WEB_SEARCH_ENDPOINT` (optional, default `https://api.search.brave.com/res/v1/web/search`)
+   - `BRAVE_WEB_SEARCH_COUNTRY` (optional, default `us`)
+   - `BRAVE_WEB_SEARCH_SAFE_SEARCH` (optional, default `strict`)
+   - `BING_WEB_SEARCH_SAFE_SEARCH` is no longer used; keep `BRAVE_WEB_SEARCH_SAFE_SEARCH` for this pipeline
+   - `GMAIL_CLIENT_ID` (OAuth2 Client ID)
+   - `GMAIL_CLIENT_SECRET` (OAuth2 Client Secret)
+   - `GMAIL_REFRESH_TOKEN` (OAuth2 Refresh Token)
+   - `GMAIL_USER_EMAIL` (Gmail sender address)
+   - `GMAIL_FROM_NAME` (optional display name)
+   - `GMAIL_RATE_LIMIT_PER_MIN` (optional, default `120`)
 8. Deploy!
 
 If you deploy from CLI instead, use:

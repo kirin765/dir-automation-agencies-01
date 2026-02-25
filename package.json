@@ -7,7 +7,7 @@
     "start": "astro dev",
     "build": "astro build",
     "collect:partners": "npx tsx scripts/collect-partners.ts --verification-mode strict --require-email --min-score 45",
-    "collect:partners:dry-run": "npx tsx scripts/collect-partners.ts --dry-run --write-staging --source duckduckgo --verification-mode strict --require-email --min-score 45 --max-results 500",
+    "collect:partners:dry-run": "npx tsx scripts/collect-partners.ts --dry-run --write-staging --source bing --verification-mode strict --require-email --min-score 45 --max-results 500",
     "collect:partners:ingest": "npx tsx scripts/collect-partners.ts --append-to-listings --verification-mode strict --require-email --min-score 45",
     "deploy:pages": "npm run build && npx wrangler pages deploy dist --project-name=dir-automation-agencies-01 --commit-dirty=true",
     "preview": "astro preview",

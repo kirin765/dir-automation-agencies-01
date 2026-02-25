@@ -85,10 +85,10 @@
 
 ### 3-4) 웹 파트너 후보 수집 배치
 
-- 실행:
-  - `npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source duckduckgo --verification-mode strict --min-score 45 --require-email`
+실행(Bing Web Search API 종료 대응 후, --source bing은 Brave Web Search API를 사용):
+  - `npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source bing --verification-mode strict --min-score 45 --require-email`
   - 후보 검수 후 적재:
-  - `npm run collect:partners:ingest -- --query-file data/partner-queries.sample.json --source duckduckgo --append-to-listings --verification-mode strict --min-score 45 --require-email`
+  - `npm run collect:partners:ingest -- --query-file data/partner-queries.sample.json --source bing --append-to-listings --verification-mode strict --min-score 45 --require-email`
 - 산출물:
   - `data/staging/partners_<YYYYMMDDHHmm>.csv` (적용 후보 CSV)
   - `data/staging/partners_<YYYYMMDDHHmm>.summary.json` (상태/점수/검수 로그)
@@ -100,6 +100,20 @@
 - 운영 기준:
   - `--verification-mode strict`가 기본 (권장 `--min-score 45`, `--require-email`)
   - `summary.json`의 `qualityGate`를 확인해 `withEmail`, `validatedWebsite`, `blockedByDomain`, `avgVerificationScore`를 점검
+
+### 3-5) 파트너 메일링 실행
+
+- dry-run:
+  - `POST /api/admin/send-partner-mail`
+  - body: `{"mode":"dry_run","sourceFile":"partners_YYYYMMDDHHMMSSsss.csv","campaignKey":"mail_20260225"}`
+- 실제 발송:
+  - 동일 요청에서 `mode`를 `send`로 변경
+- 참고: `sourceFile` 모드는 Node 런타임에서만 처리되며, 운영 Pages 환경에서는 `candidates` 배열을 함께 전달해 발송 실행을 권장합니다.
+- 확인 항목:
+  - `sendSummary.total`, `sendSummary.accepted`, `sendSummary.alreadySent`, `sendSummary.queued`, `sendSummary.sent`, `sendSummary.failed`, `sendSummary.skippedInvalidEmail`
+- 운영 제약:
+  - `alreadySent`가 높으면 대상 재발송 가능성 낮음
+  - `failed` 급증 시 OAuth 토큰/쿼터/도메인 제한 확인
 
 ## 4) 이벤트 추적
 

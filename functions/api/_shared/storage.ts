@@ -3,6 +3,30 @@ import slugify from 'slugify';
 const rateBuckets = new Map();
 const ONE_MINUTE = 60_000;
 const tableColumnsCache = new Map();
+const ALLOWED_EMAIL_LOG_STATUSES = new Set(['queued', 'sent', 'failed', 'skipped', 'invalid']);
+
+export interface EmailSendLogRow {
+  id: string;
+  recipientEmail: string;
+  website: string;
+  campaignKey: string | null;
+  sourceFile: string | null;
+  status: string;
+  messageId: string | null;
+  providerErrorCode: string | null;
+  providerError: string | null;
+  sentAt: string | null;
+  skippedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface EmailSendLogUpdate {
+  status: 'queued' | 'sent' | 'failed' | 'skipped' | 'invalid';
+  messageId?: string;
+  errorCode?: string;
+  errorText?: string;
+}
 
 function makeColumnCacheKey(table) {
   return `table:${table}`;
@@ -57,6 +81,50 @@ function normalizeSlugText(value) {
     lower: true,
     strict: true,
   });
+}
+
+function normalizeEmailForLog(value) {
+  return normalizeValue(value).toLowerCase();
+}
+
+function normalizeWebsiteForLog(value) {
+  const raw = normalizeValue(value);
+  if (!raw) {
+    return '';
+  }
+
+  try {
+    const parsed = new URL(raw);
+    return parsed.hostname.replace(/^www\./i, '').toLowerCase();
+  } catch {
+    return raw
+      .toLowerCase()
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .split('?')[0]
+      .split('#')[0]
+      .split('/')[0];
+  }
+}
+
+function mapEmailSendLogRow(raw) {
+  if (!raw) return null;
+
+  return {
+    id: String(raw.id || ''),
+    recipientEmail: String(raw.recipient_email || ''),
+    website: String(raw.website || ''),
+    campaignKey: raw.campaign_key ?? null,
+    sourceFile: raw.source_file ?? null,
+    status: String(raw.status || ''),
+    messageId: raw.message_id ?? null,
+    providerErrorCode: raw.provider_error_code ?? null,
+    providerError: raw.provider_error ?? null,
+    sentAt: raw.sent_at ?? null,
+    skippedAt: raw.skipped_at ?? null,
+    createdAt: raw.created_at ?? null,
+    updatedAt: raw.updated_at ?? null,
+  };
 }
 
 export async function isListingSlugTaken(db, slug) {
@@ -756,6 +824,104 @@ export async function queryEventCounts(db, sinceMinutes = 60) {
     acc[row.event_type] = Number(row.count || 0);
     return acc;
   }, {});
+}
+
+export async function getEmailSendLogByRecipient(db, recipientEmail, website) {
+  assertDbAvailable(db, 'email send log lookup');
+  const normalizedEmail = normalizeEmailForLog(recipientEmail);
+  const normalizedWebsite = normalizeWebsiteForLog(website);
+
+  if (!normalizedEmail && !normalizedWebsite) {
+    return null;
+  }
+
+  const statement = db.prepare(`
+    SELECT *
+      FROM email_send_log
+     WHERE (website = ?1 OR recipient_email = ?2)
+       AND status IN ('sent', 'queued')
+     ORDER BY CASE WHEN website = ?1 THEN 0 ELSE 1 END, created_at DESC
+     LIMIT 1
+  `);
+
+  const row = await statement
+    .bind(normalizedWebsite || normalizedEmail, normalizedEmail)
+    .first();
+
+  return mapEmailSendLogRow(row);
+}
+
+export async function insertEmailSendLog(db, payload) {
+  assertDbAvailable(db, 'email send log insertion');
+
+  const id = String(payload?.id || crypto.randomUUID());
+  const status =
+    typeof payload?.status === 'string' && ALLOWED_EMAIL_LOG_STATUSES.has(payload.status)
+      ? payload.status
+      : 'queued';
+
+  const email = normalizeEmailForLog(payload?.recipientEmail);
+  const website = normalizeWebsiteForLog(payload?.website);
+
+  await db
+    .prepare(
+      `INSERT INTO email_send_log
+        (id, recipient_email, website, campaign_key, source_file, status, message_id, provider_error_code, provider_error, sent_at, skipped_at)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`
+    )
+    .bind(
+      id,
+      email,
+      website,
+      payload?.campaignKey || null,
+      payload?.sourceFile || null,
+      status,
+      payload?.messageId || null,
+      payload?.providerErrorCode || null,
+      payload?.providerError || null,
+      payload?.sentAt || null,
+      payload?.skippedAt || null
+    )
+    .run();
+
+  return id;
+}
+
+export async function markEmailSendLogResult(db, id, update) {
+  assertDbAvailable(db, 'email send log update');
+  if (!ALLOWED_EMAIL_LOG_STATUSES.has(update.status)) {
+    throw new Error(`Invalid email send status: ${update.status}`);
+  }
+
+  const now = new Date().toISOString();
+  const values = [id, update.status, now, update.messageId ?? null, update.errorCode ?? null, update.errorText ?? null];
+  const sets = [
+    'status = ?2',
+    'updated_at = ?3',
+    'message_id = ?4',
+    'provider_error_code = ?5',
+    'provider_error = ?6',
+  ];
+
+  if (update.status === 'sent') {
+    values.push(now);
+    sets.push('sent_at = ?7');
+  }
+  if (update.status === 'skipped' || update.status === 'invalid') {
+    values.push(now);
+    sets.push('skipped_at = ?7');
+  }
+
+  const statement = db.prepare(`UPDATE email_send_log SET ${sets.join(', ')} WHERE id = ?1`);
+  const result = await statement
+    .bind(...values)
+    .run();
+
+  if (result.meta && result.meta.changes === 0) {
+    throw new Error('Email send log not found.');
+  }
+
+  return;
 }
 
 export async function insertTrackingEvent(db, payload, sourceIp = 'unknown') {

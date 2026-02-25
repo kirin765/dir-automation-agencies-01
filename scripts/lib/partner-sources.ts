@@ -171,7 +171,7 @@ const DUCKDUCKGO_SITE_EXCLUDES = [
   '-site:yellowpages.com',
 ].join(' ');
 
-const BING_RSS_EXCLUDES = [
+const WEB_SEARCH_SOURCE_EXCLUDES = [
   'site:clutch.co',
   'site:goodfirms.com',
   'site:sortlist.com',
@@ -184,52 +184,38 @@ const BING_RSS_EXCLUDES = [
   'site:yellowpages.com',
   'site:linkedin.com',
   'site:github.com',
-  'site:clutch.co',
 ].map((entry) => `-${entry}`).join(' ');
 
-function decodeEntity(value: string): string {
-  return value
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&amp;/g, '&');
-}
+const BRAVE_API_DEFAULT_ENDPOINT = 'https://api.search.brave.com/res/v1/web/search';
+const BRAVE_API_DEFAULT_COUNTRY = 'us';
+const BRAVE_API_DEFAULT_SAFE_SEARCH = 'strict';
+const BRAVE_API_MAX_COUNT = 20;
 
-function stripCdata(value: string): string {
-  return value.replace(/^<!\[CDATA\[/, '').replace(/\]\]>$/, '');
-}
+type BraveWebPage = {
+  title?: string;
+  url?: string;
+  description?: string;
+};
 
-function parseTagValue(xml: string, tagName: string): string {
-  const regex = new RegExp(`<${tagName}(?:\\s+[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, 'i');
-  const match = regex.exec(xml);
-  if (!match) return '';
-  const raw = (match[1] || '').trim();
-  return raw ? cleanText(decodeEntity(stripCdata(raw))) : '';
-}
+type BraveSearchResponse = {
+  web?: {
+    results?: BraveWebPage[];
+  };
+};
 
-function parseRssItemsFromXml(xml: string, maxResults: number): { title: string; url: string; description: string }[] {
-  const candidates: { title: string; url: string; description: string }[] = [];
-  const chunks = xml.split('<item>');
-
-  for (let i = 1; i < chunks.length && candidates.length < maxResults; i += 1) {
-    const block = chunks[i].split('</item>')[0] || '';
-    if (!block) continue;
-
-    const title = parseTagValue(`<item>${block}`, 'title');
-    const url = parseTagValue(`<item>${block}`, 'link');
-    const description = parseTagValue(`<item>${block}`, 'description');
-
-    if (url) {
-      candidates.push({
-        title,
-        url,
-        description,
-      });
-    }
+function getBraveConfig() {
+  const key = process.env.BRAVE_WEB_SEARCH_API_KEY || process.env.BING_WEB_SEARCH_API_KEY || '';
+  if (!key) {
+    throw new Error('No brave api key configured');
   }
 
-  return candidates;
+  return {
+    key,
+    endpoint: process.env.BRAVE_WEB_SEARCH_ENDPOINT || BRAVE_API_DEFAULT_ENDPOINT,
+    country: process.env.BRAVE_WEB_SEARCH_COUNTRY || BRAVE_API_DEFAULT_COUNTRY,
+    safeSearch:
+      process.env.BRAVE_WEB_SEARCH_SAFE_SEARCH || process.env.BING_WEB_SEARCH_SAFE_SEARCH || BRAVE_API_DEFAULT_SAFE_SEARCH,
+  };
 }
 
 function cleanText(value: string): string {
@@ -448,16 +434,20 @@ async function fetchWithTimeout(url: string, timeoutMs: number, options: Request
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
+    const headers: Record<string, string> = {
+      'user-agent':
+        'Mozilla/5.0 (compatible; partner-discovery/1.0; +https://automationagencydirectory.com)',
+      ...(options.headers || {}),
+    };
+    if (!('accept' in headers)) {
+      headers.accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+    }
+
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
       redirect: 'follow',
-      headers: {
-        ...(options.headers || {}),
-        'user-agent':
-          'Mozilla/5.0 (compatible; partner-discovery/1.0; +https://automationagencydirectory.com)',
-        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      },
+      headers,
     });
     return response;
   } finally {
@@ -771,59 +761,81 @@ async function fetchWebsiteDetails(candidate: CandidateRaw): Promise<CandidateRa
   }
 }
 
-class BingSource implements SourceAdapter {
+class BraveSource implements SourceAdapter {
   key = 'bing';
-  displayName = 'Bing RSS Search';
+  displayName = 'Brave Web Search API';
 
   async discover(query: SearchQuery, options: { maxResults: number }): Promise<CandidateRaw[]> {
     const keywordSuffix = query.platforms?.length
       ? `(${query.platforms.join(' OR ')})`
       : '("automation agency" OR "marketing automation agency" OR "zapier partner")';
-    const q = `${query.query} ${query.country || ''} ${keywordSuffix} ${BING_RSS_EXCLUDES}`.trim();
-    const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(q)}&format=rss`;
-    const response = await fetchWithTimeout(searchUrl, 12000, {
-      headers: {
-        referer: 'https://www.bing.com/',
-      },
-    });
+    const q = `${query.query} ${query.country || ''} ${keywordSuffix} ${WEB_SEARCH_SOURCE_EXCLUDES}`.trim();
+    const count = Math.max(1, Math.min(options.maxResults, BRAVE_API_MAX_COUNT));
 
-    if (!response.ok) {
+    try {
+      const config = getBraveConfig();
+      const searchUrl = new URL(config.endpoint);
+      searchUrl.searchParams.set('q', q);
+      searchUrl.searchParams.set('count', String(count));
+      searchUrl.searchParams.set('country', config.country);
+      searchUrl.searchParams.set('safesearch', config.safeSearch);
+
+      const response = await fetchWithTimeout(searchUrl.toString(), 12000, {
+        headers: {
+          'X-Subscription-Token': config.key,
+          accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return [];
+      }
+
+      let payload: BraveSearchResponse;
+      try {
+        payload = (await response.json()) as BraveSearchResponse;
+      } catch {
+        return [];
+      }
+
+      const pages = payload.web?.results || [];
+      const seen = new Set<string>();
+      const candidates: CandidateRaw[] = [];
+
+      for (const item of pages) {
+        const website = normalizeWebsite(item.url || '');
+        if (!website || seen.has(website)) continue;
+        seen.add(website);
+
+        candidates.push({
+          source: this.key,
+          discoveredName: cleanText(item.title || '') || 'Unknown',
+          discoveredWebsite: website,
+          sourceRef: item.url || website,
+          snippet: cleanText(item.description || ''),
+          country: query.country,
+          platforms: query.platforms,
+          query,
+        });
+      }
+
+      return candidates.filter((candidate) => {
+        const check = isDirectoryCandidateUrl(candidate);
+        if (check.blocked) {
+          candidate.discoveryFlags = {
+            blockedBySource: true,
+            rejectionReasons: check.reasons,
+          };
+          return false;
+        }
+        return true;
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'No brave api key configured') {
+        throw error;
+      }
       return [];
     }
-
-    const xml = await response.text();
-    const parsed = parseRssItemsFromXml(xml, options.maxResults);
-    const seen = new Set<string>();
-    const candidates: CandidateRaw[] = [];
-
-    for (const item of parsed) {
-      const website = normalizeWebsite(item.url);
-      if (!website || seen.has(website)) continue;
-      seen.add(website);
-
-      candidates.push({
-        source: this.key,
-        discoveredName: cleanText(item.title) || 'Unknown',
-        discoveredWebsite: website,
-        sourceRef: item.url,
-        snippet: item.description || undefined,
-        country: query.country,
-        platforms: query.platforms,
-        query,
-      });
-    }
-
-    return candidates.filter((candidate) => {
-      const check = isDirectoryCandidateUrl(candidate);
-      if (check.blocked) {
-        candidate.discoveryFlags = {
-          blockedBySource: true,
-          rejectionReasons: check.reasons,
-        };
-        return false;
-      }
-      return true;
-    });
   }
 
   async fetchDetails(candidate: CandidateRaw): Promise<CandidateRaw> {
@@ -857,6 +869,6 @@ class FallbackSeedSource implements SourceAdapter {
 
 export const sourceAdapters: Record<string, SourceAdapter> = {
   duckduckgo: new DuckDuckGoSource(),
-  bing: new BingSource(),
+  bing: new BraveSource(),
   seed: new FallbackSeedSource(),
 };

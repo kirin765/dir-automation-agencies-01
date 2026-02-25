@@ -1,0 +1,211 @@
+---
+---
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partner Mail Sender</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, Arial, system-ui, sans-serif;
+      }
+      body {
+        margin: 0 auto;
+        padding: 20px;
+        max-width: 920px;
+      }
+      h1 {
+        margin-bottom: 8px;
+      }
+      .card {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+      }
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+      }
+      input,
+      textarea,
+      select,
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+      }
+      textarea {
+        min-height: 220px;
+        font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+      }
+      button {
+        font-weight: 700;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      .row > * {
+        flex: 1;
+      }
+      .status {
+        margin-top: 8px;
+        white-space: pre-wrap;
+        background: #0f172a;
+        color: #f1f5f9;
+        border-radius: 6px;
+        padding: 12px;
+        min-height: 120px;
+        font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+        overflow: auto;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 14px;
+      }
+      .small {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Partner Mail Sender</h1>
+    <p class="muted">관리자 키 입력 후 staging CSV(`accepted`만) 또는 후보 배열로 메일링을 실행합니다. CSV는 Node 로컬 실행 시 `sourceFile`을 읽고, Hosted runtime에서는 `candidates` 사용을 권장합니다.</p>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="adminKey">x-admin-key</label>
+          <input id="adminKey" type="password" placeholder="ADMIN_API_KEY" />
+        </div>
+        <div>
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="dry_run">dry_run</option>
+            <option value="send">send</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="sourceFile">Source File (권장: data/staging/partners_*.csv)</label>
+          <input id="sourceFile" placeholder="예: partners_202602251234567.csv" />
+        </div>
+        <div>
+          <label for="campaignKey">Campaign Key</label>
+          <input id="campaignKey" placeholder="예: mail_2026_02_25" />
+        </div>
+      </div>
+
+      <div>
+        <label for="candidates">candidates[] (선택) JSON 배열</label>
+        <textarea id="candidates" placeholder='[{"name":"...", "email":"...", "website":"...", "verification_status":"accepted"}]'></textarea>
+        <p class="small muted">sourceFile 또는 candidates[] 중 하나는 반드시 필요합니다.</p>
+      </div>
+
+      <button id="runBtn" type="button">Run</button>
+      <button id="resetBtn" type="button">Reset</button>
+      <div id="status" class="status">ready</div>
+    </div>
+
+    <script>
+      const ADMIN_KEY_STORAGE = 'admin-partner-mail-key';
+      const adminKeyInput = document.getElementById('adminKey');
+      const modeInput = document.getElementById('mode');
+      const sourceFileInput = document.getElementById('sourceFile');
+      const campaignKeyInput = document.getElementById('campaignKey');
+      const candidatesInput = document.getElementById('candidates');
+      const runBtn = document.getElementById('runBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const status = document.getElementById('status');
+
+      const savedKey = localStorage.getItem(ADMIN_KEY_STORAGE);
+      if (savedKey) {
+        adminKeyInput.value = savedKey;
+      }
+
+      function nowCampaignKey() {
+        const now = new Date();
+        return `mail_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(
+          now.getHours()
+        ).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      }
+      campaignKeyInput.value = nowCampaignKey();
+
+      runBtn.addEventListener('click', async () => {
+        const key = String(adminKeyInput.value || '').trim();
+        const mode = String(modeInput.value || 'dry_run');
+        const sourceFile = String(sourceFileInput.value || '').trim();
+        const campaignKey = String(campaignKeyInput.value || '').trim();
+        let candidates = [];
+
+        const raw = String(candidatesInput.value || '').trim();
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) {
+              throw new Error('candidates[] must be an array');
+            }
+            candidates = parsed;
+          } catch (err) {
+            status.textContent = `invalid candidates JSON: ${err instanceof Error ? err.message : err}`;
+            return;
+          }
+        }
+
+        if (!key) {
+          status.textContent = 'x-admin-key is required';
+          return;
+        }
+        if (!sourceFile && !candidates.length) {
+          status.textContent = 'sourceFile or candidates[] is required';
+          return;
+        }
+
+        localStorage.setItem(ADMIN_KEY_STORAGE, key);
+        status.textContent = 'Running...';
+        runBtn.disabled = true;
+
+        try {
+          const payload = { mode, campaignKey, sourceFile: sourceFile || undefined };
+          if (candidates.length) {
+            payload.candidates = candidates;
+          }
+
+          const response = await fetch('/api/admin/send-partner-mail', {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-admin-key': key,
+            },
+            body: JSON.stringify(payload),
+          });
+          const resultText = await response.text();
+          try {
+            const result = JSON.parse(resultText);
+            status.textContent = `status=${response.status}\n${JSON.stringify(result, null, 2)}`;
+          } catch {
+            status.textContent = `status=${response.status}\n${resultText}`;
+          }
+        } catch (error) {
+          status.textContent = `request failed: ${error instanceof Error ? error.message : error}`;
+        } finally {
+          runBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        sourceFileInput.value = '';
+        campaignKeyInput.value = nowCampaignKey();
+        candidatesInput.value = '';
+        status.textContent = 'reset';
+      });
+    </script>
+  </body>
+</html>
