@@ -1,0 +1,62 @@
+[
+  {
+    "query": "Zapier automation agency",
+    "country": "United States",
+    "platforms": ["zapier", "automation"]
+  },
+  {
+    "query": "Make.com automation consultant",
+    "country": "United States",
+    "platforms": ["make"]
+  },
+  {
+    "query": "n8n workflow development partner",
+    "country": "United States",
+    "platforms": ["n8n"]
+  },
+  {
+    "query": "AI automation agency",
+    "country": "United Kingdom",
+    "platforms": ["automation", "ai"]
+  },
+  {
+    "query": "Zapier partner",
+    "country": "United Kingdom",
+    "platforms": ["zapier", "automation"]
+  },
+  {
+    "query": "Make.com consultant",
+    "country": "Germany",
+    "platforms": ["make"]
+  },
+  {
+    "query": "n8n workflow specialist",
+    "country": "Germany",
+    "platforms": ["n8n", "automation"]
+  },
+  {
+    "query": "automation agency",
+    "country": "Australia",
+    "platforms": ["automation", "custom"]
+  },
+  {
+    "query": "AI automation consultant",
+    "country": "Australia",
+    "platforms": ["ai"]
+  },
+  {
+    "query": "Zapier implementation partner",
+    "country": "India",
+    "platforms": ["zapier", "automation"]
+  },
+  {
+    "query": "Make.com build agency",
+    "country": "India",
+    "platforms": ["make"]
+  },
+  {
+    "query": "n8n automation agency",
+    "country": "India",
+    "platforms": ["n8n"]
+  }
+]

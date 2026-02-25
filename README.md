@@ -143,6 +143,43 @@ id,name,platforms,location,country,description,price_min,price_max,rating,review
 npm run build
 ```
 
+### Automated Partner Candidate Collection (Web Discovery)
+
+Use `collect:partners` to generate partner candidates from public web discovery before manual review.
+
+1. Prepare query templates: `data/partner-queries.sample.json` (edit/copy as needed).
+2. Run discovery (dry run first):
+
+```bash
+npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source duckduckgo --verification-mode strict --min-score 45
+```
+
+3. Inspect generated staging files:
+
+```bash
+ls data/staging/partners_*
+```
+
+4. Exporting rules
+
+- `accepted`: 즉시 메일링용 추출 대상
+  - 조건: `email` 존재, `website` 접근 정상, 업체 신호(컨택트/소개/서비스/워크/자동화) 1개 이상, 최소 점수 통과
+- `pending_review`: 초기 자동 검수에서 제외하고 사후 수동 검토 필요
+  - 예: 이메일은 존재하나 신호 부족, 사이트 접근성 미흡, 점수 미달
+- `rejected`: 이메일 미보유/형식 오류, 중복 도메인/슬러그, 필수정보 누락
+
+4. Merge accepted candidates into `data/listings.csv`:
+
+```bash
+npm run collect:partners:ingest -- --append-to-listings --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45
+```
+
+Notes:
+- Candidates are written as `source=public_api`, `verified=false`, `verification_method=api_match`.
+- `data/listings.csv` 노출 규칙은 기존 그대로 유지되어, `verified=true` 또는 `seed_generated`만 노출됩니다.
+- 기본 검증은 중복, 도메인 유효성, 플랫폼 키워드 매칭, 휴리스틱 점수 + `email` 중심 신뢰 신호 기준으로 수행됩니다.
+- `collect:partners:dry-run -- --max-results 50 --min-score 45 --verification-mode strict`는 검증된 후보 비율을 빠르게 점검하는 용도로 사용합니다.
+
 ### Data Fields
 
 | Field | Type | Description |

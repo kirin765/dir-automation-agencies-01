@@ -83,6 +83,24 @@
   - `.github/workflows/sync-d1-listings.yml`를 통해 30분 간격 동기화
   - D1(`verified=1`)을 조회해 `data/listings.csv`를 재생성하고 빌드/배포 수행
 
+### 3-4) 웹 파트너 후보 수집 배치
+
+- 실행:
+  - `npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source duckduckgo --verification-mode strict --min-score 45 --require-email`
+  - 후보 검수 후 적재:
+  - `npm run collect:partners:ingest -- --query-file data/partner-queries.sample.json --source duckduckgo --append-to-listings --verification-mode strict --min-score 45 --require-email`
+- 산출물:
+  - `data/staging/partners_<YYYYMMDDHHmm>.csv` (적용 후보 CSV)
+  - `data/staging/partners_<YYYYMMDDHHmm>.summary.json` (상태/점수/검수 로그)
+- 기본 규칙:
+  - 새 후보는 `source=public_api`, `verified=false`, `verification_method=api_match`
+  - 중복 도메인/슬러그는 제외
+  - 점수 미달/신호 미흡/이메일 미보유는 `pending_review` 또는 `rejected`
+  - `accepted`만 자동 적재하고, 나머지는 수동 검토 큐 유지
+- 운영 기준:
+  - `--verification-mode strict`가 기본 (권장 `--min-score 45`, `--require-email`)
+  - `summary.json`의 `qualityGate`를 확인해 `withEmail`, `validatedWebsite`, `blockedByDomain`, `avgVerificationScore`를 점검
+
 ## 4) 이벤트 추적
 
 - 폼/CTA/클릭 추적: `POST /api/events`
