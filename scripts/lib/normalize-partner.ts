@@ -88,6 +88,31 @@ const DIRECTORY_DOMAINS = new Set([
   'freelancer.com',
 ]);
 
+const GENERIC_MAILBOX_DOMAINS = new Set([
+  'gmail.com',
+  'googlemail.com',
+  'outlook.com',
+  'hotmail.com',
+  'yahoo.com',
+  'icloud.com',
+  'naver.com',
+  'daum.net',
+  'kakao.com',
+  'mail.com',
+]);
+
+const SPAMMY_LOCAL_PARTS = new Set([
+  'info',
+  'contact',
+  'hello',
+  'support',
+  'admin',
+  'sales',
+  'office',
+  'noreply',
+  'no-reply',
+]);
+
 function normalizeMode(mode: string): VerificationMode {
   return mode === 'moderate' || mode === 'lenient' ? mode : DEFAULT_VERIFICATION_MODE;
 }
@@ -96,6 +121,47 @@ function normalizeText(value: string): string {
   return String(value || '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function extractEmailParts(email: string): { local: string; domain: string } {
+  const normalized = normalizeText(email).toLowerCase();
+  const atIndex = normalized.lastIndexOf('@');
+  if (atIndex < 0) {
+    return { local: '', domain: '' };
+  }
+  return {
+    local: normalized.slice(0, atIndex),
+    domain: normalized.slice(atIndex + 1),
+  };
+}
+
+function isSpammyDomainPattern(value: string): boolean {
+  const normalized = normalizeText(value).toLowerCase();
+  const { local, domain } = extractEmailParts(normalized);
+  if (!domain || !local) return false;
+
+  if (domain === 'sentry.io') return true;
+  if (domain.endsWith('.ingest.us.sentry.io')) return true;
+  if (/^[0-9a-f]+\.ingest\.us\.sentry\.io$/i.test(domain)) return true;
+
+  if (/^o[0-9a-f]+\.ingest\.us\.sentry\.io$/i.test(domain)) {
+    return true;
+  }
+  if (domain === 'mycompany.com') return true;
+  if (domain.endsWith('.sentry.io')) return true;
+  return SPAMMY_LOCAL_PARTS.has(local);
+}
+
+function isMailboxProvider(domain: string): boolean {
+  return GENERIC_MAILBOX_DOMAINS.has((domain || '').toLowerCase());
+}
+
+function websiteDomainRoot(website: string): string {
+  try {
+    return new URL(website).hostname.replace(/^www\./i, '').toLowerCase();
+  } catch {
+    return '';
+  }
 }
 
 function normalizeCountry(value: string): string {
@@ -133,6 +199,22 @@ function isDirectoryLikeCandidate(candidate: { website: string; name: string; de
     ? Array.from(DIRECTORY_DOMAINS).some((domain) => websiteHost === domain || websiteHost.endsWith(`.${domain}`))
     : false;
   return hostHit || textHit;
+}
+
+function isLikelyOfficialEmail(candidate: NormalizedPartner, verification: VerificationState): boolean {
+  if (!verification.emailValid) return false;
+
+  const website = normalizeText(candidate.website).toLowerCase();
+  if (!website) return false;
+
+  const websiteRoot = websiteDomainRoot(website);
+  const emailDomain = normalizeText(verification.emailDomain).toLowerCase();
+
+  if (!websiteRoot || !emailDomain) return true;
+  if (isMailboxProvider(emailDomain)) return true;
+  if (emailDomain === websiteRoot || emailDomain.endsWith(`.${websiteRoot}`)) return true;
+
+  return false;
 }
 
 function extractPlatforms(text: string, seed?: string[]): string[] {
@@ -351,6 +433,13 @@ export function normalizeCandidate(
   if (requireEmail && !verification.emailValid) {
     result.reasons.push('missing or invalid email');
     result.validationNotes.push('missing or invalid email');
+    result.status = 'rejected';
+  }
+
+  if (verification.emailValid && isSpammyDomainPattern(result.email)) {
+    result.reasons.push('suspicious email pattern');
+    result.validationNotes.push('suspicious email pattern');
+    result.status = verificationModeValue === 'strict' ? 'pending_review' : result.status;
   }
 
   result.score = scoreCandidate(result, result.verificationSignals || verification);
@@ -363,6 +452,13 @@ export function normalizeCandidate(
       verification.automationSignal ||
       verification.servicesSignal ||
       verification.workSignal;
+    const hasQualitySignal =
+      contactSignal ||
+      verification.aboutSignal ||
+      verification.servicesSignal ||
+      verification.mailtoSignal;
+
+    const hasOfficialEmail = isLikelyOfficialEmail(result, verification);
 
     const websiteOk = verification.websiteOk;
     const emailValid = verification.emailValid;
@@ -370,15 +466,25 @@ export function normalizeCandidate(
     if (result.score < minScore) {
       result.validationNotes.push(`score ${result.score} < threshold ${minScore}`);
       result.status = 'pending_review';
+      if (requireEmail && !hasOfficialEmail) {
+        result.reasons.push('email does not match business domain');
+        result.validationNotes.push('email does not match business domain');
+      }
     } else if (verificationModeValue === 'strict') {
       if (requireEmail && !emailValid) {
         result.status = 'rejected';
       } else if (!websiteOk) {
         result.status = 'pending_review';
         result.validationNotes.push('website verification failed');
+      } else if (!hasOfficialEmail) {
+        result.status = 'pending_review';
+        result.validationNotes.push('email does not match business domain');
       } else if (!hasSignal) {
         result.status = 'pending_review';
         result.validationNotes.push('low verification signal');
+      } else if (!hasQualitySignal) {
+        result.status = 'pending_review';
+        result.validationNotes.push('missing business verification signal');
       } else {
         result.status = 'accepted';
       }
