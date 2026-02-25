@@ -1,0 +1,66 @@
+name: Discover vendors and update master CSV
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: discover-vendors-cron
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect new vendors
+        env:
+          BRAVE_WEB_SEARCH_API_KEY: ${{ secrets.BRAVE_WEB_SEARCH_API_KEY }}
+          BRAVE_WEB_SEARCH_ENDPOINT: ${{ secrets.BRAVE_WEB_SEARCH_ENDPOINT }}
+          BRAVE_WEB_SEARCH_COUNTRY: ${{ secrets.BRAVE_WEB_SEARCH_COUNTRY }}
+          BRAVE_WEB_SEARCH_SAFE_SEARCH: ${{ secrets.BRAVE_WEB_SEARCH_SAFE_SEARCH }}
+        run: |
+          npm run collect:partners:ingest -- --source bing,duckduckgo --query-file data/partner-queries.sample.json --verification-mode strict --require-email --min-score 45 --max-results 250
+
+      - name: Rebuild master vendor list (dedupe)
+        run: |
+          npm run vendor-list:build
+
+      - name: Optional cleanup old staging files
+        run: |
+          cd data/staging
+          ls -1 partners_*.csv | sort | head -n -40 | xargs -r rm -f
+          cd - > /dev/null
+
+      - name: Commit updated data
+        env:
+          CI_BOT_NAME: github-actions[bot]
+          CI_BOT_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          git config user.name "${CI_BOT_NAME}"
+          git config user.email "${CI_BOT_EMAIL}"
+          git add data/listings.csv data/vendor-list-master.csv
+          # 필요 시 최근 staging 파일도 기록:
+          # git add data/staging/*.csv
+          if git diff --cached --quiet; then
+            echo "No data changes. skip commit."
+            exit 0
+          fi
+
+          TIMESTAMP="$(date -u +'%Y%m%d-%H%M')"
+          git commit -m "chore(data): refresh vendor master from scheduled discovery ${TIMESTAMP}"
+          git push
