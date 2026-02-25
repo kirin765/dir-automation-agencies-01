@@ -29,6 +29,7 @@ const hasListings = listings.length > 0;
       id="claim-feedback"
       role="status"
       aria-live="polite"
+      tabindex="-1"
       class={`mb-4 px-4 py-3 rounded-xl border ${
         error ? 'text-red-300 border-red-500/40 bg-red-900/20' : success ? 'text-green-300 border-green-500/40 bg-green-900/20' : 'hidden'
       }`}
@@ -111,6 +112,33 @@ const hasListings = listings.length > 0;
       const submitButton = form.querySelector('button[type="submit"]');
       const originalText = submitButton ? submitButton.textContent : '';
 
+      const showFeedback = (message, level = 'success') => {
+        feedback.className =
+          'mb-4 px-4 py-3 rounded-xl border ' +
+          (level === 'error'
+            ? 'text-red-300 border-red-500/40 bg-red-900/20'
+            : 'text-green-300 border-green-500/40 bg-green-900/20');
+        feedback.textContent = message;
+        feedback.setAttribute('aria-live', level === 'error' ? 'assertive' : 'polite');
+        feedback.hidden = false;
+
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try {
+          feedback.focus({ preventScroll: true });
+        } catch (focusError) {
+          feedback.focus();
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('submitted') === '1') {
+        showFeedback('Claim request received. We will review it within 2 business days.', 'success');
+      }
+      const errorMessage = params.get('error');
+      if (errorMessage) {
+        showFeedback(`Submission failed: ${errorMessage}`, 'error');
+      }
+
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (submitButton) {
@@ -127,23 +155,17 @@ const hasListings = listings.length > 0;
           const payload = await response.json().catch(() => ({ error: 'Unknown response format.' }));
 
           if (response.ok && payload?.ok) {
-            feedback.className =
-              'mb-4 px-4 py-3 rounded-xl border text-green-300 border-green-500/40 bg-green-900/20';
-            feedback.textContent = 'Claim request received. We will review it within 2 business days.';
+            showFeedback('Claim request received. We will review it within 2 business days.', 'success');
             form.reset();
           } else {
-            feedback.className =
-              'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
-            feedback.textContent = `Submission failed: ${payload?.error || 'Unknown error. Please try again.'}`;
+            showFeedback(`Submission failed: ${payload?.error || 'Unknown error. Please try again.'}`, 'error');
             if (submitButton && originalText) {
               submitButton.disabled = false;
               submitButton.textContent = originalText;
             }
           }
         } catch (error) {
-          feedback.className =
-            'mb-4 px-4 py-3 rounded-xl border text-red-300 border-red-500/40 bg-red-900/20';
-          feedback.textContent = 'Submission failed. Network issue or server error. Please try again.';
+          showFeedback('Submission failed. Network issue or server error. Please try again.', 'error');
           if (submitButton) {
             submitButton.disabled = false;
             submitButton.textContent = originalText || 'Submit Ownership Request';
