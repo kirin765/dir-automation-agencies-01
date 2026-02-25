@@ -85,10 +85,10 @@
 
 ### 3-4) 웹 파트너 후보 수집 배치
 
-실행(Bing Web Search API 종료 대응 후, --source bing은 Brave Web Search API를 사용):
-  - `npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source bing --verification-mode strict --min-score 45 --require-email`
+실행(Bing Web Search API 종료 대응 후, --source bing,duckduckgo에서 bing 우선, DDG 폴백):
+  - `npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --source bing,duckduckgo --verification-mode strict --min-score 45 --require-email`
   - 후보 검수 후 적재:
-  - `npm run collect:partners:ingest -- --query-file data/partner-queries.sample.json --source bing --append-to-listings --verification-mode strict --min-score 45 --require-email`
+  - `npm run collect:partners:ingest -- --query-file data/partner-queries.sample.json --source bing,duckduckgo --append-to-listings --verification-mode strict --min-score 45 --require-email`
 - 산출물:
   - `data/staging/partners_<YYYYMMDDHHmm>.csv` (적용 후보 CSV)
   - `data/staging/partners_<YYYYMMDDHHmm>.summary.json` (상태/점수/검수 로그)
@@ -100,6 +100,7 @@
 - 운영 기준:
   - `--verification-mode strict`가 기본 (권장 `--min-score 45`, `--require-email`)
   - `summary.json`의 `qualityGate`를 확인해 `withEmail`, `validatedWebsite`, `blockedByDomain`, `avgVerificationScore`를 점검
+  - `summary.json`의 `effectiveSources`와 `sourceErrors`를 확인해 실제 작동 소스를 점검
 
 ### 3-5) 파트너 메일링 실행
 

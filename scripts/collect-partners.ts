@@ -31,6 +31,11 @@ interface QueryFileEntry {
   query: string;
   country?: string;
   platforms?: string[];
+  queryGroup?: string;
+}
+
+interface QueryWithGroup extends SearchQuery {
+  queryGroup?: string;
 }
 
 interface ScriptQualityGate {
@@ -50,6 +55,9 @@ interface ScriptSummary {
   verificationMode: VerificationMode;
   minScore: number;
   requireEmail: boolean;
+  effectiveSources: string[];
+  sourceErrors: Record<string, string[]>;
+  queryGroups: string[];
   totalDiscovered: number;
   accepted: number;
   pendingReview: number;
@@ -95,7 +103,7 @@ function usage(): void {
   console.log(`
 collect-partners usage:
 
-  --source <name,...>            source adapters: duckduckgo(HTML), bing(Brave Web Search API), seed (default: duckduckgo)
+  --source <name,...>            source adapters: duckduckgo(HTML), bing(Brave Web Search API), seed (default: bing,duckduckgo)
   --query-file <path>            query template file (default: ${DEFAULT_QUERY_FILE})
   --max-results <n>              total max candidates (default: 5000)
   --limit-per-source <n>         per source cap (default: 2000)
@@ -112,7 +120,7 @@ collect-partners usage:
 
 function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
-    sources: ['duckduckgo'],
+    sources: ['bing', 'duckduckgo'],
     queryFile: DEFAULT_QUERY_FILE,
     maxResults: 5000,
     limitPerSource: 2000,
@@ -212,17 +220,23 @@ function parseArgs(argv: string[]): CliArgs {
   return args;
 }
 
-function loadQueries(filePath: string): SearchQuery[] {
+function loadQueries(filePath: string): QueryWithGroup[] {
   const raw = readFileSync(filePath, 'utf-8');
   const parsed = JSON.parse(raw);
   const list: QueryFileEntry[] = Array.isArray(parsed) ? parsed : [];
   return list
     .filter((item) => item?.query)
-    .map((item) => ({
-      query: String(item.query || '').trim(),
-      country: String(item.country || '').trim() || undefined,
-      platforms: normalizePlatformTokens(item.platforms || []),
-    }))
+    .map((item) => {
+      const entry: QueryWithGroup = {
+        query: String(item.query || '').trim(),
+        country: String(item.country || '').trim() || undefined,
+        platforms: normalizePlatformTokens(item.platforms || []),
+      };
+      if (item.queryGroup && typeof item.queryGroup === 'string') {
+        entry.queryGroup = item.queryGroup.trim();
+      }
+      return entry;
+    })
     .filter((item) => item.query);
 }
 
@@ -288,9 +302,17 @@ async function run() {
 
   let nextId = existing.maxId + 1;
   const discoveredCandidates: CandidateRaw[] = [];
+  const sourceStats = new Map<string, { discovered: number; errors: string[] }>();
+  const queryGroups = new Set<string>();
+
+  for (const sourceName of activeSources) {
+    sourceStats.set(sourceName, { discovered: 0, errors: [] });
+  }
 
   for (const sourceName of activeSources) {
     let sourceCount = 0;
+    const stats = sourceStats.get(sourceName);
+    if (!stats) continue;
 
     for (const query of queries) {
       if (discoveredCandidates.length >= args.maxResults) break;
@@ -300,18 +322,30 @@ async function run() {
       const perSourceBudget = Math.min(remaining, args.limitPerSource - sourceCount);
       if (perSourceBudget <= 0) break;
 
-      const candidates = await runDiscoveries(
-        sourceName,
-        query,
-        perSourceBudget
-      );
-      sourceCount += candidates.length;
-      discoveredCandidates.push(
-        ...candidates.map((candidate) => ({
-          ...candidate,
+      try {
+        const candidates = await runDiscoveries(
+          sourceName,
           query,
-        }))
-      );
+          perSourceBudget
+        );
+        sourceCount += candidates.length;
+        stats.discovered += candidates.length;
+        if (query.queryGroup) {
+          queryGroups.add(query.queryGroup);
+        }
+        discoveredCandidates.push(
+          ...candidates.map((candidate) => ({
+            ...candidate,
+            query,
+          }))
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        stats.errors.push(`${query.query}: ${message}`);
+        console.warn(
+          `[collect-partners] source ${sourceName} query "${query.query}" failed (${message}). continuing`
+        );
+      }
     }
   }
 
@@ -402,6 +436,8 @@ async function run() {
       websiteStatus: candidate.verificationSignals?.websiteStatus || 'unknown',
     },
     summary: summarizeCandidate(candidate),
+    effectiveSource: candidate.source,
+    sourceQueryGroup: (candidate.query as QueryWithGroup | undefined)?.queryGroup || 'unassigned',
   }));
 
   const acceptedWithEmail = acceptedCandidates.filter((candidate) => !!candidate.email).length;
@@ -425,6 +461,15 @@ async function run() {
   const summary: ScriptSummary = {
     startedAt: new Date().toISOString(),
     sources: activeSources,
+    effectiveSources: Array.from(sourceStats.entries())
+      .filter(([, stats]) => stats.discovered > 0)
+      .map(([source]) => source),
+    sourceErrors: Object.fromEntries(
+      Array.from(sourceStats.entries())
+        .map(([source, stats]) => [source, stats.errors])
+        .filter(([, errors]) => errors.length > 0)
+    ),
+    queryGroups: Array.from(queryGroups.values()).sort(),
     maxResults: args.maxResults,
     limitPerSource: args.limitPerSource,
     verificationMode: args.verificationMode,

@@ -1,62 +1,74 @@
 [
   {
-    "query": "official zapier partner website",
+    "query": "Zapier partner agency official website automation services",
     "country": "United States",
-    "platforms": ["zapier", "automation"]
+    "platforms": ["zapier", "automation"],
+    "queryGroup": "platform-zapier"
   },
   {
-    "query": "make.com certified partner agency",
+    "query": "Make.com certified partner agency automation workflows",
     "country": "United States",
-    "platforms": ["make"]
+    "platforms": ["make", "automation"],
+    "queryGroup": "platform-make"
   },
   {
-    "query": "n8n implementation agency",
+    "query": "n8n implementation partner agency automation",
     "country": "United States",
-    "platforms": ["n8n"]
+    "platforms": ["n8n", "automation"],
+    "queryGroup": "platform-n8n"
   },
   {
-    "query": "AI automation agency official website",
+    "query": "AI automation agency services official website",
+    "country": "United States",
+    "platforms": ["automation", "ai", "zapier", "make", "n8n"],
+    "queryGroup": "platform-automation"
+  },
+  {
+    "query": "Zapier partner agency official website",
     "country": "United Kingdom",
-    "platforms": ["automation", "ai"]
+    "platforms": ["zapier", "automation"],
+    "queryGroup": "platform-zapier"
   },
   {
-    "query": "zapier agency contact website",
+    "query": "Make.com agency automation consultant",
     "country": "United Kingdom",
-    "platforms": ["zapier", "automation"]
+    "platforms": ["make", "automation"],
+    "queryGroup": "platform-make"
   },
   {
-    "query": "make.com agency official",
-    "country": "Germany",
-    "platforms": ["make"]
+    "query": "n8n partner services for business",
+    "country": "United Kingdom",
+    "platforms": ["n8n"],
+    "queryGroup": "platform-n8n"
   },
   {
-    "query": "n8n solutions partner agency",
-    "country": "Germany",
-    "platforms": ["n8n", "automation"]
+    "query": "AI automation consulting company",
+    "country": "United Kingdom",
+    "platforms": ["ai", "automation"],
+    "queryGroup": "platform-automation"
   },
   {
-    "query": "automation agency services page",
-    "country": "Australia",
-    "platforms": ["automation", "custom"]
-  },
-  {
-    "query": "AI automation consultant agency",
-    "country": "Australia",
-    "platforms": ["ai"]
-  },
-  {
-    "query": "zapier automation consultant",
+    "query": "Zapier partner agency official site",
     "country": "India",
-    "platforms": ["zapier", "automation"]
+    "platforms": ["zapier", "automation"],
+    "queryGroup": "platform-zapier"
   },
   {
-    "query": "make.com development partner",
+    "query": "Make.com partner company workflow automation",
     "country": "India",
-    "platforms": ["make"]
+    "platforms": ["make", "automation"],
+    "queryGroup": "platform-make"
   },
   {
-    "query": "n8n automation agency official",
+    "query": "n8n implementation company official website",
     "country": "India",
-    "platforms": ["n8n"]
+    "platforms": ["n8n", "automation"],
+    "queryGroup": "platform-n8n"
+  },
+  {
+    "query": "AI process automation agency",
+    "country": "India",
+    "platforms": ["automation", "ai"],
+    "queryGroup": "platform-automation"
   }
 ]

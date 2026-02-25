@@ -151,7 +151,7 @@ Use `collect:partners` to generate partner candidates from public web discovery 
 2. Run discovery (dry run first):
 
 ```bash
-npm run collect:partners:dry-run -- --source bing --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
+npm run collect:partners:dry-run -- --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
 ```
 
 3. Inspect generated staging files:
@@ -171,8 +171,11 @@ ls data/staging/partners_*
 4. Merge accepted candidates into `data/listings.csv`:
 
 ```bash
-npm run collect:partners:ingest -- --source bing --append-to-listings --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
+npm run collect:partners:ingest -- --source bing,duckduckgo --append-to-listings --query-file data/partner-queries.sample.json --verification-mode strict --min-score 45 --require-email
 ```
+
+- Source precedence: `bing`(Brave API) as primary, `duckduckgo` fallback on source/query failures.
+- Summary output now includes `sourceErrors`, `effectiveSources`, and `queryGroups` to inspect candidate mix.
 
 ### 파트너 메일링 발송(accepted 기반)
 
