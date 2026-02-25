@@ -59,6 +59,34 @@ const PLATFORM_MAP: Record<string, string> = {
 const DEFAULT_MIN_SCORE = 30;
 const DEFAULT_VERIFICATION_MODE: VerificationMode = 'strict';
 const EMAIL_REGEX = /^(?:[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+)@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+const DIRECTORY_INDICATORS = [
+  'directory',
+  'marketplace',
+  'listing',
+  'reviews',
+  'review',
+  'compare',
+  'top 10',
+  'top 50',
+  'service directory',
+  'directory listing',
+  'agency directory',
+];
+const DIRECTORY_DOMAINS = new Set([
+  'clutch.co',
+  'goodfirms.com',
+  'sortlist.com',
+  'fiverr.com',
+  'upwork.com',
+  'truelancer.com',
+  'trustpilot.com',
+  'capterra.com',
+  'g2.com',
+  'softwareadvice.com',
+  'yellowpages.com',
+  'yelp.com',
+  'freelancer.com',
+]);
 
 function normalizeMode(mode: string): VerificationMode {
   return mode === 'moderate' || mode === 'lenient' ? mode : DEFAULT_VERIFICATION_MODE;
@@ -88,6 +116,23 @@ function normalizeWebsite(value: string): string {
     return valueText.replace(/\/+$/g, '');
   }
   return `https://${valueText}`.replace(/\/+$/g, '');
+}
+
+function isDirectoryLikeCandidate(candidate: { website: string; name: string; description?: string; country?: string; }): boolean {
+  const websiteHost = (() => {
+    try {
+      return new URL(candidate.website).hostname.replace(/^www\./i, '').toLowerCase();
+    } catch {
+      return '';
+    }
+  })();
+
+  const text = `${candidate.name} ${candidate.description || ''} ${candidate.country || ''}`.toLowerCase();
+  const textHit = DIRECTORY_INDICATORS.some((token) => text.includes(token));
+  const hostHit = websiteHost
+    ? Array.from(DIRECTORY_DOMAINS).some((domain) => websiteHost === domain || websiteHost.endsWith(`.${domain}`))
+    : false;
+  return hostHit || textHit;
 }
 
 function extractPlatforms(text: string, seed?: string[]): string[] {
@@ -289,6 +334,17 @@ export function normalizeCandidate(
   if (platforms.length === 0) {
     result.reasons.push('no platform signal');
     result.validationNotes.push('no platform signal');
+    result.status = 'rejected';
+  }
+
+  if (isDirectoryLikeCandidate({
+    website: rawWebsite,
+    name,
+    description: description || '',
+    country,
+  })) {
+    result.reasons.push('directory-like source');
+    result.validationNotes.push('directory-like source');
     result.status = 'rejected';
   }
 

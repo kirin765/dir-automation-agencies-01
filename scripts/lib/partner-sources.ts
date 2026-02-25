@@ -32,6 +32,10 @@ export interface CandidateRaw {
   email?: string;
   query?: SearchQuery;
   verificationSignals?: VerificationSignals;
+  discoveryFlags?: {
+    blockedBySource?: boolean;
+    rejectionReasons?: string[];
+  };
 }
 
 export interface SourceAdapter {
@@ -40,6 +44,65 @@ export interface SourceAdapter {
   discover(query: SearchQuery, options: { maxResults: number }): Promise<CandidateRaw[]>;
   fetchDetails(candidate: CandidateRaw): Promise<CandidateRaw>;
 }
+
+const DIRECTORY_DOMAINS = new Set([
+  'clutch.co',
+  'goodfirms.com',
+  'sortlist.com',
+  'fiverr.com',
+  'upwork.com',
+  'trustpilot.com',
+  'g2.com',
+  'capterra.com',
+  'softwareadvice.com',
+  'yelp.com',
+  'yellowpages.com',
+  'agencyspotter.com',
+  'agencyanalytics.com',
+  'agencycentral.com',
+  'agencylist.co',
+  'freelancer.com',
+]);
+
+const DIRECTORY_PATH_HINTS = [
+  '/directory',
+  '/directories',
+  '/listing',
+  '/listings',
+  '/find-a',
+  '/find-an',
+  '/marketplace',
+  '/vendors',
+  '/agency',
+];
+
+const DIRECTORY_TEXT_HINTS = [
+  'directory',
+  'directory of',
+  'list of',
+  'best',
+  'reviews',
+  'reviewed',
+  'top',
+  'listing',
+  'marketplace',
+  'compare',
+  'service directory',
+  'directory listing',
+];
+
+const DUCKDUCKGO_SITE_EXCLUDES = [
+  '-site:clutch.co',
+  '-site:goodfirms.com',
+  '-site:sortlist.com',
+  '-site:fiverr.com',
+  '-site:upwork.com',
+  '-site:trustpilot.com',
+  '-site:g2.com',
+  '-site:capterra.com',
+  '-site:softwareadvice.com',
+  '-site:yellowpages.com',
+].join(' ');
 
 function cleanText(value: string): string {
   return String(value || '')
@@ -67,21 +130,62 @@ function getResultUrl(rawUrl: string): string {
   try {
     const parsed = new URL(rawUrl, 'https://duckduckgo.com');
     const uddg = parsed.searchParams.get('uddg');
-    if (uddg) {
-      return uddg;
-    }
+    if (uddg) return uddg;
 
     const link = parsed.searchParams.get('uddg1');
-    if (link) {
-      return link;
-    }
+    if (link) return link;
     return rawUrl;
   } catch {
     return rawUrl;
   }
 }
 
-function evaluateSignalsFromText(text: string, sourceHtml: string): Omit<VerificationSignals, 'websiteStatus' | 'websiteStatusCode' | 'websiteOk' | 'emailFromSource'> {
+function normalizeHostForFilter(input: string): string {
+  const value = String(input || '').toLowerCase().trim();
+  try {
+    return new URL(value).hostname.replace(/^www\./i, '');
+  } catch {
+    return value
+      .replace(/^https?:\/\//i, '')
+      .split('/')[0]
+      .split('?')[0]
+      .replace(/^www\./i, '');
+  }
+}
+
+function isKnownDirectoryHost(hostname: string): boolean {
+  const host = normalizeHostForFilter(hostname);
+  if (!host) return false;
+  return Array.from(DIRECTORY_DOMAINS).some((domain) => host === domain || host.endsWith(`.${domain}`));
+}
+
+function isDirectoryCandidateUrl(candidate: CandidateRaw): { blocked: boolean; reasons: string[] } {
+  const reasons: string[] = [];
+  const host = normalizeHostForFilter(candidate.discoveredWebsite || '');
+  const candidateText = `${candidate.discoveredName || ''} ${candidate.snippet || ''}`.toLowerCase();
+  const candidateUrl = String(candidate.discoveredWebsite || '').toLowerCase();
+
+  if (isKnownDirectoryHost(host)) {
+    reasons.push(`blacklist_host:${host}`);
+  }
+
+  const pathHint = DIRECTORY_PATH_HINTS.find((pattern) => candidateUrl.includes(pattern));
+  if (pathHint) {
+    reasons.push(`directory_path:${pathHint}`);
+  }
+
+  const textHint = DIRECTORY_TEXT_HINTS.find((pattern) => candidateText.includes(pattern));
+  if (textHint) {
+    reasons.push(`directory_text:${textHint}`);
+  }
+
+  return { blocked: reasons.length > 0, reasons };
+}
+
+function evaluateSignalsFromText(
+  text: string,
+  sourceHtml: string
+): Omit<VerificationSignals, 'websiteStatus' | 'websiteStatusCode' | 'websiteOk' | 'emailFromSource'> {
   const normalized = text.toLowerCase();
   return {
     contactSignal: /\bcontact\b|reach us|get in touch|contact us|contact information/.test(normalized),
@@ -94,23 +198,37 @@ function evaluateSignalsFromText(text: string, sourceHtml: string): Omit<Verific
   };
 }
 
-function extractDetailsFromHtml(html: string): { name?: string; description?: string; email?: string; signals: VerificationSignals } {
+function parseEmailsFromHtml(html: string): string[] {
+  const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+  const matches = html.match(emailRegex) || [];
+  const normalized = matches.map((item) => item.toLowerCase());
+  const unique: string[] = [];
+  for (const item of normalized) {
+    if (!unique.includes(item)) unique.push(item);
+  }
+  return unique;
+}
+
+function extractDetailsFromHtml(html: string): {
+  name?: string;
+  description?: string;
+  email?: string;
+  signals: VerificationSignals;
+} {
   const lowered = html.toLowerCase();
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+  const descMatch =
+    html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+    html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
 
-  const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
-  const rawEmails = (html.match(emailRegex) || []).map((item) => item.toLowerCase());
-  const visibleEmail = rawEmails.find((email) => !!email);
-
+  const emails = parseEmailsFromHtml(html);
   const plainText = cleanText(html).toLowerCase();
   const signalFlags = evaluateSignalsFromText(plainText, lowered);
 
   return {
     name: titleMatch ? cleanText(titleMatch[1]) : undefined,
     description: descMatch ? cleanText(descMatch[1]) : undefined,
-    email: visibleEmail,
+    email: emails.find((email) => !!email),
     signals: {
       websiteOk: true,
       websiteStatus: 'ok',
@@ -122,9 +240,64 @@ function extractDetailsFromHtml(html: string): { name?: string; description?: st
       workSignal: signalFlags.workSignal,
       socialSignal: signalFlags.socialSignal,
       mailtoSignal: signalFlags.mailtoSignal,
-      emailFromSource: !!visibleEmail,
+      emailFromSource: !!emails[0],
     },
   };
+}
+
+function mergeSignals(base: VerificationSignals, extra: VerificationSignals): VerificationSignals {
+  return {
+    websiteOk: base.websiteOk || extra.websiteOk,
+    websiteStatus: base.websiteStatus || extra.websiteStatus,
+    websiteStatusCode: base.websiteStatusCode || extra.websiteStatusCode,
+    contactSignal: base.contactSignal || extra.contactSignal,
+    aboutSignal: base.aboutSignal || extra.aboutSignal,
+    automationSignal: base.automationSignal || extra.automationSignal,
+    servicesSignal: base.servicesSignal || extra.servicesSignal,
+    workSignal: base.workSignal || extra.workSignal,
+    socialSignal: base.socialSignal || extra.socialSignal,
+    mailtoSignal: base.mailtoSignal || extra.mailtoSignal,
+    emailFromSource: base.emailFromSource || extra.emailFromSource,
+  };
+}
+
+function collectContactLinks(baseUrl: string, html: string, maxLinks = 2): string[] {
+  const links: string[] = [];
+  const hrefRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
+  const allowedPaths = ['/contact', '/contact-us', '/about', '/about-us', '/aboutus'];
+
+  const tryAdd = (href: string | null) => {
+    if (!href) return;
+    const raw = href.split('#')[0].trim();
+    if (!raw) return;
+
+    const lower = raw.toLowerCase();
+    if (!allowedPaths.some((path) => lower.includes(path))) return;
+
+    try {
+      const target = new URL(raw, baseUrl);
+      if (target.origin !== new URL(baseUrl).origin) return;
+      const normalized = target.toString().replace(/\/+$/, '');
+      if (!links.includes(normalized)) {
+        links.push(normalized);
+      }
+    } catch {
+      // ignore bad links
+    }
+  };
+
+  let match = hrefRegex.exec(html);
+  while (match !== null && links.length < maxLinks) {
+    tryAdd(match[1]);
+    match = hrefRegex.exec(html);
+  }
+
+  return links.slice(0, maxLinks);
+}
+
+function mergeEmail(base: string | undefined, fallback: string | undefined): string | undefined {
+  if (base) return base;
+  return fallback;
 }
 
 async function fetchWithTimeout(url: string, timeoutMs: number, options: RequestInit = {}) {
@@ -171,6 +344,7 @@ function parseLinksFromDuckduckgo(html: string, maxResults: number) {
 
     if (!website || seen.has(website)) continue;
     seen.add(website);
+
     results.push({
       source: 'duckduckgo',
       discoveredName: rawName || 'Unknown',
@@ -188,7 +362,7 @@ class DuckDuckGoSource implements SourceAdapter {
   displayName = 'DuckDuckGo HTML Search';
 
   async discover(query: SearchQuery, options: { maxResults: number }): Promise<CandidateRaw[]> {
-    const q = `${query.query} ${query.country || ''}`.trim();
+    const q = `${query.query} ${query.country || ''} "automation partner" ${DUCKDUCKGO_SITE_EXCLUDES}`.trim();
     const searchUrl = `https://duckduckgo.com/html/?q=${encodeURIComponent(q)}`;
     const response = await fetchWithTimeout(searchUrl, 12000);
     if (!response.ok) {
@@ -196,14 +370,24 @@ class DuckDuckGoSource implements SourceAdapter {
     }
 
     const html = await response.text();
-    const results = parseLinksFromDuckduckgo(html, options.maxResults).map((result) => ({
+    const rawResults = parseLinksFromDuckduckgo(html, options.maxResults).map((result) => ({
       ...result,
       query,
       country: result.country || query.country,
       platforms: query.platforms,
     }));
 
-    return results;
+    return rawResults.filter((candidate) => {
+      const check = isDirectoryCandidateUrl(candidate);
+      if (check.blocked) {
+        candidate.discoveryFlags = {
+          blockedBySource: true,
+          rejectionReasons: check.reasons,
+        };
+        return false;
+      }
+      return true;
+    });
   }
 
   async fetchDetails(candidate: CandidateRaw): Promise<CandidateRaw> {
@@ -215,15 +399,14 @@ class DuckDuckGoSource implements SourceAdapter {
       const normalizedWebsite = normalizeWebsite(candidate.discoveredWebsite);
 
       if (!response.ok) {
-        const status = response.status;
         return {
           ...candidate,
           discoveredWebsite: normalizedWebsite,
           sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
           verificationSignals: {
             websiteOk: false,
-            websiteStatus: `http_${status}`,
-            websiteStatusCode: status,
+            websiteStatus: `http_${response.status}`,
+            websiteStatusCode: response.status,
             contactSignal: false,
             aboutSignal: false,
             automationSignal: false,
@@ -257,26 +440,51 @@ class DuckDuckGoSource implements SourceAdapter {
         };
       }
 
-      const html = await response.text();
-      const details = extractDetailsFromHtml(html);
+      const homepageHtml = await response.text();
+      const homepageDetails = extractDetailsFromHtml(homepageHtml);
+      let mergedSignals: VerificationSignals = {
+        ...homepageDetails.signals,
+        websiteOk: true,
+        websiteStatus: homepageDetails.signals.websiteStatus,
+        websiteStatusCode: homepageDetails.signals.websiteStatusCode,
+      };
+      let mergedEmail = mergeEmail(candidate.email, homepageDetails.email);
+
+      const extraLinks = collectContactLinks(normalizedWebsite, homepageHtml, 3);
+      for (const link of extraLinks) {
+        try {
+          const extraResponse = await fetchWithTimeout(link, 9000);
+          if (!extraResponse.ok) continue;
+
+          const extraType = String(extraResponse.headers.get('content-type') || '').toLowerCase();
+          if (!extraType.includes('text/html') && !extraType.includes('application/xhtml+xml')) {
+            continue;
+          }
+
+          const extraHtml = await extraResponse.text();
+          const extraDetails = extractDetailsFromHtml(extraHtml);
+          mergedSignals = mergeSignals(mergedSignals, extraDetails.signals);
+          mergedEmail = mergeEmail(mergedEmail, extraDetails.email);
+        } catch {
+          // best-effort only
+        }
+      }
+
       const name =
         candidate.discoveredName && candidate.discoveredName !== 'Unknown'
           ? candidate.discoveredName
-          : details.name || candidate.discoveredName;
+          : homepageDetails.name || candidate.discoveredName;
 
       return {
         ...candidate,
-        discoveredName: name || details.name || 'Unknown',
+        discoveredName: name || homepageDetails.name || 'Unknown',
         discoveredWebsite: normalizedWebsite,
         sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
-        snippet: candidate.snippet || details.description,
-        email: candidate.email || details.email,
+        snippet: candidate.snippet || homepageDetails.description,
+        email: mergedEmail,
         verificationSignals: {
-          ...details.signals,
-          websiteOk: true,
-          websiteStatus: details.signals.websiteStatus,
-          websiteStatusCode: details.signals.websiteStatusCode,
-          emailFromSource: !!(candidate.email || details.email),
+          ...mergedSignals,
+          emailFromSource: !!mergedEmail,
         },
       };
     } catch {
