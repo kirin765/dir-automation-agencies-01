@@ -116,6 +116,15 @@
   - `alreadySent`가 높으면 대상 재발송 가능성 낮음
   - `failed` 급증 시 OAuth 토큰/쿼터/도메인 제한 확인
 
+### 3-6) 파트너 메일링 자동화(주기 크론)
+
+- 실행 명령(로컬): `npm run send:vendors -- --base-url https://automationagencydirectory.com --admin-key <ADMIN_API_KEY>`
+- 주간/일일 운영:
+  - `.github/workflows/send-vendors-cron.yml`에서 매일 UTC 02:00에 `data/vendor-list-master.csv` 기준 자동 전송
+  - 이미 발송 이력이 있으면 `/api/admin/send-partner-mail`의 내부 dedupe(`email_send_log`)로 `alreadySent` 처리되어 중복 발송이 차단됨
+- 실패 대응:
+  - 워크플로 로그에서 `send API failed` 또는 HTTP 4xx/5xx 발생 시, ADMIN_API_KEY/권한 확인 후 배포 URL(`/api/admin/send-partner-mail`) 재시도
+
 ## 4) 이벤트 추적
 
 - 폼/CTA/클릭 추적: `POST /api/events`

@@ -1,0 +1,47 @@
+name: Send outreach e-mails for vendor master
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  send_vendors:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: send-vendors-cron
+      cancel-in-progress: false
+    env:
+      BASE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://automationagencydirectory.com' }}
+      ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send vendor outreach
+        if: ${{ env.ADMIN_API_KEY != '' }}
+        run: |
+          npm run send:vendors -- \
+            --base-url "${BASE_URL}" \
+            --admin-key "${ADMIN_API_KEY}" \
+            --source-csv data/vendor-list-master.csv \
+            --batch-size 40 \
+            --campaign-key "outreach_${{ github.run_id }}"
+
+      - name: Skip when admin key is missing
+        if: ${{ env.ADMIN_API_KEY == '' }}
+        run: |
+          echo "ADMIN_API_KEY is not configured. Set repo secret ADMIN_API_KEY to enable vendor outreach cron."
+          exit 1

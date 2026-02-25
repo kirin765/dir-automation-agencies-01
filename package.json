@@ -24,6 +24,8 @@
     "sync-and-deploy": "npm run sync:d1:listings && npm run build && npx wrangler pages deploy dist --project-name=dir-automation-agencies-01 --commit-dirty=true",
     "admin:tui": "bash scripts/admin-ops.sh",
     "test:workflow": "node scripts/test-pages-workflow.mjs",
+    "send:vendors": "npx tsx scripts/send-vendor-campaign.ts --mode send",
+    "send:vendors:dry-run": "npx tsx scripts/send-vendor-campaign.ts --mode dry_run",
     "astro": "astro"
   },
   "dependencies": {
