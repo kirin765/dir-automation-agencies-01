@@ -476,7 +476,7 @@ export function normalizeCandidate(
       } else if (!websiteOk) {
         result.status = 'pending_review';
         result.validationNotes.push('website verification failed');
-      } else if (!hasOfficialEmail) {
+      } else if (requireEmail && !hasOfficialEmail) {
         result.status = 'pending_review';
         result.validationNotes.push('email does not match business domain');
       } else if (!hasSignal) {

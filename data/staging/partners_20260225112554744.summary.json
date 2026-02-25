@@ -1,0 +1,26 @@
+{
+  "startedAt": "2026-02-25T11:25:54.746Z",
+  "sources": [
+    "duckduckgo"
+  ],
+  "maxResults": 300,
+  "limitPerSource": 120,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 0,
+  "accepted": 0,
+  "pendingReview": 0,
+  "rejected": 0,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_20260225112554744.csv",
+  "qualityGate": {
+    "withEmail": 0,
+    "acceptedWithEmail": 0,
+    "acceptedWithoutEmail": 0,
+    "validatedWebsite": 0,
+    "blockedByDomain": 0,
+    "avgVerificationScore": 0
+  },
+  "candidates": []
+}

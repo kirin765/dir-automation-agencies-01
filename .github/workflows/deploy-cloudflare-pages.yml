@@ -47,3 +47,52 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler pages deploy dist --project-name=dir-automation-agencies-01
         # GitHub PRs run only build verification; main branch includes deploy.
+
+      - name: Notify Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          EVENT_NAME: ${{ github.event_name }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "SLACK_WEBHOOK_URL is not set. Skip Slack notification."
+            exit 0
+          fi
+          python - <<'PY'
+          import json
+          import os
+
+          is_success = os.environ.get("JOB_STATUS", "failure") == "success"
+          color = "#36a64f" if is_success else "#ff0000"
+          result = "SUCCESS" if is_success else "FAILED"
+
+          payload = {
+              "attachments": [
+                  {
+                      "color": color,
+                      "text": (
+                        f"[{os.environ['WORKFLOW_NAME']}] {result}\n"
+                        f"ref: {os.environ['REF_NAME']}\n"
+                        f"event: {os.environ['EVENT_NAME']}\n"
+                        f"actor: {os.environ['ACTOR']}\n"
+                        f"run: <{os.environ['RUN_URL']}|#{os.environ['RUN_ID']}>"
+                      ),
+                  }
+              ]
+          }
+          payload["attachments"][0]["fields"] = [
+            {
+              "title": "Repository",
+              "value": os.environ.get("GITHUB_REPOSITORY", ""),
+              "short": True,
+            }
+          ]
+
+          print(json.dumps(payload))
+          PY | curl -s -X POST -H 'Content-type: application/json' --data-binary @- "${SLACK_WEBHOOK_URL}"

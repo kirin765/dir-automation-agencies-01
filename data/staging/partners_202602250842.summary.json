@@ -1,0 +1,1052 @@
+{
+  "startedAt": "2026-02-25T08:42:06.004Z",
+  "sources": [
+    "bing"
+  ],
+  "maxResults": 100,
+  "limitPerSource": 2000,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 28,
+  "accepted": 7,
+  "pendingReview": 2,
+  "rejected": 19,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250842.csv",
+  "qualityGate": {
+    "withEmail": 7,
+    "validatedWebsite": 7,
+    "blockedByDomain": 10,
+    "avgVerificationScore": 219
+  },
+  "candidates": [
+    {
+      "status": "rejected",
+      "name": "Official Zapier Partner Program | Grow with Zapier",
+      "country": "United States",
+      "website": "https://zapier.com/l/partners",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 192,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Official Zapier Partner Program | Grow with Zapier | United States | zapier/automation/custom | score=192 | rejected | https://zapier.com/l/partners"
+    },
+    {
+      "status": "pending_review",
+      "id": 2,
+      "name": "Zapier Solution Partner Program | Automation Consultants & Experts",
+      "country": "United States",
+      "website": "https://zapier.com/l/solution-partner",
+      "source": "public_api",
+      "email": "yourname@yourcompany.com",
+      "verification_score": 217,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "email does not match business domain"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "yourcompany.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Solution Partner Program | Automation Consultants & Experts | United States | zapier/automation | score=217 | pending_review | https://zapier.com/l/solution-partner"
+    },
+    {
+      "status": "rejected",
+      "name": "Integrations, App and Software Automation | Automate With Zapier",
+      "country": "United States",
+      "website": "https://zapier.com/apps",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 177,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Integrations, App and Software Automation | Automate With Zapier | United States | zapier/automation | score=177 | rejected | https://zapier.com/apps"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier | LinkedIn",
+      "country": "United States",
+      "website": "https://www.linkedin.com/company/zapier",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 170,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier | LinkedIn | United States | zapier/make/automation | score=170 | rejected | https://www.linkedin.com/company/zapier"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "country": "United States",
+      "website": "https://zapier.com",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 212,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier: Automate AI Workflows, Agents, and Apps | United States | zapier/automation/ai | score=212 | rejected | https://zapier.com"
+    },
+    {
+      "status": "rejected",
+      "name": "Our Partners | Find A Partner To Support Your Business Needs | Make",
+      "country": "United States",
+      "website": "https://www.make.com/en/partners-directory",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "Our Partners | Find A Partner To Support Your Business Needs | Make | United States | make/automation/custom | score=110 | rejected | https://www.make.com/en/partners-directory"
+    },
+    {
+      "status": "accepted",
+      "id": 3,
+      "name": "AI Automation Agency UK for SMEs | Voice AI & n8n Experts",
+      "country": "United Kingdom",
+      "website": "https://aiagencyplus.com",
+      "source": "public_api",
+      "email": "hello@aiagencyplus.com",
+      "verification_score": 237,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "aiagencyplus.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Automation Agency UK for SMEs | Voice AI & n8n Experts | United Kingdom | n8n/automation/ai | score=237 | accepted | https://aiagencyplus.com"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Automation Agency UK - AI Automation Services | Pod Digital",
+      "country": "United Kingdom",
+      "website": "https://www.poddigital.co.uk/ai-automation-agency",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 184,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Automation Agency UK - AI Automation Services | Pod Digital | United Kingdom | automation/ai | score=184 | rejected | https://www.poddigital.co.uk/ai-automation-agency"
+    },
+    {
+      "status": "accepted",
+      "id": 4,
+      "name": "AI Automation Agency",
+      "country": "United Kingdom",
+      "website": "https://aiautomation.agency",
+      "source": "public_api",
+      "email": "hello@aiautomation.agency",
+      "verification_score": 187,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": true,
+        "emailDomain": "aiautomation.agency",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Automation Agency | United Kingdom | automation/ai/custom | score=187 | accepted | https://aiautomation.agency"
+    },
+    {
+      "status": "accepted",
+      "id": 5,
+      "name": "AI agency UK | Artificial intelligence agency London",
+      "country": "United Kingdom",
+      "website": "https://automee.digital",
+      "source": "public_api",
+      "email": "info@automee.digital",
+      "verification_score": 229,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "automee.digital",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI agency UK | Artificial intelligence agency London | United Kingdom | automation/ai | score=229 | accepted | https://automee.digital"
+    },
+    {
+      "status": "accepted",
+      "id": 6,
+      "name": "The Ai Automation Agency",
+      "country": "United Kingdom",
+      "website": "https://theaiautomationagency.ai",
+      "source": "public_api",
+      "email": "sales@theaiautomationagency.ai",
+      "verification_score": 237,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "theaiautomationagency.ai",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "The Ai Automation Agency | United Kingdom | automation/ai | score=237 | accepted | https://theaiautomationagency.ai"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Automation Agency",
+      "country": "United Kingdom",
+      "website": "https://idealink.tech/ai-automation-agency",
+      "source": "public_api",
+      "email": "info@idealink.tech",
+      "verification_score": 202,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "idealink.tech",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Automation Agency | United Kingdom | automation/ai | score=202 | rejected | https://idealink.tech/ai-automation-agency"
+    },
+    {
+      "status": "accepted",
+      "id": 7,
+      "name": "What Is An AI Automation Agency? | F2B Digital",
+      "country": "United Kingdom",
+      "website": "https://www.f2b.co.uk/what-is-an-ai-automation-agency",
+      "source": "public_api",
+      "email": "solutions@f2b.co.uk",
+      "verification_score": 209,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "f2b.co.uk",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "What Is An AI Automation Agency? | F2B Digital | United Kingdom | automation/ai | score=209 | accepted | https://www.f2b.co.uk/what-is-an-ai-automation-agency"
+    },
+    {
+      "status": "rejected",
+      "name": "Contact Sales | Zapier",
+      "country": "United Kingdom",
+      "website": "https://zapier.com/l/contact-sales",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 192,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Contact Sales | Zapier | United Kingdom | zapier/automation/ai | score=192 | rejected | https://zapier.com/l/contact-sales"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier | LinkedIn",
+      "country": "United Kingdom",
+      "website": "https://www.linkedin.com/company/zapier",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 170,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier | LinkedIn | United Kingdom | zapier/make/automation | score=170 | rejected | https://www.linkedin.com/company/zapier"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "country": "United Kingdom",
+      "website": "https://zapier.com",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 212,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier: Automate AI Workflows, Agents, and Apps | United Kingdom | zapier/automation/ai | score=212 | rejected | https://zapier.com"
+    },
+    {
+      "status": "rejected",
+      "name": "Build AI teammates with Zapier Agents",
+      "country": "United Kingdom",
+      "website": "https://zapier.com/agents",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 147,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Build AI teammates with Zapier Agents | United Kingdom | zapier/automation/ai/custom | score=147 | rejected | https://zapier.com/agents"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier Solution Partner Program | Automation Consultants & Experts",
+      "country": "United Kingdom",
+      "website": "https://zapier.com/l/solution-partner",
+      "source": "public_api",
+      "email": "yourname@yourcompany.com",
+      "verification_score": 217,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "yourcompany.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Solution Partner Program | Automation Consultants & Experts | United Kingdom | zapier/automation | score=217 | rejected | https://zapier.com/l/solution-partner"
+    },
+    {
+      "status": "rejected",
+      "name": "Site Automation | LinkedIn",
+      "country": "Australia",
+      "website": "https://au.linkedin.com/company/site-automation",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 160,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Site Automation | LinkedIn | Australia | automation/custom | score=160 | rejected | https://au.linkedin.com/company/site-automation"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "country": "India",
+      "website": "https://zapier.com",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 212,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier: Automate AI Workflows, Agents, and Apps | India | zapier/automation/ai | score=212 | rejected | https://zapier.com"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier | LinkedIn",
+      "country": "India",
+      "website": "https://www.linkedin.com/company/zapier",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 170,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier | LinkedIn | India | zapier/make/automation | score=170 | rejected | https://www.linkedin.com/company/zapier"
+    },
+    {
+      "status": "pending_review",
+      "id": 8,
+      "name": "Zapier Consulting Services | No-Code Automation Platform Consultant",
+      "country": "India",
+      "website": "https://www.prosperspark.com/zapier-automation",
+      "source": "public_api",
+      "email": "logo-mark-colour@2x.png",
+      "verification_score": 217,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "email does not match business domain"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "2x.png",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Consulting Services | No-Code Automation Platform Consultant | India | zapier/automation | score=217 | pending_review | https://www.prosperspark.com/zapier-automation"
+    },
+    {
+      "status": "accepted",
+      "id": 9,
+      "name": "APACs Most Experienced Zapier Expert and DIgital Automation Consultant - That Automation Agency",
+      "country": "India",
+      "website": "https://thatautomationagency.com/zapier-digital-automation-consulting",
+      "source": "public_api",
+      "email": "team@thatautomationagency.com",
+      "verification_score": 217,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "thatautomationagency.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "APACs Most Experienced Zapier Expert and DIgital Automation Consultant - That Automation Agency | India | zapier/automation | score=217 | accepted | https://thatautomationagency.com/zapier-digital-automation-consulting"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier Solution Partner Program | Automation Consultants & Experts",
+      "country": "India",
+      "website": "https://zapier.com/l/solution-partner",
+      "source": "public_api",
+      "email": "yourname@yourcompany.com",
+      "verification_score": 217,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "yourcompany.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Solution Partner Program | Automation Consultants & Experts | India | zapier/automation | score=217 | rejected | https://zapier.com/l/solution-partner"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier Consultants – Certified | flowmondo",
+      "country": "India",
+      "website": "https://www.flowmondo.com/zapier-experts",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 184,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Consultants – Certified | flowmondo | India | zapier/automation | score=184 | rejected | https://www.flowmondo.com/zapier-experts"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier Consulting Firm | Get Expert Help",
+      "country": "India",
+      "website": "https://www.axeautomation.co/zapier-consulting",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 184,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Consulting Firm | Get Expert Help | India | zapier/automation/custom | score=184 | rejected | https://www.axeautomation.co/zapier-consulting"
+    },
+    {
+      "status": "accepted",
+      "id": 10,
+      "name": "Certified Zapier Consultants & Zapier Expert Partner",
+      "country": "India",
+      "website": "https://flow.digital/zapier-consultant",
+      "source": "public_api",
+      "email": "hello@flow.digital",
+      "verification_score": 217,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "flow.digital",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Certified Zapier Consultants & Zapier Expert Partner | India | zapier/automation | score=217 | accepted | https://flow.digital/zapier-consultant"
+    },
+    {
+      "status": "rejected",
+      "name": "Integrations, App and Software Automation | Automate With Zapier",
+      "country": "India",
+      "website": "https://zapier.com/apps",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 177,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Integrations, App and Software Automation | Automate With Zapier | India | zapier/automation | score=177 | rejected | https://zapier.com/apps"
+    }
+  ]
+}

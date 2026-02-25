@@ -1,0 +1,465 @@
+{
+  "startedAt": "2026-02-25T06:57:25.567Z",
+  "sources": [
+    "bing"
+  ],
+  "maxResults": 60,
+  "limitPerSource": 20,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 12,
+  "accepted": 0,
+  "pendingReview": 1,
+  "rejected": 11,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250657.csv",
+  "qualityGate": {
+    "withEmail": 0,
+    "validatedWebsite": 0,
+    "blockedByDomain": 2,
+    "avgVerificationScore": 0
+  },
+  "candidates": [
+    {
+      "status": "pending_review",
+      "id": 2,
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "United States",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | United States | n8n/automation/ai | score=245 | pending_review | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker",
+      "country": "United States",
+      "website": "https://blocktalker.co.kr/n8n-workflow-examples-2026-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 142,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker | United States | n8n/ai | score=142 | rejected | https://blocktalker.co.kr/n8n-workflow-examples-2026-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE",
+      "country": "United States",
+      "website": "https://tilnote.io/pages/68a82ddfe158f2462a1e09ba",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 140,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE | United States | n8n/ai | score=140 | rejected | https://tilnote.io/pages/68a82ddfe158f2462a1e09ba"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "Germany",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | Germany | n8n/automation/ai | score=245 | rejected | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker",
+      "country": "Germany",
+      "website": "https://blocktalker.co.kr/n8n-workflow-examples-2026-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 142,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker | Germany | n8n/automation/ai | score=142 | rejected | https://blocktalker.co.kr/n8n-workflow-examples-2026-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE",
+      "country": "Germany",
+      "website": "https://tilnote.io/pages/68a82ddfe158f2462a1e09ba",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 140,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE | Germany | n8n/automation/ai | score=140 | rejected | https://tilnote.io/pages/68a82ddfe158f2462a1e09ba"
+    },
+    {
+      "status": "rejected",
+      "name": "How software defined-automation is shaping manufacturing for the AI age",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "How software defined-automation is shaping manufacturing for the AI age | Australia | automation/ai/custom | score=110 | rejected | https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens"
+    },
+    {
+      "status": "rejected",
+      "name": "The rise in automation and what it means for the future",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "The rise in automation and what it means for the future | Australia | automation/custom | score=110 | rejected | https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future"
+    },
+    {
+      "status": "rejected",
+      "name": "Sustainability: Electrification and automation of energy",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2026/01/electrification-automation-competitive-sustainable-industry",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "Sustainability: Electrification and automation of energy | Australia | automation/ai/custom | score=110 | rejected | https://www.weforum.org/stories/2026/01/electrification-automation-competitive-sustainable-industry"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "India",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | India | n8n/automation/ai | score=245 | rejected | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker",
+      "country": "India",
+      "website": "https://blocktalker.co.kr/n8n-workflow-examples-2026-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 142,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker | India | n8n/automation/ai | score=142 | rejected | https://blocktalker.co.kr/n8n-workflow-examples-2026-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE",
+      "country": "India",
+      "website": "https://tilnote.io/pages/68a82ddfe158f2462a1e09ba",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 140,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE | India | n8n/automation/ai | score=140 | rejected | https://tilnote.io/pages/68a82ddfe158f2462a1e09ba"
+    }
+  ]
+}

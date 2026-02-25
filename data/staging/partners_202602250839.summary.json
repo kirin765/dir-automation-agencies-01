@@ -1,0 +1,24 @@
+{
+  "startedAt": "2026-02-25T08:39:11.739Z",
+  "sources": [
+    "bing"
+  ],
+  "maxResults": 100,
+  "limitPerSource": 2000,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 0,
+  "accepted": 0,
+  "pendingReview": 0,
+  "rejected": 0,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250839.csv",
+  "qualityGate": {
+    "withEmail": 0,
+    "validatedWebsite": 0,
+    "blockedByDomain": 0,
+    "avgVerificationScore": 0
+  },
+  "candidates": []
+}

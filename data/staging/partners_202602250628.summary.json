@@ -1,0 +1,759 @@
+{
+  "startedAt": "2026-02-25T06:28:11.897Z",
+  "sources": [
+    "bing"
+  ],
+  "maxResults": 60,
+  "limitPerSource": 20,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 20,
+  "accepted": 2,
+  "pendingReview": 4,
+  "rejected": 14,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250628.csv",
+  "qualityGate": {
+    "withEmail": 2,
+    "validatedWebsite": 2,
+    "blockedByDomain": 5,
+    "avgVerificationScore": 162
+  },
+  "candidates": [
+    {
+      "status": "pending_review",
+      "id": 2,
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "United States",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | United States | n8n/automation/ai | score=245 | pending_review | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker",
+      "country": "United States",
+      "website": "https://blocktalker.co.kr/n8n-workflow-examples-2026-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 142,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker | United States | n8n/ai | score=142 | rejected | https://blocktalker.co.kr/n8n-workflow-examples-2026-guide"
+    },
+    {
+      "status": "pending_review",
+      "id": 3,
+      "name": "환영합니다 | n8n 공식 기술 문서 한글판",
+      "country": "United States",
+      "website": "https://n8n-docs.infograb.net",
+      "source": "public_api",
+      "email": "support@infograb.net",
+      "verification_score": 197,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "infograb.net",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "환영합니다 | n8n 공식 기술 문서 한글판 | United States | n8n | score=197 | pending_review | https://n8n-docs.infograb.net"
+    },
+    {
+      "status": "rejected",
+      "name": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE",
+      "country": "United States",
+      "website": "https://tilnote.io/pages/68a82ddfe158f2462a1e09ba",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 140,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE | United States | n8n/ai | score=140 | rejected | https://tilnote.io/pages/68a82ddfe158f2462a1e09ba"
+    },
+    {
+      "status": "accepted",
+      "id": 4,
+      "name": "n8n - 나무위키",
+      "country": "United States",
+      "website": "https://namu.wiki/w/n8n",
+      "source": "public_api",
+      "email": "support@namu.wiki",
+      "verification_score": 167,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": true,
+        "emailDomain": "namu.wiki",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "n8n - 나무위키 | United States | n8n/automation | score=167 | accepted | https://namu.wiki/w/n8n"
+    },
+    {
+      "status": "rejected",
+      "name": "OpenAI",
+      "country": "United Kingdom",
+      "website": "https://openai.com/ko-kr",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 80,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "OpenAI | United Kingdom | automation/ai | score=80 | rejected | https://openai.com/ko-kr"
+    },
+    {
+      "status": "rejected",
+      "name": "인공지능(AI)이란? 기본 개념부터 미래 전망까지 완벽 정리",
+      "country": "United Kingdom",
+      "website": "https://m.blog.naver.com/4433232/223766458954",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 100,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공지능(AI)이란? 기본 개념부터 미래 전망까지 완벽 정리 | United Kingdom | automation/ai | score=100 | rejected | https://m.blog.naver.com/4433232/223766458954"
+    },
+    {
+      "status": "accepted",
+      "id": 5,
+      "name": "인공지능(AI)이란 무엇일까요? 개념, 종류, 역사, 미래 전망 ...",
+      "country": "United Kingdom",
+      "website": "https://aeiai.net/ai-knowledge/ai-terms-concepts/%ec%9d%b8%ea%b3%b5%ec%a7%80%eb%8a%a5ai%ec%9d%b4%eb%9e%80-%eb%ac%b4%ec%97%87%ec%9d%bc%ea%b9%8c%ec%9a%94-%ea%b0%9c%eb%85%90-%ec%a2%85%eb%a5%98-%ec%97%ad%ec%82%ac-%eb%af%b8%eb%9e%98-%ec%a0%84",
+      "source": "public_api",
+      "email": "aeiai.net@aeiai.net",
+      "verification_score": 157,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "aeiai.net",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": false,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공지능(AI)이란 무엇일까요? 개념, 종류, 역사, 미래 전망 ... | United Kingdom | automation/ai | score=157 | accepted | https://aeiai.net/ai-knowledge/ai-terms-concepts/%ec%9d%b8%ea%b3%b5%ec%a7%80%eb%8a%a5ai%ec%9d%b4%eb%9e%80-%eb%ac%b4%ec%97%87%ec%9d%bc%ea%b9%8c%ec%9a%94-%ea%b0%9c%eb%85%90-%ec%a2%85%eb%a5%98-%ec%97%ad%ec%82%ac-%eb%af%b8%eb%9e%98-%ec%a0%84"
+    },
+    {
+      "status": "rejected",
+      "name": "인공지능 - 나무위키",
+      "country": "United Kingdom",
+      "website": "https://namu.wiki/w/%ec%9d%b8%ea%b3%b5%ec%a7%80%eb%8a%a5",
+      "source": "public_api",
+      "email": "support@namu.wiki",
+      "verification_score": 147,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "namu.wiki",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공지능 - 나무위키 | United Kingdom | automation/ai | score=147 | rejected | https://namu.wiki/w/%ec%9d%b8%ea%b3%b5%ec%a7%80%eb%8a%a5"
+    },
+    {
+      "status": "pending_review",
+      "id": 6,
+      "name": "인공지능 (AI)이란 무엇인가요? - IBM",
+      "country": "United Kingdom",
+      "website": "https://www.ibm.com/kr-ko/think/topics/artificial-intelligence",
+      "source": "public_api",
+      "email": "xxx@ccc.com",
+      "verification_score": 142,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "email does not match business domain"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "ccc.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공지능 (AI)이란 무엇인가요? - IBM | United Kingdom | automation/ai | score=142 | pending_review | https://www.ibm.com/kr-ko/think/topics/artificial-intelligence"
+    },
+    {
+      "status": "rejected",
+      "name": "인공지능(AI) 완벽 가이드: 정의, 활용, 미래 전망",
+      "country": "United Kingdom",
+      "website": "https://www.toolify.ai/ko/ai-news-kr/ai-3722998",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 88,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "인공지능(AI) 완벽 가이드: 정의, 활용, 미래 전망 | United Kingdom | automation/ai | score=88 | rejected | https://www.toolify.ai/ko/ai-news-kr/ai-3722998"
+    },
+    {
+      "status": "pending_review",
+      "id": 7,
+      "name": "인공지능(AI)이란 무엇인가요? | Google Cloud",
+      "country": "United Kingdom",
+      "website": "https://cloud.google.com/learn/what-is-artificial-intelligence",
+      "source": "public_api",
+      "email": "marketing-studio-cloud-regional-pmms@google.com",
+      "verification_score": 187,
+      "verification_status": "pending_review",
+      "validation_notes": [
+        "email does not match business domain"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "google.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공지능(AI)이란 무엇인가요? | Google Cloud | United Kingdom | automation/ai | score=187 | pending_review | https://cloud.google.com/learn/what-is-artificial-intelligence"
+    },
+    {
+      "status": "rejected",
+      "name": "인공 지능 (AI)이란 무엇입니까? ‒ 인텔",
+      "country": "United Kingdom",
+      "website": "https://www.intel.co.kr/content/www/kr/ko/learn/what-is-artificial-intelligence.html",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 150,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": false,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "인공 지능 (AI)이란 무엇입니까? ‒ 인텔 | United Kingdom | automation/ai | score=150 | rejected | https://www.intel.co.kr/content/www/kr/ko/learn/what-is-artificial-intelligence.html"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "Germany",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | Germany | n8n/automation/ai | score=245 | rejected | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker",
+      "country": "Germany",
+      "website": "https://blocktalker.co.kr/n8n-workflow-examples-2026-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 142,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "2026년 n8n 워크플로우 예제로 배우는 노코드 자동화 A to Z - Blocktalker | Germany | n8n/automation/ai | score=142 | rejected | https://blocktalker.co.kr/n8n-workflow-examples-2026-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "환영합니다 | n8n 공식 기술 문서 한글판",
+      "country": "Germany",
+      "website": "https://n8n-docs.infograb.net",
+      "source": "public_api",
+      "email": "support@infograb.net",
+      "verification_score": 207,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "email does not match business domain",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "infograb.net",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "환영합니다 | n8n 공식 기술 문서 한글판 | Germany | n8n/automation | score=207 | rejected | https://n8n-docs.infograb.net"
+    },
+    {
+      "status": "rejected",
+      "name": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE",
+      "country": "Germany",
+      "website": "https://tilnote.io/pages/68a82ddfe158f2462a1e09ba",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 140,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "N8N 설치부터 자동화·AI 연동까지 사용법 완벽 가이드 - TILNOTE | Germany | n8n/automation/ai | score=140 | rejected | https://tilnote.io/pages/68a82ddfe158f2462a1e09ba"
+    },
+    {
+      "status": "rejected",
+      "name": "How software defined-automation is shaping manufacturing for the AI age",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "How software defined-automation is shaping manufacturing for the AI age | Australia | automation/ai/custom | score=110 | rejected | https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens"
+    },
+    {
+      "status": "rejected",
+      "name": "The rise in automation and what it means for the future",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "The rise in automation and what it means for the future | Australia | automation/custom | score=110 | rejected | https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future"
+    },
+    {
+      "status": "rejected",
+      "name": "OpenAI",
+      "country": "Australia",
+      "website": "https://openai.com/ko-kr",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 80,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "OpenAI | Australia | automation/ai | score=80 | rejected | https://openai.com/ko-kr"
+    }
+  ]
+}

@@ -1,0 +1,741 @@
+{
+  "startedAt": "2026-02-25T05:28:10.842Z",
+  "sources": [
+    "duckduckgo"
+  ],
+  "maxResults": 20,
+  "limitPerSource": 2000,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 20,
+  "accepted": 7,
+  "pendingReview": 0,
+  "rejected": 13,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250528.csv",
+  "qualityGate": {
+    "withEmail": 7,
+    "validatedWebsite": 7,
+    "blockedByDomain": 2,
+    "avgVerificationScore": 213.14
+  },
+  "candidates": [
+    {
+      "status": "accepted",
+      "id": 2,
+      "name": "Zapier Automation Agency | 13+ Years Experience in Zapier",
+      "country": "United States",
+      "website": "https://zapierautomationagency.com",
+      "source": "public_api",
+      "email": "ratulbinhasan2011@gmail.com",
+      "verification_score": 229,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "gmail.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Automation Agency | 13+ Years Experience in Zapier | United States | zapier/automation | score=229 | accepted | https://zapierautomationagency.com"
+    },
+    {
+      "status": "accepted",
+      "id": 3,
+      "name": "Solution Partner Directory - Zapier",
+      "country": "United States",
+      "website": "https://zapier.com/partnerdirectory",
+      "source": "public_api",
+      "email": "bob@companyemail.com",
+      "verification_score": 217,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "companyemail.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Solution Partner Directory - Zapier | United States | zapier/automation | score=217 | accepted | https://zapier.com/partnerdirectory"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier - Wikipedia",
+      "country": "United States",
+      "website": "https://en.wikipedia.org/wiki/zapier",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 169,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier - Wikipedia | United States | zapier/automation | score=169 | rejected | https://en.wikipedia.org/wiki/zapier"
+    },
+    {
+      "status": "accepted",
+      "id": 4,
+      "name": "The Zapier Agency That Helps You Automate Smarter",
+      "country": "United States",
+      "website": "https://theautomated.agency/the-zapier-agency-that-helps-you-automate-smarter",
+      "source": "public_api",
+      "email": "hello@theautomated.agency",
+      "verification_score": 217,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "theautomated.agency",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "The Zapier Agency That Helps You Automate Smarter | United States | zapier/automation | score=217 | accepted | https://theautomated.agency/the-zapier-agency-that-helps-you-automate-smarter"
+    },
+    {
+      "status": "rejected",
+      "name": "6 Top Zapier Automation Companies in the USA | Medium",
+      "country": "United States",
+      "website": "https://medium.com/@muhammadsadiqchandio/6-top-zapier-automation-companies-in-the-usa-to-trust-in-2025-c26a99bec471",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 95,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "6 Top Zapier Automation Companies in the USA | Medium | United States | zapier/automation | score=95 | rejected | https://medium.com/@muhammadsadiqchandio/6-top-zapier-automation-companies-in-the-usa-to-trust-in-2025-c26a99bec471"
+    },
+    {
+      "status": "accepted",
+      "id": 5,
+      "name": "The Top Zapier Agencies to Help You Automate Your Business",
+      "country": "United States",
+      "website": "https://www.shno.co/no-code-agencies/zapier",
+      "source": "public_api",
+      "email": "shankar@shno.co",
+      "verification_score": 194,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "shno.co",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "The Top Zapier Agencies to Help You Automate Your Business | United States | zapier/automation | score=194 | accepted | https://www.shno.co/no-code-agencies/zapier"
+    },
+    {
+      "status": "rejected",
+      "name": "Best Zapier Consultants - Zapier Expert",
+      "country": "United States",
+      "website": "https://www.zapierexpert.net",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 184,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Best Zapier Consultants - Zapier Expert | United States | zapier/automation | score=184 | rejected | https://www.zapierexpert.net"
+    },
+    {
+      "status": "accepted",
+      "id": 6,
+      "name": "Zapier Consulting Services | No-Code Automation Platform Consultant",
+      "country": "United States",
+      "website": "https://www.prosperspark.com/zapier-automation",
+      "source": "public_api",
+      "email": "logo-mark-colour@2x.png",
+      "verification_score": 217,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "2x.png",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier Consulting Services | No-Code Automation Platform Consultant | United States | zapier/automation | score=217 | accepted | https://www.prosperspark.com/zapier-automation"
+    },
+    {
+      "status": "accepted",
+      "id": 7,
+      "name": "Top Zapier Development Agencies And Automation Experts",
+      "country": "United States",
+      "website": "https://reverbico.com/blog/top-zapier-development-agencies-and-automation-experts",
+      "source": "public_api",
+      "email": "david@reverbico.com",
+      "verification_score": 209,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "reverbico.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Top Zapier Development Agencies And Automation Experts | United States | zapier/automation | score=209 | accepted | https://reverbico.com/blog/top-zapier-development-agencies-and-automation-experts"
+    },
+    {
+      "status": "rejected",
+      "name": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "country": "United States",
+      "website": "https://zapier.com",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 197,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "missing or invalid email",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Zapier: Automate AI Workflows, Agents, and Apps | United States | zapier/automation/ai | score=197 | rejected | https://zapier.com"
+    },
+    {
+      "status": "rejected",
+      "name": "Find A Partner To Support Your Business Needs - Make",
+      "country": "United States",
+      "website": "https://www.make.com/en/partners-directory",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 95,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "Find A Partner To Support Your Business Needs - Make | United States | make/automation | score=95 | rejected | https://www.make.com/en/partners-directory"
+    },
+    {
+      "status": "rejected",
+      "name": "Make Consultants - Certified | flowmondo",
+      "country": "United States",
+      "website": "https://www.flowmondo.com/make-experts",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 169,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Make Consultants - Certified | flowmondo | United States | make/automation | score=169 | rejected | https://www.flowmondo.com/make-experts"
+    },
+    {
+      "status": "rejected",
+      "name": "Professional Make.com Automation Services - Bluelinks Agency",
+      "country": "United States",
+      "website": "https://www.bluelinks.agency/automation/make/services",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 169,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Professional Make.com Automation Services - Bluelinks Agency | United States | make/automation | score=169 | rejected | https://www.bluelinks.agency/automation/make/services"
+    },
+    {
+      "status": "accepted",
+      "id": 8,
+      "name": "Make.com Automation Services | Scraping Agency",
+      "country": "United States",
+      "website": "https://scrapingagency.com/make-automation",
+      "source": "public_api",
+      "email": "alex@company.com",
+      "verification_score": 209,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "company.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Make.com Automation Services | Scraping Agency | United States | make/automation/custom | score=209 | accepted | https://scrapingagency.com/make-automation"
+    },
+    {
+      "status": "rejected",
+      "name": "Make Automation Consultants | Workflow Automation &amp; App Integration",
+      "country": "United States",
+      "website": "https://www.prosperspark.com/make-automation",
+      "source": "public_api",
+      "email": "logo-mark-colour@2x.png",
+      "verification_score": 217,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "2x.png",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Make Automation Consultants | Workflow Automation &amp; App Integration | United States | make/automation | score=217 | rejected | https://www.prosperspark.com/make-automation"
+    },
+    {
+      "status": "rejected",
+      "name": "Make.com Automation Consulting &amp; Expert Support | MMC Global",
+      "country": "United States",
+      "website": "https://mmcgbl.com/products/make-automation",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 95,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "Make.com Automation Consulting &amp; Expert Support | MMC Global | United States | make/automation | score=95 | rejected | https://mmcgbl.com/products/make-automation"
+    },
+    {
+      "status": "rejected",
+      "name": "Trusted Make.com Consultants | We Are Certified Experts",
+      "country": "United States",
+      "website": "https://www.smvvirtual.com/make-consultants",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 192,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Trusted Make.com Consultants | We Are Certified Experts | United States | make/automation | score=192 | rejected | https://www.smvvirtual.com/make-consultants"
+    },
+    {
+      "status": "rejected",
+      "name": "Make Consulting - Top AI Automation Agency",
+      "country": "United States",
+      "website": "https://elevateautomations.com/make-consulting",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 192,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Make Consulting - Top AI Automation Agency | United States | zapier/make/automation/ai/custom | score=192 | rejected | https://elevateautomations.com/make-consulting"
+    },
+    {
+      "status": "rejected",
+      "name": "Make.com Automation Services | Automate Repetitive Tasks",
+      "country": "United States",
+      "website": "https://www.enacton.com/services/makecom-automation",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 184,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Make.com Automation Services | Automate Repetitive Tasks | United States | make/automation/ai | score=184 | rejected | https://www.enacton.com/services/makecom-automation"
+    },
+    {
+      "status": "rejected",
+      "name": "John G. - AI Consultant &amp; Process Automation Engineer | Make ... - Upwork",
+      "country": "United States",
+      "website": "https://www.upwork.com/freelancers/jackautomates",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 95,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "John G. - AI Consultant &amp; Process Automation Engineer | Make ... - Upwork | United States | make/automation/ai | score=95 | rejected | https://www.upwork.com/freelancers/jackautomates"
+    }
+  ]
+}

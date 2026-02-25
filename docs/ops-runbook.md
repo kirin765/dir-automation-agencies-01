@@ -80,7 +80,7 @@
   - `npm run sync-and-build`
   - `npm run sync-and-deploy` (동일 명령으로 동기화 + 빌드 + 배포)
 - 자동:
-  - `.github/workflows/sync-d1-listings.yml`를 통해 30분 간격 동기화
+  - `.github/workflows/sync-d1-listings.yml`를 통해 매일 00:00(KST) 1회 동기화
   - D1(`verified=1`)을 조회해 `data/listings.csv`를 재생성하고 빌드/배포 수행
 
 ### 3-4) 웹 파트너 후보 수집 배치
@@ -127,7 +127,35 @@
 3. 폼 저장 실패 급증: `api/admin/metrics`와 `api/events` 상태 확인 후 DB 바인딩 점검
 4. 404 급증: 최근 콘텐츠 배포 전/후 페이지 수 비교(검색된 페이지 수, 라우트 프리셋)
 
-## 6) Phase 5 운영 점검 루틴
+## 7) 알림 채널 정책 (Slack 전용)
+
+- 목표: GitHub Actions, Cloudflare, Vercel의 배포/실패 알림을 **Slack만** 수신하고, Email 알림은 비활성화
+
+### A. GitHub Actions (이 저장소)
+- 워크플로 `.github/workflows/deploy-cloudflare-pages.yml`  
+- 워크플로 `.github/workflows/sync-d1-listings.yml`
+- 각 완료 이벤트(`always()`)에서 `SLACK_WEBHOOK_URL` 존재 시 Slack으로 결과 전송
+- Repository Settings > Notifications(또는 조직/계정 알림)에서:
+  - Email 알림 체크를 비활성화
+  - Slack만 남김
+  - 팀 단위 알림 정책을 우선 적용하면 개인 설정과 충돌 없이 일괄 관리 가능
+
+- 필요 시 수동 테스트:
+  - GitHub Secrets에 `SLACK_WEBHOOK_URL` 등록
+  - `workflow_dispatch` 또는 `main` push로 워크플로 한 번 실행해 Slack 도착 확인
+
+### B. Cloudflare Pages 알림
+- Pages/Workers → Project Settings → Notifications(또는 프로젝트 알림 설정)
+- Email 대상 채널 비활성화
+- Slack Incoming Webhook/워크스페이스 연결(또는 Cloudflare가 제공하는 Slack 채널 연동 방식)
+- 플랫폼 기본 알림은 비활성(또는 최소), 이 저장소는 GitHub Actions 알림을 주 채널로 사용
+
+### C. Vercel 알림
+- Vercel Dashboard → Project Settings → Integrations/Notifications
+- Email 알림 off, Slack integration on
+- 현재 배포는 Cloudflare Pages 중심이므로 Vercel은 보조 파이프라인으로만 운영 시 채널 정책 문서에 맞춰 비활성 권장
+
+## 8) Phase 5 운영 점검 루틴
 
 ### 월 1회: 인덱싱/운영 정합성
 - Cloudflare Pages 배포 상태 점검 (`Deployments`)

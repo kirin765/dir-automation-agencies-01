@@ -266,6 +266,7 @@ The `scripts/process-data.ts` script:
    - `GMAIL_USER_EMAIL` (Gmail sender address)
    - `GMAIL_FROM_NAME` (optional display name)
    - `GMAIL_RATE_LIMIT_PER_MIN` (optional, default `120`)
+   - `SLACK_WEBHOOK_URL` (Slack incoming webhook URL; GitHub Actions 알림 전용)
 8. Deploy!
 
 If you deploy from CLI instead, use:

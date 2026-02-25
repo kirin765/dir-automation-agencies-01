@@ -1,0 +1,169 @@
+{
+  "startedAt": "2026-02-25T06:16:30.101Z",
+  "sources": [
+    "duckduckgo"
+  ],
+  "maxResults": 60,
+  "limitPerSource": 2000,
+  "verificationMode": "strict",
+  "minScore": 45,
+  "requireEmail": true,
+  "totalDiscovered": 4,
+  "accepted": 0,
+  "pendingReview": 0,
+  "rejected": 4,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250616.csv",
+  "qualityGate": {
+    "withEmail": 0,
+    "validatedWebsite": 0,
+    "blockedByDomain": 0,
+    "avgVerificationScore": 0
+  },
+  "candidates": [
+    {
+      "status": "rejected",
+      "name": "The Automation Partner - LinkedIn",
+      "country": "United States",
+      "website": "https://www.linkedin.com/company/theautomationpartner",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 170,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "The Automation Partner - LinkedIn | United States | make/automation/ai | score=170 | rejected | https://www.linkedin.com/company/theautomationpartner"
+    },
+    {
+      "status": "rejected",
+      "name": "The Automation Partner | Make",
+      "country": "United States",
+      "website": "https://www.make.com/en/partners-directory/the-automation-partner",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 95,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "The Automation Partner | Make | United States | make/automation | score=95 | rejected | https://www.make.com/en/partners-directory/the-automation-partner"
+    },
+    {
+      "status": "rejected",
+      "name": "The Automation Partner - LinkedIn",
+      "country": "United States",
+      "website": "https://ar.linkedin.com/company/theautomationpartner",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 170,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": true,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "The Automation Partner - LinkedIn | United States | make/automation/ai | score=170 | rejected | https://ar.linkedin.com/company/theautomationpartner"
+    },
+    {
+      "status": "rejected",
+      "name": "Erick - Certified AI &amp; Automation Partner | Zapier, Make.com, HubSpot ...",
+      "country": "United States",
+      "website": "https://techautomation.net",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 152,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "Erick - Certified AI &amp; Automation Partner | Zapier, Make.com, HubSpot ... | United States | zapier/make/n8n/automation/ai | score=152 | rejected | https://techautomation.net"
+    }
+  ]
+}

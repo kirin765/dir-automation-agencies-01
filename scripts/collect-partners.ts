@@ -35,6 +35,8 @@ interface QueryFileEntry {
 
 interface ScriptQualityGate {
   withEmail: number;
+  acceptedWithEmail: number;
+  acceptedWithoutEmail: number;
   validatedWebsite: number;
   blockedByDomain: number;
   avgVerificationScore: number;
@@ -402,8 +404,13 @@ async function run() {
     summary: summarizeCandidate(candidate),
   }));
 
+  const acceptedWithEmail = acceptedCandidates.filter((candidate) => !!candidate.email).length;
+  const acceptedWithoutEmail = acceptedCandidates.length - acceptedWithEmail;
+
   const qualityGate: ScriptQualityGate = {
-    withEmail: acceptedCandidates.filter((candidate) => !!candidate.email).length,
+    withEmail: acceptedWithEmail,
+    acceptedWithEmail,
+    acceptedWithoutEmail,
     validatedWebsite: acceptedCandidates.filter((candidate) => !!candidate.verificationSignals?.websiteOk).length,
     blockedByDomain,
     avgVerificationScore:
@@ -480,7 +487,7 @@ async function run() {
     `[collect-partners] discovered=${discoveredCandidates.length}, accepted=${acceptedCandidates.length}, pending_review=${pendingReviewCandidates.length}, rejected=${rejected}`
   );
   console.log(
-    `[collect-partners] qualityGate: withEmail=${qualityGate.withEmail}, validatedWebsite=${qualityGate.validatedWebsite}, blockedByDomain=${qualityGate.blockedByDomain}, avgVerificationScore=${qualityGate.avgVerificationScore}`
+    `[collect-partners] qualityGate: withEmail=${qualityGate.withEmail}, acceptedWithEmail=${qualityGate.acceptedWithEmail}, acceptedWithoutEmail=${qualityGate.acceptedWithoutEmail}, validatedWebsite=${qualityGate.validatedWebsite}, blockedByDomain=${qualityGate.blockedByDomain}, avgVerificationScore=${qualityGate.avgVerificationScore}`
   );
   if (args.writeStaging) {
     console.log(`[collect-partners] staging: ${stagingFilePath}`);

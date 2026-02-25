@@ -1,0 +1,611 @@
+{
+  "startedAt": "2026-02-25T08:11:14.538Z",
+  "sources": [
+    "bing"
+  ],
+  "maxResults": 60,
+  "limitPerSource": 20,
+  "verificationMode": "moderate",
+  "minScore": 30,
+  "requireEmail": true,
+  "totalDiscovered": 16,
+  "accepted": 2,
+  "pendingReview": 0,
+  "rejected": 14,
+  "appended": 0,
+  "stagingFile": "/Users/kiwankim/dir-automation-agencies-01/data/staging/partners_202602250811.csv",
+  "qualityGate": {
+    "withEmail": 2,
+    "validatedWebsite": 2,
+    "blockedByDomain": 8,
+    "avgVerificationScore": 212
+  },
+  "candidates": [
+    {
+      "status": "accepted",
+      "id": 2,
+      "name": "YouTube 動画をアップロードする - Android - YouTube ヘルプ",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/57407",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "accepted"
+      ],
+      "reasonCodes": [],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "YouTube 動画をアップロードする - Android - YouTube ヘルプ | United States | zapier/automation | score=179 | accepted | https://support.google.com/youtube/answer/57407"
+    },
+    {
+      "status": "rejected",
+      "name": "YouTube の急上昇チャート - YouTube ヘルプ - Google Help",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/7239739",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "YouTube の急上昇チャート - YouTube ヘルプ - Google Help | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/7239739"
+    },
+    {
+      "status": "rejected",
+      "name": "YouTube へのログインとログアウト - パソコン - YouTube ヘルプ",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/3802431",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "YouTube へのログインとログアウト - パソコン - YouTube ヘルプ | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/3802431"
+    },
+    {
+      "status": "rejected",
+      "name": "YouTube の操作方法",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/2398242",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "YouTube の操作方法 | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/2398242"
+    },
+    {
+      "status": "rejected",
+      "name": "YouTube 動画のエラーのトラブルシューティング - YouTube ヘルプ",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/3037019",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "YouTube 動画のエラーのトラブルシューティング - YouTube ヘルプ | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/3037019"
+    },
+    {
+      "status": "rejected",
+      "name": "動画の画質を変更する",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/91449",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "動画の画質を変更する | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/91449"
+    },
+    {
+      "status": "rejected",
+      "name": "Google アカウントで YouTube を利用する - YouTube ヘルプ",
+      "country": "United States",
+      "website": "https://support.google.com/youtube/answer/69961",
+      "source": "public_api",
+      "email": "robert@broofa.com",
+      "verification_score": 179,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "accepted",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "broofa.com",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": false,
+        "mailtoSignal": true,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "Google アカウントで YouTube を利用する - YouTube ヘルプ | United States | zapier/automation | score=179 | rejected | https://support.google.com/youtube/answer/69961"
+    },
+    {
+      "status": "accepted",
+      "id": 3,
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "United States",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "accepted",
+      "validation_notes": [
+        "suspicious email pattern"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | United States | n8n/automation/ai | score=245 | accepted | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker",
+      "country": "United States",
+      "website": "https://blocktalker.co.kr/n8n-basic-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 132,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker | United States | n8n/ai | score=132 | rejected | https://blocktalker.co.kr/n8n-basic-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "Germany",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | Germany | n8n/automation/ai | score=245 | rejected | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker",
+      "country": "Germany",
+      "website": "https://blocktalker.co.kr/n8n-basic-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 132,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker | Germany | n8n/automation/ai | score=132 | rejected | https://blocktalker.co.kr/n8n-basic-guide"
+    },
+    {
+      "status": "rejected",
+      "name": "How software defined-automation is shaping manufacturing for the AI age",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "How software defined-automation is shaping manufacturing for the AI age | Australia | automation/ai/custom | score=110 | rejected | https://www.weforum.org/stories/2026/02/software-defined-automation-the-force-awakens"
+    },
+    {
+      "status": "rejected",
+      "name": "The rise in automation and what it means for the future",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "The rise in automation and what it means for the future | Australia | automation/custom | score=110 | rejected | https://www.weforum.org/stories/2021/04/the-rise-in-automation-and-what-it-means-for-the-future"
+    },
+    {
+      "status": "rejected",
+      "name": "Sustainability: Electrification and automation of energy",
+      "country": "Australia",
+      "website": "https://www.weforum.org/stories/2026/01/electrification-automation-competitive-sustainable-industry",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 110,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": false,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "http_403"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": false,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "http_403"
+      },
+      "summary": "Sustainability: Electrification and automation of energy | Australia | automation/ai/custom | score=110 | rejected | https://www.weforum.org/stories/2026/01/electrification-automation-competitive-sustainable-industry"
+    },
+    {
+      "status": "rejected",
+      "name": "AI Workflow Automation Platform & Tools - n8n",
+      "country": "India",
+      "website": "https://n8n.io",
+      "source": "public_api",
+      "email": "f75b6df242301a9f6d95d63e184216c9@o1420875.ingest.us.sentry.io",
+      "verification_score": 245,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "reasonCodes": [
+        "suspicious email pattern",
+        "duplicate domain or slug"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": true,
+        "aboutSignal": true,
+        "emailValid": true,
+        "emailDomain": "o1420875.ingest.us.sentry.io",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": true,
+        "aboutSignal": true,
+        "automationSignal": true,
+        "servicesSignal": true,
+        "workSignal": true,
+        "socialSignal": true,
+        "mailtoSignal": false,
+        "emailFromSource": true,
+        "websiteStatus": "ok"
+      },
+      "summary": "AI Workflow Automation Platform & Tools - n8n | India | n8n/automation/ai | score=245 | rejected | https://n8n.io"
+    },
+    {
+      "status": "rejected",
+      "name": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker",
+      "country": "India",
+      "website": "https://blocktalker.co.kr/n8n-basic-guide",
+      "source": "public_api",
+      "email": "",
+      "verification_score": 132,
+      "verification_status": "rejected",
+      "validation_notes": [
+        "missing or invalid email"
+      ],
+      "reasonCodes": [
+        "missing or invalid email"
+      ],
+      "validation": {
+        "websiteOk": true,
+        "contactSignal": false,
+        "aboutSignal": false,
+        "emailValid": false,
+        "emailDomain": "",
+        "websiteStatus": "ok"
+      },
+      "signals": {
+        "contactSignal": false,
+        "aboutSignal": false,
+        "automationSignal": true,
+        "servicesSignal": false,
+        "workSignal": false,
+        "socialSignal": false,
+        "mailtoSignal": false,
+        "emailFromSource": false,
+        "websiteStatus": "ok"
+      },
+      "summary": "n8n 기초 사용법부터 AI 연동까지 완벽 가이드 - Blocktalker | India | n8n/automation/ai | score=132 | rejected | https://blocktalker.co.kr/n8n-basic-guide"
+    }
+  ]
+}
