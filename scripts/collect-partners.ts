@@ -93,7 +93,7 @@ function usage(): void {
   console.log(`
 collect-partners usage:
 
-  --source <name,...>            source adapters: duckduckgo, seed (default: duckduckgo)
+  --source <name,...>            source adapters: duckduckgo, bing, seed (default: duckduckgo)
   --query-file <path>            query template file (default: ${DEFAULT_QUERY_FILE})
   --max-results <n>              total max candidates (default: 5000)
   --limit-per-source <n>         per source cap (default: 2000)

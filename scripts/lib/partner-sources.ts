@@ -74,7 +74,60 @@ const DIRECTORY_PATH_HINTS = [
   '/marketplace',
   '/vendors',
   '/agency',
+  '/question',
+  '/questions',
+  '/answers',
+  '/forum',
+  '/community',
+  '/user',
+  '/users',
+  '/wiki',
+  '/blog',
+  '/docs',
+  '/documentation',
+  '/documentation/',
+  '/help',
+  '/tutorial',
+  '/tutorials',
+  '/guide',
+  '/guides',
+  '/post',
+  '/posts',
+  '/tags',
+  '/tag/',
 ];
+
+const NON_AGENCY_HOST_HINTS = new Set([
+  'facebook.com',
+  'twitter.com',
+  'x.com',
+  'instagram.com',
+  'reddit.com',
+  'quora.com',
+  'stacker.news',
+  'stackoverflow.com',
+  'github.com',
+  'gitlab.com',
+  'discord.com',
+  'wikipedia.org',
+  'namu.wiki',
+  'tistory.com',
+  'magicaiprompts.com',
+  'infograb.net',
+  'aeiai.net',
+  'medium.com',
+  'zhihu.com',
+  'youtube.com',
+  'twitch.tv',
+  'bilibili.com',
+  'facebook.net',
+  'wix.com',
+  'wordpress.com',
+  'wordpress.org',
+  'blogspot.com',
+  'soundcloud.com',
+  'dribbble.com',
+]);
 
 const DIRECTORY_TEXT_HINTS = [
   'directory',
@@ -89,6 +142,20 @@ const DIRECTORY_TEXT_HINTS = [
   'compare',
   'service directory',
   'directory listing',
+  'question',
+  'answers',
+  'forum',
+  'community',
+  'review',
+  'wiki',
+  'blog',
+  'tutorial',
+  'guide',
+  'documentation',
+  'documentation page',
+  'technical documentation',
+  'questions',
+  'profile',
 ];
 
 const DUCKDUCKGO_SITE_EXCLUDES = [
@@ -103,6 +170,67 @@ const DUCKDUCKGO_SITE_EXCLUDES = [
   '-site:softwareadvice.com',
   '-site:yellowpages.com',
 ].join(' ');
+
+const BING_RSS_EXCLUDES = [
+  'site:clutch.co',
+  'site:goodfirms.com',
+  'site:sortlist.com',
+  'site:fiverr.com',
+  'site:upwork.com',
+  'site:trustpilot.com',
+  'site:g2.com',
+  'site:capterra.com',
+  'site:softwareadvice.com',
+  'site:yellowpages.com',
+  'site:linkedin.com',
+  'site:github.com',
+  'site:clutch.co',
+].map((entry) => `-${entry}`).join(' ');
+
+function decodeEntity(value: string): string {
+  return value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
+function stripCdata(value: string): string {
+  return value.replace(/^<!\[CDATA\[/, '').replace(/\]\]>$/, '');
+}
+
+function parseTagValue(xml: string, tagName: string): string {
+  const regex = new RegExp(`<${tagName}(?:\\s+[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, 'i');
+  const match = regex.exec(xml);
+  if (!match) return '';
+  const raw = (match[1] || '').trim();
+  return raw ? cleanText(decodeEntity(stripCdata(raw))) : '';
+}
+
+function parseRssItemsFromXml(xml: string, maxResults: number): { title: string; url: string; description: string }[] {
+  const candidates: { title: string; url: string; description: string }[] = [];
+  const chunks = xml.split('<item>');
+
+  for (let i = 1; i < chunks.length && candidates.length < maxResults; i += 1) {
+    const block = chunks[i].split('</item>')[0] || '';
+    if (!block) continue;
+
+    const title = parseTagValue(`<item>${block}`, 'title');
+    const url = parseTagValue(`<item>${block}`, 'link');
+    const description = parseTagValue(`<item>${block}`, 'description');
+
+    if (url) {
+      candidates.push({
+        title,
+        url,
+        description,
+      });
+    }
+  }
+
+  return candidates;
+}
 
 function cleanText(value: string): string {
   return String(value || '')
@@ -156,7 +284,11 @@ function normalizeHostForFilter(input: string): string {
 function isKnownDirectoryHost(hostname: string): boolean {
   const host = normalizeHostForFilter(hostname);
   if (!host) return false;
-  return Array.from(DIRECTORY_DOMAINS).some((domain) => host === domain || host.endsWith(`.${domain}`));
+  if (Array.from(DIRECTORY_DOMAINS).some((domain) => host === domain || host.endsWith(`.${domain}`))) {
+    return true;
+  }
+
+  return Array.from(NON_AGENCY_HOST_HINTS).some((domain) => host === domain || host.endsWith(`.${domain}`));
 }
 
 function isDirectoryCandidateUrl(candidate: CandidateRaw): { blocked: boolean; reasons: string[] } {
@@ -164,6 +296,18 @@ function isDirectoryCandidateUrl(candidate: CandidateRaw): { blocked: boolean; r
   const host = normalizeHostForFilter(candidate.discoveredWebsite || '');
   const candidateText = `${candidate.discoveredName || ''} ${candidate.snippet || ''}`.toLowerCase();
   const candidateUrl = String(candidate.discoveredWebsite || '').toLowerCase();
+
+  if (/\bdocs?\b/.test(candidateText)) {
+    reasons.push('non-business-content:text:docs');
+  }
+
+  if (/\bguide\b|\btutorial\b|\breference\b/.test(candidateText)) {
+    reasons.push('non-business-content:text:guide');
+  }
+
+  if (/\.wiki$/.test(host) && !host.includes('wikipedia.org')) {
+    reasons.push('non-business-content:wiki-host');
+  }
 
   if (isKnownDirectoryHost(host)) {
     reasons.push(`blacklist_host:${host}`);
@@ -509,6 +653,184 @@ class DuckDuckGoSource implements SourceAdapter {
   }
 }
 
+async function fetchWebsiteDetails(candidate: CandidateRaw): Promise<CandidateRaw> {
+  try {
+    const response = await fetchWithTimeout(candidate.discoveredWebsite, 10000, {
+      headers: { 'accept-language': 'en-US,en;q=0.9' },
+    });
+
+    const normalizedWebsite = normalizeWebsite(candidate.discoveredWebsite);
+
+    if (!response.ok) {
+      return {
+        ...candidate,
+        discoveredWebsite: normalizedWebsite,
+        sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
+        verificationSignals: {
+          websiteOk: false,
+          websiteStatus: `http_${response.status}`,
+          websiteStatusCode: response.status,
+          contactSignal: false,
+          aboutSignal: false,
+          automationSignal: false,
+          servicesSignal: false,
+          workSignal: false,
+          socialSignal: false,
+          mailtoSignal: false,
+          emailFromSource: !!candidate.email,
+        },
+      };
+    }
+
+    const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+    if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
+      return {
+        ...candidate,
+        discoveredWebsite: normalizedWebsite,
+        sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
+        verificationSignals: {
+          websiteOk: false,
+          websiteStatus: 'non_html',
+          contactSignal: false,
+          aboutSignal: false,
+          automationSignal: false,
+          servicesSignal: false,
+          workSignal: false,
+          socialSignal: false,
+          mailtoSignal: false,
+          emailFromSource: !!candidate.email,
+        },
+      };
+    }
+
+    const homepageHtml = await response.text();
+    const homepageDetails = extractDetailsFromHtml(homepageHtml);
+    let mergedSignals: VerificationSignals = {
+      ...homepageDetails.signals,
+      websiteOk: true,
+      websiteStatus: homepageDetails.signals.websiteStatus,
+      websiteStatusCode: homepageDetails.signals.websiteStatusCode,
+    };
+    let mergedEmail = mergeEmail(candidate.email, homepageDetails.email);
+
+    const extraLinks = collectContactLinks(normalizedWebsite, homepageHtml, 3);
+    for (const link of extraLinks) {
+      try {
+        const extraResponse = await fetchWithTimeout(link, 9000);
+        if (!extraResponse.ok) continue;
+
+        const extraType = String(extraResponse.headers.get('content-type') || '').toLowerCase();
+        if (!extraType.includes('text/html') && !extraType.includes('application/xhtml+xml')) {
+          continue;
+        }
+
+        const extraHtml = await extraResponse.text();
+        const extraDetails = extractDetailsFromHtml(extraHtml);
+        mergedSignals = mergeSignals(mergedSignals, extraDetails.signals);
+        mergedEmail = mergeEmail(mergedEmail, extraDetails.email);
+      } catch {
+        // best-effort only
+      }
+    }
+
+    const name =
+      candidate.discoveredName && candidate.discoveredName !== 'Unknown'
+        ? candidate.discoveredName
+        : homepageDetails.name || candidate.discoveredName;
+
+    return {
+      ...candidate,
+      discoveredName: name || homepageDetails.name || 'Unknown',
+      discoveredWebsite: normalizedWebsite,
+      sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
+      snippet: candidate.snippet || homepageDetails.description,
+      email: mergedEmail,
+      verificationSignals: {
+        ...mergedSignals,
+        emailFromSource: !!mergedEmail,
+      },
+    };
+  } catch {
+    return {
+      ...candidate,
+      discoveredWebsite: normalizeWebsite(candidate.discoveredWebsite),
+      sourceRef: candidate.sourceRef || candidate.discoveredWebsite,
+      verificationSignals: {
+        websiteOk: false,
+        websiteStatus: 'error',
+        contactSignal: false,
+        aboutSignal: false,
+        automationSignal: false,
+        servicesSignal: false,
+        workSignal: false,
+        socialSignal: false,
+        mailtoSignal: false,
+        emailFromSource: !!candidate.email,
+      },
+    };
+  }
+}
+
+class BingSource implements SourceAdapter {
+  key = 'bing';
+  displayName = 'Bing RSS Search';
+
+  async discover(query: SearchQuery, options: { maxResults: number }): Promise<CandidateRaw[]> {
+    const keywordSuffix = query.platforms?.length
+      ? `(${query.platforms.join(' OR ')})`
+      : '("automation agency" OR "marketing automation agency" OR "zapier partner")';
+    const q = `${query.query} ${query.country || ''} ${keywordSuffix} ${BING_RSS_EXCLUDES}`.trim();
+    const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(q)}&format=rss`;
+    const response = await fetchWithTimeout(searchUrl, 12000, {
+      headers: {
+        referer: 'https://www.bing.com/',
+      },
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const xml = await response.text();
+    const parsed = parseRssItemsFromXml(xml, options.maxResults);
+    const seen = new Set<string>();
+    const candidates: CandidateRaw[] = [];
+
+    for (const item of parsed) {
+      const website = normalizeWebsite(item.url);
+      if (!website || seen.has(website)) continue;
+      seen.add(website);
+
+      candidates.push({
+        source: this.key,
+        discoveredName: cleanText(item.title) || 'Unknown',
+        discoveredWebsite: website,
+        sourceRef: item.url,
+        snippet: item.description || undefined,
+        country: query.country,
+        platforms: query.platforms,
+        query,
+      });
+    }
+
+    return candidates.filter((candidate) => {
+      const check = isDirectoryCandidateUrl(candidate);
+      if (check.blocked) {
+        candidate.discoveryFlags = {
+          blockedBySource: true,
+          rejectionReasons: check.reasons,
+        };
+        return false;
+      }
+      return true;
+    });
+  }
+
+  async fetchDetails(candidate: CandidateRaw): Promise<CandidateRaw> {
+    return fetchWebsiteDetails(candidate);
+  }
+}
+
 class FallbackSeedSource implements SourceAdapter {
   key = 'seed';
   displayName = 'Manual Seed URLs';
@@ -535,5 +857,6 @@ class FallbackSeedSource implements SourceAdapter {
 
 export const sourceAdapters: Record<string, SourceAdapter> = {
   duckduckgo: new DuckDuckGoSource(),
+  bing: new BingSource(),
   seed: new FallbackSeedSource(),
 };
