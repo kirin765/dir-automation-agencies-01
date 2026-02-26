@@ -54,10 +54,15 @@
    - 승인: `POST /api/admin/update-join`
    - 바디: `{"id":"<request-id>","status":"approved"}`
 3. 즉시 확인:
-   - 동일 id를 `status=approved`로 재조회해 상태 전환 확인
+   - 동일 id를 `/api/admin/join-agencies?status=approved&id=<id>`로 조회해 상태 전환 확인
 4. 동기화 보정 단계 (필요 시):
    - 승인 응답에서 `slug` 추출 후 `GET /api/listings?slug=<slug>`로 노출 여부 확인
+   - 응답에 `slug`가 비어 있거나 `join-agencies` 조회 기준값(`status=approved&id=<id>`)에서 `company_name`, `city` 기반 후보 slug를 생성해 fallback 재검증
    - 미반영 시 `POST /api/admin/update-join`를 한 번 더 호출해 재시도
+   - 실패 패턴:
+     - `200 + error`(권한/파싱): 즉시 조치 로그 확인
+     - `200 + slug: ""`: 재처리 로그에서 fallback 후보 조회 및 `listings` 존재성 재확인
+     - `5xx`: DB 바인딩 또는 SQL 실행 경로 점검(Cloudflare 로그)
 5. 승인 완료 시:
    - `listings`에 verified 레코드가 생성/갱신됨(`verified=1`)
    - 승인된 slug는 `/listing/{slug}` 노출 대상이 됨

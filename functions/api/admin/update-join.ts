@@ -120,14 +120,28 @@ export async function onRequestPost(context) {
       } else {
         await upsertListingBySlug(db, resolvedSlug, approvedPayload);
       }
-      const updatedListing = await getListingBySlug(db, resolvedSlug);
+
+      const finalSlugHint = String(resolvedSlug || '').trim();
+      const confirmedByHint = finalSlugHint ? await getListingBySlug(db, finalSlugHint) : null;
+      let finalSlug = String(confirmedByHint?.slug || finalSlugHint).trim();
+
+      if (!finalSlug) {
+        const confirmedByPreferred = await getListingBySlug(db, preferredSlug);
+        finalSlug = String(confirmedByPreferred?.slug || '').trim();
+      }
+
+      if (!finalSlug) {
+        finalSlug = await findUniqueListingSlug(db, preferredSlug);
+      }
+
+      const updatedListing = await getListingBySlug(db, finalSlug);
       return new Response(
         JSON.stringify({
           ok: true,
           id,
           status,
           ownerToken: updatedListing?.owner_token || token,
-          slug: resolvedSlug,
+          slug: finalSlug || '',
         }),
         { headers: { 'content-type': 'application/json' } }
       );

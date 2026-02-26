@@ -18,10 +18,11 @@ export async function onRequestGet(context) {
   const status = url.searchParams.get('status') || undefined;
   const website = url.searchParams.get('website') || undefined;
   const contactEmail = url.searchParams.get('contactEmail') || undefined;
+  const id = url.searchParams.get('id') || undefined;
 
   const db = getDb(env);
   try {
-    const rows = await queryJoinAgencyRequests(db, { status, website, contactEmail });
+    const rows = await queryJoinAgencyRequests(db, { status, website, contactEmail, id });
     return new Response(
       JSON.stringify({ ok: true, count: rows.length, items: rows }),
       { headers: { 'content-type': 'application/json' } }
@@ -33,4 +34,3 @@ export async function onRequestGet(context) {
     );
   }
 }
-

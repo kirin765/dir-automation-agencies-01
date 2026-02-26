@@ -431,6 +431,11 @@ export async function queryJoinAgencyRequests(db, filters = {}) {
   const where = [];
   const params = [];
 
+  if (filters.id) {
+    params.push(filters.id);
+    where.push(`id = ?${params.length}`);
+  }
+
   if (filters.status) {
     params.push(filters.status);
     where.push(`status = ?${params.length}`);

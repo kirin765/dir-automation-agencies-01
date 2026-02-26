@@ -123,13 +123,15 @@ NODE
     return 1
   }
 
+  local response_file
+  response_file="$(mktemp)"
+  printf '%s' "$json" > "$response_file"
   local visible
-  visible="$(node - "$slug" <<'NODE'
+  visible="$(node - "$response_file" "$slug" <<'NODE'
 const fs = require('fs');
-const targetSlug = String(process.argv[2] || '').toLowerCase();
-const raw = fs.readFileSync(0, 'utf8');
+const targetSlug = String(process.argv[3] || '').toLowerCase();
 try {
-  const parsed = JSON.parse(raw || '{}');
+  const parsed = JSON.parse(fs.readFileSync(process.argv[2], 'utf8') || '{}');
   const items = Array.isArray(parsed.items) ? parsed.items : [];
   const found = items.some((item) => String(item.slug || '').toLowerCase() === targetSlug);
   process.stdout.write(found ? '1' : '0');
@@ -138,6 +140,7 @@ try {
 }
 NODE
 )"
+  rm -f "$response_file"
 
   echo "$visible"
 }
@@ -145,18 +148,142 @@ NODE
 extract_json_value() {
   local json="$1"
   local key="$2"
-
-  node - "$key" <<'NODE'
-const key = process.argv[2];
-const raw = require('fs').readFileSync(0, 'utf8');
+  local tmp_file
+  tmp_file="$(mktemp)"
+  printf '%s' "$json" > "$tmp_file"
+  node - "$tmp_file" "$key" <<'NODE'
+const fs = require('fs');
+const key = process.argv[3];
+const raw = fs.readFileSync(process.argv[2], 'utf8');
 try {
   const parsed = JSON.parse(raw || '{}');
-  const value = parsed?.[key] ?? '';
-  process.stdout.write(String(value));
+  const value = parsed?.[key];
+  process.stdout.write(value === undefined || value === null ? '' : String(value));
 } catch {
   process.exit(0);
 }
 NODE
+  rm -f "$tmp_file"
+}
+
+slugify_simple() {
+  local text="$1"
+  node - "$text" <<'NODE'
+const input = String(process.argv[2] || '')
+  .toLowerCase()
+  .trim()
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/-+/g, '-')
+  .replace(/^-+|-+$/g, '');
+process.stdout.write(input);
+NODE
+}
+
+extract_join_request_fields() {
+  local json="$1"
+  local tmp_file
+  tmp_file="$(mktemp)"
+  printf '%s' "$json" > "$tmp_file"
+  node - "$tmp_file" <<'NODE'
+const fs = require('fs');
+const raw = fs.readFileSync(process.argv[2], 'utf8');
+try {
+  const parsed = JSON.parse(raw || '{}');
+  const items = Array.isArray(parsed.items) ? parsed.items : [];
+  const row = items[0] || {};
+  const company = String(row.company_name || row.companyName || '').trim();
+  const city = String(row.city || '').trim();
+  const country = String(row.country || '').trim();
+  process.stdout.write([company, city, country].join('\t'));
+} catch {
+  process.stdout.write('');
+}
+NODE
+  rm -f "$tmp_file"
+}
+
+resolve_slug_from_join_request() {
+  local request_id="$1"
+  local fallback_json
+  fallback_json="$(api_call GET "/api/admin/join-agencies?status=approved&id=${request_id}")" || {
+    echo "resolve_join_request_lookup_failed"
+    return 1
+  }
+
+  local fields
+  fields="$(extract_join_request_fields "$fallback_json")"
+  if [[ -z "$fields" ]]; then
+    echo "resolve_join_request_fields_empty"
+    return 1
+  fi
+
+  local company city country
+  IFS=$'\t' read -r company city country <<< "$fields"
+
+  local candidates=()
+  local candidate
+  if [[ -n "$company" ]]; then
+    candidate="$(slugify_simple "${company}-${city}")"
+    [[ -n "$candidate" ]] && candidates+=("$candidate")
+    candidate="$(slugify_simple "$company")"
+    [[ -n "$candidate" ]] && candidates+=("$candidate")
+    candidate="$(slugify_simple "${company}-${country}")"
+    [[ -n "$candidate" ]] && candidates+=("$candidate")
+  fi
+
+  local uniq_seen=()
+  local seen candidate_norm
+  for candidate in "${candidates[@]}"; do
+    candidate_norm="$(printf '%s' "$candidate" | tr '[:upper:]' '[:lower:]')"
+    if [[ -z "$candidate_norm" ]]; then
+      continue
+    fi
+    for seen in "${uniq_seen[@]}"; do
+      if [[ "$candidate_norm" == "$seen" ]]; then
+        continue 2
+      fi
+    done
+    uniq_seen+=("$candidate_norm")
+    echo "$candidate_norm"
+  done
+}
+
+resolve_slug_with_fallback() {
+  local request_id="$1"
+  local response_slug="$2"
+
+  if [[ -n "$response_slug" ]]; then
+    if [[ "$(is_listing_visible_by_slug "$response_slug" || true)" == "1" ]]; then
+      echo "$response_slug"
+      return 0
+    fi
+  fi
+
+  local candidates
+  candidates="$(resolve_slug_from_join_request "$request_id")"
+  local code="$?"
+  if [[ "$code" -ne 0 ]]; then
+    return "$code"
+  fi
+
+  if [[ -z "$candidates" ]]; then
+    return 4
+  fi
+
+  local candidate
+  while IFS= read -r candidate; do
+    if [[ -z "$candidate" ]]; then
+      continue
+    fi
+    if [[ "$(is_listing_visible_by_slug "$candidate" || true)" == "1" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done <<< "$candidates"
+
+  return 5
 }
 
 pick_listings() {
@@ -204,6 +331,10 @@ reconcile_join_request() {
   local owner_token
   local visible
   local visible_after_retry
+  local resolved_slug
+  local fallback_code
+  local request_fields
+  local snippet
 
   response="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"approved\"}")" || {
     echo "  [실패] 승인 API 호출 실패"
@@ -214,7 +345,32 @@ reconcile_join_request() {
   owner_token="$(extract_json_value "$response" ownerToken)"
 
   if [[ -z "$slug" ]]; then
-    echo "  [실패] 응답에 slug가 없어 목록 반영 검증 불가"
+    echo "  [경고] 응답에서 slug가 없어 fallback 점검을 진행합니다."
+    snippet="$(printf '%s' "$response" | tr '\n' ' ')"
+    echo "  응답 샘플: ${snippet:0:240}"
+
+    resolved_slug="$(resolve_slug_with_fallback "$request_id" "")"
+    fallback_code="$?"
+    if [[ "$fallback_code" -eq 0 && -n "$resolved_slug" ]]; then
+      echo "  [완료] fallback 점검으로 listings 반영 확인"
+      if [[ -n "$owner_token" ]]; then
+        echo "  Owner token: $owner_token"
+        echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
+      else
+        echo "  Owner token: (미생성)"
+      fi
+      return 0
+    fi
+
+    if [[ "$fallback_code" -eq 1 ]]; then
+      echo "  [실패] approved 요청 재조회 실패(필터 기반 조회 실패)"
+    elif [[ "$fallback_code" -eq 4 ]]; then
+      echo "  [실패] approved 요청에서 slug 후보 정보 부재"
+    elif [[ "$fallback_code" -eq 5 ]]; then
+      echo "  [실패] fallback 후보로 목록 반영 미발견"
+    else
+      echo "  [실패] slug fallback 점검 실패"
+    fi
     return 1
   fi
 
@@ -231,6 +387,15 @@ reconcile_join_request() {
     return 0
   fi
 
+  request_fields="$(extract_join_request_fields "$(api_call GET "/api/admin/join-agencies?status=approved&id=${request_id}" 2>/dev/null || true)")"
+  if [[ -n "$request_fields" ]]; then
+    local field_name
+    field_name="$(printf '%s' "$request_fields" | awk -F'\t' '{print $1}')"
+    if [[ -n "$field_name" ]]; then
+      echo "  요청 재확인: ${field_name} (id: ${request_id})"
+    fi
+  fi
+
   echo "  [재시도] listings 미반영 감지, 동일 요청 1회 재호출"
   response_retry="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"approved\"}")" || {
     echo "  [실패] 재승인 API 호출 실패"
@@ -240,7 +405,22 @@ reconcile_join_request() {
   slug="$(extract_json_value "$response_retry" slug)"
   owner_token="$(extract_json_value "$response_retry" ownerToken)"
   if [[ -z "$slug" ]]; then
-    echo "  [실패] 재호출 응답에 slug가 없어 목록 반영 검증 불가"
+    echo "  [경고] 재호출 응답에서 slug가 없어 fallback 점검을 진행합니다."
+    snippet="$(printf '%s' "$response_retry" | tr '\n' ' ')"
+    echo "  응답 샘플: ${snippet:0:240}"
+    resolved_slug="$(resolve_slug_with_fallback "$request_id" "")"
+    fallback_code="$?"
+    if [[ "$fallback_code" -eq 0 && -n "$resolved_slug" ]]; then
+      echo "  [완료] 재호출 후 fallback 점검으로 listings 반영 확인"
+      if [[ -n "$owner_token" ]]; then
+        echo "  Owner token: $owner_token"
+        echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
+      else
+        echo "  Owner token: (미생성)"
+      fi
+      return 0
+    fi
+    echo "  [실패] 재호출 후 slug 누락 + fallback 실패"
     return 1
   fi
 
