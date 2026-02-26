@@ -75,7 +75,10 @@ export async function onRequestPost(context) {
       const baseSlug = `${requestRow.company_name || ''}-${requestRow.city || ''}`;
       const preferredSlug = toSlug(baseSlug) || `agency-${crypto.randomUUID().slice(0, 8)}`;
       const existing = await getListingBySlug(db, preferredSlug);
-      const slug = existing ? existing.slug : await findUniqueListingSlug(db, preferredSlug);
+      let resolvedSlug = existing ? String(existing.slug || '').trim() : '';
+      if (!resolvedSlug) {
+        resolvedSlug = await findUniqueListingSlug(db, preferredSlug);
+      }
       const requestedDescription = normalizeDescription(requestRow.description || '');
       const requestedPriceMin = safeInt(requestRow.price_min, 0);
       const requestedPriceMax = safeInt(requestRow.price_max, 0);
@@ -104,7 +107,7 @@ export async function onRequestPost(context) {
           priceMax: Math.max(requestedPriceMin, requestedPriceMax),
           website: requestRow.website,
           contactEmail: requestRow.contact_email,
-          slug,
+          slug: resolvedSlug,
           source: 'verified_manual',
           sourceRef: requestRow.contact_email || requestRow.website || '',
           verificationMethod: 'manual_review',
@@ -112,18 +115,19 @@ export async function onRequestPost(context) {
           ownerToken: token,
         });
 
-        await upsertListingBySlug(db, createdSlug, approvedPayload);
+        resolvedSlug = createdSlug;
+        await upsertListingBySlug(db, resolvedSlug, approvedPayload);
       } else {
-        await upsertListingBySlug(db, slug, approvedPayload);
+        await upsertListingBySlug(db, resolvedSlug, approvedPayload);
       }
-      const updatedListing = await getListingBySlug(db, slug);
+      const updatedListing = await getListingBySlug(db, resolvedSlug);
       return new Response(
         JSON.stringify({
           ok: true,
           id,
           status,
           ownerToken: updatedListing?.owner_token || token,
-          slug,
+          slug: resolvedSlug,
         }),
         { headers: { 'content-type': 'application/json' } }
       );
