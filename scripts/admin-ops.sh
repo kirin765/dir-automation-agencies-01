@@ -326,42 +326,150 @@ NODE
 reconcile_join_request() {
   local request_id="$1"
   local response
-  local response_retry
   local slug
   local owner_token
-  local visible
-  local visible_after_retry
   local resolved_slug
   local fallback_code
   local request_fields
   local snippet
+  local attempt
+  local max_attempts=4
+  local reason
+  local final_reason='unknown'
+  local listing_sync_status
+  local error_code
+  local observed_slug
+  local backoff_seconds
 
-  response="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"approved\"}")" || {
-    echo "  [실패] 승인 API 호출 실패"
-    return 1
-  }
-
-  slug="$(extract_json_value "$response" slug)"
-  owner_token="$(extract_json_value "$response" ownerToken)"
-
-  if [[ -z "$slug" ]]; then
-    echo "  [경고] 응답에서 slug가 없어 fallback 점검을 진행합니다."
-    snippet="$(printf '%s' "$response" | tr '\n' ' ')"
-    echo "  응답 샘플: ${snippet:0:240}"
-
-    resolved_slug="$(resolve_slug_with_fallback "$request_id" "")"
-    fallback_code="$?"
-    if [[ "$fallback_code" -eq 0 && -n "$resolved_slug" ]]; then
-      echo "  [완료] fallback 점검으로 listings 반영 확인"
-      if [[ -n "$owner_token" ]]; then
-        echo "  Owner token: $owner_token"
-        echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
-      else
-        echo "  Owner token: (미생성)"
-      fi
-      return 0
+  for ((attempt = 1; attempt <= max_attempts; attempt += 1)); do
+    if [[ "$attempt" -eq 1 ]]; then
+      backoff_seconds=0.3
+    elif [[ "$attempt" -eq 2 ]]; then
+      backoff_seconds=0.6
+    elif [[ "$attempt" -eq 3 ]]; then
+      backoff_seconds=1.2
+    else
+      backoff_seconds=1.2
     fi
 
+    response="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"approved\"}")" || {
+      reason="apiError"
+      final_reason="$reason"
+      if [[ "$attempt" -lt "$max_attempts" ]]; then
+        echo "  [재시도] 승인 API 일시 오류/네트워크 예외 (${attempt}/${max_attempts})"
+        if [[ "$backoff_seconds" != 0 ]]; then
+          sleep "$backoff_seconds"
+        fi
+        reason=""
+        continue
+      fi
+      echo "  [실패] 승인 API 호출 실패 (${attempt}/${max_attempts})"
+      break
+    }
+
+    slug="$(extract_json_value "$response" slug)"
+    owner_token="$(extract_json_value "$response" ownerToken)"
+    listing_sync_status="$(extract_json_value "$response" listingSyncStatus)"
+    error_code="$(extract_json_value "$response" errorCode)"
+    observed_slug="$(extract_json_value "$response" attemptedSlug)"
+
+    if [[ -z "$slug" && -n "$observed_slug" ]]; then
+      slug="$observed_slug"
+    fi
+
+    if [[ -z "$slug" ]]; then
+      resolved_slug="$(resolve_slug_with_fallback "$request_id" "")"
+      fallback_code=$?
+      if [[ "$fallback_code" -eq 0 && -n "$resolved_slug" ]]; then
+        slug="$resolved_slug"
+        observed_slug="$resolved_slug"
+      else
+        reason="slugMissing"
+      fi
+    fi
+
+    if [[ -n "$slug" ]]; then
+      if [[ "$(is_listing_visible_by_slug "$slug" || true)" == "1" ]]; then
+        echo "  Listing slug: $slug"
+        echo "  [완료] listings 반영 확인"
+        if [[ -n "$owner_token" ]]; then
+          echo "  Owner token: $owner_token"
+          echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
+        else
+          echo "  Owner token: (미생성)"
+        fi
+        return 0
+      fi
+
+      if [[ -z "$reason" ]]; then
+        if [[ "$listing_sync_status" == "persisted" ]]; then
+          reason="retryableSyncLag"
+        elif [[ "$listing_sync_status" == "missing" ]]; then
+          reason="listingNotFound"
+        elif [[ "$error_code" == "LISTING_UPSERT_SCHEMA_MISMATCH" || "$error_code" == "LISTING_NOT_FOUND" || "$error_code" == "LISTING_UPSERT_FAILED" ]]; then
+          reason="listingNotFound"
+        elif [[ "$listing_sync_status" == "retryableSyncLag" || "$listing_sync_status" == "pending" || "$error_code" == "LISTING_SYNC_RETRY" ]]; then
+          reason="retryableSyncLag"
+        elif [[ "$listing_sync_status" == "not_applicable" ]]; then
+          reason="listingNotFound"
+        elif [[ -n "$error_code" ]]; then
+          reason="apiError"
+        else
+          reason="listingNotFound"
+        fi
+      fi
+    fi
+
+    if [[ -z "$request_fields" ]]; then
+      request_fields="$(extract_join_request_fields "$(api_call GET "/api/admin/join-agencies?status=approved&id=${request_id}" 2>/dev/null || true)")"
+      if [[ -n "$request_fields" ]]; then
+        local field_name
+        field_name="$(printf '%s' "$request_fields" | awk -F'\t' '{print $1}')"
+        if [[ -n "$field_name" ]]; then
+          echo "  요청 재확인: ${field_name} (id: ${request_id})"
+        fi
+      fi
+    fi
+
+    if [[ "$reason" == "slugMissing" ]]; then
+      final_reason="slugMissing"
+      snippet="$(printf '%s' "$response" | tr '\n' ' ')"
+      echo "  [경고] 응답에서 slug를 확인할 수 없습니다."
+      echo "  응답 샘플: ${snippet:0:240}"
+    else
+      final_reason="$reason"
+      echo "  [실패] listings 반영 미반영 (${reason}) [시도 ${attempt}/${max_attempts}]"
+      echo "  errorCode=${error_code:-none} / listingSyncStatus=${listing_sync_status:-none}"
+      if [[ -n "$slug" ]]; then
+        echo "  후보 slug: $slug"
+      fi
+    fi
+
+    if [[ "$attempt" -lt "$max_attempts" ]]; then
+      if [[ "$reason" == "listingNotFound" ]]; then
+        echo "  [재시도] listings 미반영 감지, 동일 요청 재호출"
+      elif [[ "$reason" == "retryableSyncLag" || "$reason" == "apiError" ]]; then
+        echo "  [재시도] 승인 API 일시 오류/지연, 동일 요청 재호출"
+      else
+        break
+      fi
+
+      if [[ "$attempt" -eq 1 ]]; then
+        backoff_seconds=0.3
+      elif [[ "$attempt" -eq 2 ]]; then
+        backoff_seconds=0.6
+      else
+        backoff_seconds=1.2
+      fi
+      sleep "$backoff_seconds"
+      reason=""
+      continue
+    fi
+  done
+
+  echo "  [실패] 재처리 후 listings 미반영"
+  echo "  실패 원인: ${final_reason}"
+  if [[ "$final_reason" == "slugMissing" ]]; then
     if [[ "$fallback_code" -eq 1 ]]; then
       echo "  [실패] approved 요청 재조회 실패(필터 기반 조회 실패)"
     elif [[ "$fallback_code" -eq 4 ]]; then
@@ -371,73 +479,12 @@ reconcile_join_request() {
     else
       echo "  [실패] slug fallback 점검 실패"
     fi
-    return 1
   fi
-
-  echo "  Listing slug: $slug"
-  visible="$(is_listing_visible_by_slug "$slug" || true)"
-  if [[ "$visible" == "1" ]]; then
-    echo "  [완료] listings 반영 확인"
-    if [[ -n "$owner_token" ]]; then
-      echo "  Owner token: $owner_token"
-      echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
-    else
-      echo "  Owner token: (미생성)"
-    fi
-    return 0
+  if [[ -n "$slug" ]]; then
+    echo "  수동 점검 권장: 요청 ${request_id}, slug ${slug}"
+  else
+    echo "  수동 점검 권장: 요청 ${request_id}"
   fi
-
-  request_fields="$(extract_join_request_fields "$(api_call GET "/api/admin/join-agencies?status=approved&id=${request_id}" 2>/dev/null || true)")"
-  if [[ -n "$request_fields" ]]; then
-    local field_name
-    field_name="$(printf '%s' "$request_fields" | awk -F'\t' '{print $1}')"
-    if [[ -n "$field_name" ]]; then
-      echo "  요청 재확인: ${field_name} (id: ${request_id})"
-    fi
-  fi
-
-  echo "  [재시도] listings 미반영 감지, 동일 요청 1회 재호출"
-  response_retry="$(api_call POST "/api/admin/update-join" "{\"id\":\"${request_id}\",\"status\":\"approved\"}")" || {
-    echo "  [실패] 재승인 API 호출 실패"
-    return 1
-  }
-
-  slug="$(extract_json_value "$response_retry" slug)"
-  owner_token="$(extract_json_value "$response_retry" ownerToken)"
-  if [[ -z "$slug" ]]; then
-    echo "  [경고] 재호출 응답에서 slug가 없어 fallback 점검을 진행합니다."
-    snippet="$(printf '%s' "$response_retry" | tr '\n' ' ')"
-    echo "  응답 샘플: ${snippet:0:240}"
-    resolved_slug="$(resolve_slug_with_fallback "$request_id" "")"
-    fallback_code="$?"
-    if [[ "$fallback_code" -eq 0 && -n "$resolved_slug" ]]; then
-      echo "  [완료] 재호출 후 fallback 점검으로 listings 반영 확인"
-      if [[ -n "$owner_token" ]]; then
-        echo "  Owner token: $owner_token"
-        echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
-      else
-        echo "  Owner token: (미생성)"
-      fi
-      return 0
-    fi
-    echo "  [실패] 재호출 후 slug 누락 + fallback 실패"
-    return 1
-  fi
-
-  visible_after_retry="$(is_listing_visible_by_slug "$slug" || true)"
-  if [[ "$visible_after_retry" == "1" ]]; then
-    echo "  [완료] 재시도 후 listings 반영 확인"
-    if [[ -n "$owner_token" ]]; then
-      echo "  Owner token: $owner_token"
-      echo "  리드 조회 링크: ${BASE_URL}/owner?token=${owner_token}"
-    else
-      echo "  Owner token: (미생성)"
-    fi
-    return 0
-  fi
-
-  echo "  [실패] 재시도 후에도 listings 미반영"
-  echo "  수동 점검 권장: 요청 ${request_id}, slug ${slug}"
   return 1
 }
 

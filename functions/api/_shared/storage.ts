@@ -5,6 +5,12 @@ const ONE_MINUTE = 60_000;
 const tableColumnsCache = new Map();
 const ALLOWED_EMAIL_LOG_STATUSES = new Set(['queued', 'sent', 'failed', 'skipped', 'invalid']);
 
+function createStorageError(code, message) {
+  const err = new Error(message);
+  (err as Error & { code?: string }).code = code;
+  return err;
+}
+
 export interface EmailSendLogRow {
   id: string;
   recipientEmail: string;
@@ -554,69 +560,57 @@ export async function updateOwnershipRequestStatus(db, id, status) {
 
 export async function upsertListingBySlug(db, slug, fields = {}) {
   assertDbAvailable(db, 'listing upsert');
-  const hasOwnerToken = await hasTableColumn(db, 'listings', 'owner_token');
+  const listingColumns = await getTableColumns(db, 'listings');
+  const hasOwnerToken = listingColumns.has('owner_token');
 
   const updates = [];
   const params = [];
 
+  const addUpdate = (column, value) => {
+    if (!listingColumns.has(column)) return;
+    updates.push(`${column} = ?${updates.length + 1}`);
+    params.push(value);
+  };
+
   if (typeof fields.featured === 'boolean') {
-    updates.push(`featured = ?${updates.length + 1}`);
-    params.push(fields.featured ? 1 : 0);
+    addUpdate('featured', fields.featured ? 1 : 0);
   }
-
   if (typeof fields.verified === 'boolean') {
-    updates.push(`verified = ?${updates.length + 1}`);
-    params.push(fields.verified ? 1 : 0);
+    addUpdate('verified', fields.verified ? 1 : 0);
   }
-
   if (typeof fields.source === 'string') {
-    updates.push(`source = ?${updates.length + 1}`);
-    params.push(fields.source);
+    addUpdate('source', fields.source);
   }
-
   if (typeof fields.sourceRef === 'string') {
-    updates.push(`source_ref = ?${updates.length + 1}`);
-    params.push(fields.sourceRef || null);
+    addUpdate('source_ref', fields.sourceRef || null);
   }
-
   if (typeof fields.verificationMethod === 'string') {
-    updates.push(`verification_method = ?${updates.length + 1}`);
-    params.push(fields.verificationMethod || 'none');
+    addUpdate('verification_method', fields.verificationMethod || 'none');
   }
-
   if (typeof fields.verifiedAt === 'string') {
-    updates.push(`verified_at = ?${updates.length + 1}`);
-    params.push(fields.verifiedAt || null);
+    addUpdate('verified_at', fields.verifiedAt || null);
   }
-
   if (typeof fields.description === 'string') {
-    updates.push(`description = ?${updates.length + 1}`);
-    params.push(fields.description.trim());
+    addUpdate('description', fields.description.trim());
   }
-
   if (Number.isFinite(fields.priceMin)) {
-    updates.push(`price_min = ?${updates.length + 1}`);
-    params.push(Math.max(0, Math.min(1_000_000, Number(fields.priceMin))));
+    addUpdate('price_min', Math.max(0, Math.min(1_000_000, Number(fields.priceMin))));
   }
-
   if (Number.isFinite(fields.priceMax)) {
-    updates.push(`price_max = ?${updates.length + 1}`);
-    params.push(Math.max(0, Math.min(1_000_000, Number(fields.priceMax))));
+    addUpdate('price_max', Math.max(0, Math.min(1_000_000, Number(fields.priceMax))));
   }
-
   if (typeof fields.featuredUntil === 'string') {
-    updates.push(`featured_until = ?${updates.length + 1}`);
-    params.push(fields.featuredUntil || null);
+    addUpdate('featured_until', fields.featuredUntil || null);
   }
-
   if (hasOwnerToken && typeof fields.ownerToken === 'string') {
-    updates.push(`owner_token = ?${updates.length + 1}`);
-    params.push(fields.ownerToken.trim());
+    addUpdate('owner_token', fields.ownerToken.trim());
+  }
+  if (typeof fields.priorityScore === 'number') {
+    addUpdate('priority_score', fields.priorityScore);
   }
 
-  if (typeof fields.priorityScore === 'number') {
-    updates.push(`priority_score = ?${updates.length + 1}`);
-    params.push(fields.priorityScore);
+  if (!updates.length && Object.keys(fields).length > 0) {
+    throw createStorageError('LISTING_UPSERT_SCHEMA_MISMATCH', 'No supported listing columns were provided for upsert.');
   }
 
   if (!updates.length) {
@@ -628,15 +622,7 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
     typeof fields.featured === 'boolean' ||
     typeof fields.featuredUntil === 'string';
   if (shouldUpdateFeaturedActive) {
-    const featuredClauseIndex = params.length + 1;
-    updates.push(`featured_active = ?${featuredClauseIndex}`);
-    if (typeof fields.featuredActive === 'boolean') {
-      params.push(fields.featuredActive ? 1 : 0);
-    } else if (typeof fields.featured === 'boolean') {
-      params.push(fields.featured ? 1 : 0);
-    } else {
-      params.push(fields.featuredUntil ? 1 : 0);
-    }
+    addUpdate('featured_active', typeof fields.featuredActive === 'boolean' ? (fields.featuredActive ? 1 : 0) : (typeof fields.featured === 'boolean' ? (fields.featured ? 1 : 0) : (fields.featuredUntil ? 1 : 0)));
   }
 
   params.push(slug);
@@ -647,9 +633,15 @@ export async function upsertListingBySlug(db, slug, fields = {}) {
     WHERE slug = ?${params.length}
   `);
 
-  const result = await statement.bind(...params).run();
+  let result;
+  try {
+    result = await statement.bind(...params).run();
+  } catch (error) {
+    throw createStorageError('LISTING_UPSERT_FAILED', error instanceof Error ? error.message : 'Failed to update listing.');
+  }
+
   if (result.meta && result.meta.changes === 0) {
-    throw new Error('Listing not found.');
+    throw createStorageError('LISTING_NOT_FOUND', 'Listing not found.');
   }
 }
 

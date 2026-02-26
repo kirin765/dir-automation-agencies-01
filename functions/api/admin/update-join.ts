@@ -34,6 +34,20 @@ function getOwnerToken(listingRow) {
   return crypto.randomUUID().replace(/-/g, '');
 }
 
+function createJoinApiError(message, code) {
+  const error = new Error(message);
+  (error as Error & { code?: string }).code = code;
+  return error;
+}
+
+function getErrorCode(error) {
+  if (!error || typeof error !== 'object') {
+    return '';
+  }
+
+  return String(error.code || '');
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   if (!isAuthorized(request, env)) {
@@ -69,7 +83,8 @@ export async function onRequestPost(context) {
       throw new Error('Join request not found.');
     }
 
-    await updateJoinAgencyRequestStatus(db, id, status);
+    const alreadyApproved = String(requestRow.status || '').trim() === status;
+    let attemptedSlug = '';
 
     if (status === 'approved') {
       const baseSlug = `${requestRow.company_name || ''}-${requestRow.city || ''}`;
@@ -79,6 +94,7 @@ export async function onRequestPost(context) {
       if (!resolvedSlug) {
         resolvedSlug = await findUniqueListingSlug(db, preferredSlug);
       }
+
       const requestedDescription = normalizeDescription(requestRow.description || '');
       const requestedPriceMin = safeInt(requestRow.price_min, 0);
       const requestedPriceMax = safeInt(requestRow.price_max, 0);
@@ -116,46 +132,70 @@ export async function onRequestPost(context) {
         });
 
         resolvedSlug = createdSlug;
-        await upsertListingBySlug(db, resolvedSlug, approvedPayload);
-      } else {
-        await upsertListingBySlug(db, resolvedSlug, approvedPayload);
       }
 
-      const finalSlugHint = String(resolvedSlug || '').trim();
-      const confirmedByHint = finalSlugHint ? await getListingBySlug(db, finalSlugHint) : null;
-      let finalSlug = String(confirmedByHint?.slug || finalSlugHint).trim();
+      await upsertListingBySlug(db, resolvedSlug, approvedPayload);
 
-      if (!finalSlug) {
-        const confirmedByPreferred = await getListingBySlug(db, preferredSlug);
-        finalSlug = String(confirmedByPreferred?.slug || '').trim();
+      const persisted = await getListingBySlug(db, resolvedSlug);
+      if (!persisted?.slug) {
+        attemptedSlug = resolvedSlug || existing?.slug || '';
+        throw createJoinApiError('Failed to persist approved listing.', 'LISTING_NOT_FOUND');
       }
 
-      if (!finalSlug) {
-        finalSlug = await findUniqueListingSlug(db, preferredSlug);
+      const finalSlug = String(persisted.slug || '').trim();
+      attemptedSlug = finalSlug;
+      if (!alreadyApproved) {
+        await updateJoinAgencyRequestStatus(db, id, status);
       }
 
-      const updatedListing = await getListingBySlug(db, finalSlug);
       return new Response(
         JSON.stringify({
           ok: true,
           id,
           status,
-          ownerToken: updatedListing?.owner_token || token,
-          slug: finalSlug || '',
+          ownerToken: persisted.owner_token || token,
+          slug: finalSlug,
+          listingSyncStatus: 'persisted',
+          attemptedSlug: finalSlug,
+          errorCode: '',
         }),
         { headers: { 'content-type': 'application/json' } }
       );
     }
 
-    return new Response(JSON.stringify({ ok: true, id, status }), {
-      headers: { 'content-type': 'application/json' },
-    });
+    await updateJoinAgencyRequestStatus(db, id, status);
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        id,
+        status,
+        listingSyncStatus: 'not_applicable',
+        attemptedSlug: '',
+        errorCode: '',
+      }),
+      { headers: { 'content-type': 'application/json' } }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to update join request';
-    const statusCode = message.includes('not found') ? 404 : 500;
-    return new Response(JSON.stringify({ error: message }), {
-      status: statusCode,
-      headers: { 'content-type': 'application/json' },
-    });
+    const errorCode = getErrorCode(error);
+    const normalizedErrorCode = errorCode || (message.includes('No supported listing columns') ? 'LISTING_UPSERT_SCHEMA_MISMATCH' : '');
+    const finalAttemptedSlug = String(attemptedSlug || '').trim();
+    const shouldNotFoundStatus = message.includes('not found');
+    const isRequestError = normalizedErrorCode === 'LISTING_UPSERT_SCHEMA_MISMATCH';
+    const finalStatusCode = isRequestError ? 400 : shouldNotFoundStatus ? 404 : 500;
+    const listingSyncStatus = normalizedErrorCode === 'LISTING_NOT_FOUND' ? 'missing' : 'failed';
+
+    return new Response(
+      JSON.stringify({
+        error: message,
+        errorCode: normalizedErrorCode || errorCode,
+        listingSyncStatus,
+        attemptedSlug: finalAttemptedSlug,
+      }),
+      {
+        status: finalStatusCode,
+        headers: { 'content-type': 'application/json' },
+      }
+    );
   }
 }
