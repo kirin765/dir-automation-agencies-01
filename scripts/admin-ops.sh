@@ -59,9 +59,9 @@ api_call() {
   rm -f "$response_file"
 
   if [[ "$code" -lt 200 || "$code" -gt 299 ]]; then
-    echo "요청 실패 (${code}): ${path}"
+    echo "요청 실패 (${code}): ${path}" >&2
     if [[ -n "$body_out" ]]; then
-      echo "$body_out"
+      echo "$body_out" >&2
     fi
     return 1
   fi

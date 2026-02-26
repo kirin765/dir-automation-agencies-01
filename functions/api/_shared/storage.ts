@@ -697,6 +697,7 @@ export async function insertListing(db, data) {
   const safeSlug = await findUniqueListingSlug(db, slug);
   const citySlug = normalizeSlugText(city);
   const countrySlug = normalizeSlugText(country);
+  const now = new Date().toISOString();
 
   const columns = [
     'slug',
@@ -733,8 +734,8 @@ export async function insertListing(db, data) {
     0,
     String(data.website || '').trim(),
     String(data.contactEmail || '').trim(),
-    'CURRENT_TIMESTAMP',
-    'CURRENT_TIMESTAMP',
+    now,
+    now,
   ];
 
   if (hasDescription) {
@@ -773,8 +774,7 @@ export async function insertListing(db, data) {
     values.push(String(data.ownerToken || '').trim() || null);
   }
 
-  const placeholders = values.map((value, index) => (String(value) === 'CURRENT_TIMESTAMP' ? `CURRENT_TIMESTAMP` : `?${index + 1}`));
-  const preparedValues = values.filter((value) => String(value) !== 'CURRENT_TIMESTAMP');
+  const placeholders = values.map((_value, index) => `?${index + 1}`);
 
   await db
     .prepare(`
@@ -782,7 +782,7 @@ export async function insertListing(db, data) {
         (${columns.join(', ')})
       VALUES (${placeholders.join(', ')})
     `)
-    .bind(...preparedValues)
+    .bind(...values)
     .run();
 
   return safeSlug;
