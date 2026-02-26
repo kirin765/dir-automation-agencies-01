@@ -10,6 +10,7 @@ export async function onRequestGet(context) {
   const category = url.searchParams.get('category') || undefined;
   const platform = url.searchParams.get('platform') || undefined;
   const location = url.searchParams.get('location') || undefined;
+  const slug = url.searchParams.get('slug') || undefined;
   const minPrice = Number.parseInt(url.searchParams.get('minPrice') || '', 10);
   const maxPrice = Number.parseInt(url.searchParams.get('maxPrice') || '', 10);
 
@@ -18,6 +19,7 @@ export async function onRequestGet(context) {
     category,
     platform,
     location,
+    slug,
     minPrice: Number.isNaN(minPrice) ? undefined : minPrice,
     maxPrice: Number.isNaN(maxPrice) ? undefined : maxPrice,
     page,

@@ -48,14 +48,17 @@
 ### 2. 승인 절차
 
 1. 신규 신청 수신:
-   - `GET /api/admin/join-agencies?status=pending`  
+   - `GET /api/admin/join-agencies?status=pending`
    - 헤더: `x-admin-key: $ADMIN_API_KEY`
 2. 승인/거부:
    - 승인: `POST /api/admin/update-join`
    - 바디: `{"id":"<request-id>","status":"approved"}`
 3. 즉시 확인:
    - 동일 id를 `status=approved`로 재조회해 상태 전환 확인
-4. 승인 완료 시:
+4. 동기화 보정 단계 (필요 시):
+   - 승인 응답에서 `slug` 추출 후 `GET /api/listings?slug=<slug>`로 노출 여부 확인
+   - 미반영 시 `POST /api/admin/update-join`를 한 번 더 호출해 재시도
+5. 승인 완료 시:
    - `listings`에 verified 레코드가 생성/갱신됨(`verified=1`)
    - 승인된 slug는 `/listing/{slug}` 노출 대상이 됨
 
@@ -72,6 +75,7 @@
 - 기능:
   - `1) 신규 신청 승인/거절`: `join` 대기 목록에서 항목을 골라 `update-join` 처리
   - `2) 기존 목록 verified 토글`: `/api/listings` 미검증 목록에서 `verified` 토글 (`/api/admin/listings`)
+  - `3) approved 목록 listings 반영 점검/재처리`: `status=approved` 항목 대상으로 슬러그 존재성 확인 후 미반영 건을 재승인 1회 재호출
 
 ### 3-3) D1 → 정적 데이터 동기화 (자동화)
 

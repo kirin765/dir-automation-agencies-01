@@ -338,6 +338,11 @@ export async function queryListings(db, filters = {}) {
     where.push(`LOWER(country) LIKE ?`);
   }
 
+  if (filters.slug) {
+    params.push(String(filters.slug || '').toLowerCase());
+    where.push(`LOWER(slug) = ?${params.length}`);
+  }
+
   if (Number.isFinite(filters.minPrice) && filters.minPrice > 0) {
     params.push(filters.minPrice);
     where.push(`price_min >= ?`);

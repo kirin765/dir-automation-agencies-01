@@ -1,4 +1,12 @@
-import { getDb, getJoinAgencyRequestById, updateJoinAgencyRequestStatus, getListingBySlug, upsertListingBySlug, findUniqueListingSlug, insertListing } from '../_shared/storage';
+import {
+  getDb,
+  getJoinAgencyRequestById,
+  getListingBySlug,
+  insertListing,
+  updateJoinAgencyRequestStatus,
+  upsertListingBySlug,
+  findUniqueListingSlug,
+} from '../_shared/storage';
 
 function isAuthorized(request, env) {
   const authHeader = request.headers.get('x-admin-key');
@@ -67,7 +75,7 @@ export async function onRequestPost(context) {
       const baseSlug = `${requestRow.company_name || ''}-${requestRow.city || ''}`;
       const preferredSlug = toSlug(baseSlug) || `agency-${crypto.randomUUID().slice(0, 8)}`;
       const existing = await getListingBySlug(db, preferredSlug);
-      const slug = existing ? await findUniqueListingSlug(db, preferredSlug) : preferredSlug;
+      const slug = existing ? existing.slug : await findUniqueListingSlug(db, preferredSlug);
       const requestedDescription = normalizeDescription(requestRow.description || '');
       const requestedPriceMin = safeInt(requestRow.price_min, 0);
       const requestedPriceMax = safeInt(requestRow.price_max, 0);
@@ -85,9 +93,7 @@ export async function onRequestPost(context) {
         ownerToken: token,
       };
 
-      if (existing) {
-        await upsertListingBySlug(db, slug, approvedPayload);
-      } else {
+      if (!existing) {
         const createdSlug = await insertListing(db, {
           name: requestRow.company_name || 'Pending name',
           city: requestRow.city,
@@ -98,17 +104,17 @@ export async function onRequestPost(context) {
           priceMax: Math.max(requestedPriceMin, requestedPriceMax),
           website: requestRow.website,
           contactEmail: requestRow.contact_email,
+          slug,
           source: 'verified_manual',
           sourceRef: requestRow.contact_email || requestRow.website || '',
           verificationMethod: 'manual_review',
           verifiedAt: new Date().toISOString(),
-          slug,
           ownerToken: token,
         });
 
-        await upsertListingBySlug(db, createdSlug, {
-          ...approvedPayload,
-        });
+        await upsertListingBySlug(db, createdSlug, approvedPayload);
+      } else {
+        await upsertListingBySlug(db, slug, approvedPayload);
       }
       const updatedListing = await getListingBySlug(db, slug);
       return new Response(
