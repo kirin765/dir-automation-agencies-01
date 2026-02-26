@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getCountries, getPlatformLabel, getVerified } from '../../scripts/process-data';
+import { getCountries, getPlatformLabel, getVerified, isApprovedListing } from '../../scripts/process-data';
 
 const listings = getVerified();
 const featuredListings = listings.filter(l => l.isFeaturedActive).slice(0, 6);
@@ -28,11 +28,6 @@ const locations = getCountries();
         Save 20+ hours/week with proven automation solutions.
       </p>
 
-      <p class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-green-500/40 bg-green-500/10 text-green-300 text-sm">
-        <span>✓</span>
-        <span>Verified listings only</span>
-      </p>
-      
       <!-- Search -->
       <form action="/search" class="max-w-xl mx-auto" data-track-form="search_submit">
         <div class="flex gap-2">
@@ -104,11 +99,20 @@ const locations = getCountries();
             href={`/listing/${listing.slug}`}
             class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
           >
-            <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start justify-between mb-3 gap-2">
               <h3 class="font-semibold text-lg">{listing.name}</h3>
-              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
-                ★ Featured
-              </span>
+              <div class="flex flex-wrap justify-end gap-2">
+                {listing.isFeaturedActive && (
+                  <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                    ★ Featured
+                  </span>
+                )}
+                {isApprovedListing(listing) && (
+                  <span class="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded">
+                    Approved
+                  </span>
+                )}
+              </div>
             </div>
             
             <div class="flex gap-2 mb-3">

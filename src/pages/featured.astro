@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getVerified } from '../../scripts/process-data';
+import { getVerified, isApprovedListing } from '../../scripts/process-data';
 
 const featuredListings = getVerified().filter((listing) => listing.isFeaturedActive);
 ---
@@ -24,9 +24,14 @@ const featuredListings = getVerified().filter((listing) => listing.isFeaturedAct
           data-listing-slug={listing.slug}
           class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
         >
-          <div class="flex justify-between items-start mb-3">
+          <div class="flex items-start justify-between mb-3 gap-2">
             <h2 class="font-semibold text-lg">{listing.name}</h2>
-            <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">★ Featured</span>
+            <div class="flex flex-wrap justify-end gap-2">
+              <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">★ Featured</span>
+              {isApprovedListing(listing) && (
+                <span class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-300">Approved</span>
+              )}
+            </div>
           </div>
           <p class="text-slate-400 text-sm mb-3">{listing.description}</p>
           <p class="text-xs text-slate-500 mb-2">Featured until: {listing.featuredUntil ? new Date(listing.featuredUntil).toLocaleDateString() : 'ongoing'}</p>

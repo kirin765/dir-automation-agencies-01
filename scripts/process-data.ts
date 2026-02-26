@@ -51,6 +51,10 @@ export interface OwnershipRequest {
   createdAt: string;
 }
 
+export function isApprovedListing(listing: Listing): boolean {
+  return listing.verified === true && listing.source === 'verified_manual';
+}
+
 const CLAIMS_PATH = path.join(process.cwd(), 'data', 'ownership-requests.json');
 const LEADS_PATH = path.join(process.cwd(), 'data', 'leads.json');
 

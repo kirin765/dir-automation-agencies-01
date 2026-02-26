@@ -2,7 +2,14 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { getByCategoryAndLocation, getCategories, getCountries, getDirectoryCategories, getPlatformLabel } from '../../../scripts/process-data';
+import {
+  getByCategoryAndLocation,
+  getCategories,
+  getCountries,
+  getDirectoryCategories,
+  getPlatformLabel,
+  isApprovedListing,
+} from '../../../scripts/process-data';
 
 export function getStaticPaths() {
   const categories = getDirectoryCategories();
@@ -72,13 +79,20 @@ const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
             data-listing-slug={listing.slug}
             class="block p-6 bg-slate-800 border border-slate-700 rounded-xl card-hover"
           >
-            <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start justify-between mb-3 gap-2">
               <h3 class="font-semibold text-lg">{listing.name}</h3>
-              {listing.isFeaturedActive && (
-                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
-                  ★ Featured
-                </span>
-              )}
+              <div class="flex flex-wrap justify-end gap-2">
+                {listing.isFeaturedActive && (
+                  <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded">
+                    ★ Featured
+                  </span>
+                )}
+                {isApprovedListing(listing) && (
+                  <span class="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded">
+                    Approved
+                  </span>
+                )}
+              </div>
             </div>
             <div class="flex gap-2 mb-3">
               {listing.platforms.map(p => (
