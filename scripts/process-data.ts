@@ -52,7 +52,11 @@ export interface OwnershipRequest {
 }
 
 export function isApprovedListing(listing: Listing): boolean {
-  return listing.verified === true && listing.source === 'verified_manual';
+  return (
+    listing.verified === true &&
+    listing.source === 'verified_manual' &&
+    listing.verificationMethod === 'manual_review'
+  );
 }
 
 const CLAIMS_PATH = path.join(process.cwd(), 'data', 'ownership-requests.json');
