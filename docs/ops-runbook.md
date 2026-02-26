@@ -82,6 +82,29 @@
   - `2) 기존 목록 verified 토글`: `/api/listings` 미검증 목록에서 `verified` 토글 (`/api/admin/listings`)
   - `3) approved 목록 listings 반영 점검/재처리`: `status=approved` 항목 대상으로 슬러그 존재성 확인 후 미반영 건을 재승인 1회 재호출
 
+### 3-2-1) /join 신청 자동 승인(일일 크론)
+
+- 대상: `GET /api/admin/join-agencies?status=pending`에서 `source_page`가 `/join` 계열인 항목
+- 승인 조건:
+  - `website` trim non-empty
+  - `verification_evidence` trim non-empty
+- 실행:
+  - 매일 UTC 03:00 cron(`.github/workflows/auto-approve-joins.yml`)
+  - `npm run approve:joins`
+  - 드라이런: `npm run approve:joins:dry-run`
+- 승인 엔드포인트:
+  - `POST /api/admin/update-join` + `{ id, status: "approved" }`
+- 재시도:
+  - 최대 `3`회, 백오프 `300ms`, `600ms`, `1200ms`
+- 실패 reason 분류:
+  - `slugMissing` (slug 응답/파생 실패)
+  - `listingNotFound` (DB 쓰기 실패 또는 미반영)
+  - `retryableSyncLag` (즉시 조회에서 미반영)
+  - `apiError` (네트워크/HTTP 오류)
+- 출력:
+  - 실행 요약: `total / evaluated / approved / skipped / failed`
+  - reason별 집계 및 실패 항목의 `id`, `companyName`, `attempts`, `errorCode` 추적
+
 ### 3-3) D1 → 정적 데이터 동기화 (자동화)
 
 - 수동:
