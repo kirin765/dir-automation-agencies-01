@@ -1,0 +1,37 @@
+name: Auto-approve pending join requests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  auto_approve_joins:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      BASE_URL: ${{ vars.PUBLIC_SITE_URL || 'https://automationagencydirectory.com' }}
+      ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate admin key
+        run: |
+          if [ -z "${ADMIN_API_KEY}" ]; then
+            echo "ADMIN_API_KEY is required. Set repo secret ADMIN_API_KEY."
+            exit 1
+          fi
+
+      - name: Auto-approve /join requests
+        run: npm run approve:joins

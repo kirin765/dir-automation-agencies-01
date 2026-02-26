@@ -26,6 +26,8 @@
     "test:workflow": "node scripts/test-pages-workflow.mjs",
     "send:vendors": "npx tsx scripts/send-vendor-campaign.ts --mode send",
     "send:vendors:dry-run": "npx tsx scripts/send-vendor-campaign.ts --mode dry_run",
+    "approve:joins": "npx tsx scripts/auto-approve-join-requests.ts",
+    "approve:joins:dry-run": "npx tsx scripts/auto-approve-join-requests.ts --dry-run",
     "astro": "astro"
   },
   "dependencies": {
