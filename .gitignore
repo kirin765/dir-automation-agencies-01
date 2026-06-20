@@ -9,6 +9,7 @@ dist/
 # env files
 .env
 .env.*
+!.env.example
 
 # logs
 npm-debug.log*
@@ -24,3 +25,6 @@ pnpm-debug.log*
 # secrets
 *.key
 *.pem
+
+# local DB deletion backups (spam dumps)
+data/_deleted-backup/

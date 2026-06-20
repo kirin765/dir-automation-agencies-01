@@ -10,6 +10,9 @@ export async function GET() {
   const listings = getVerified();
   const categories = getDirectoryCategories();
   const countries = getCountries();
+  const listingLastModified = new Map(
+    listings.map((listing) => [listing.slug, listing.verifiedAt || new Date().toISOString()])
+  );
 
   const verifiedCategoryPages = categories.filter((category) =>
     listings.some((listing) => listing.platforms.includes(category))
@@ -33,7 +36,6 @@ export async function GET() {
     '/terms',
     '/fraud-policy',
     '/contact',
-    '/claim',
     '/featured',
     '/join',
     ...verifiedCategoryPages.map((category) => `/${category}`),
@@ -48,6 +50,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pages.map((page) => `  <url>
     <loc>${SITE_URL}${page}</loc>
+    ${page.startsWith('/listing/') ? `<lastmod>${new Date(listingLastModified.get(page.replace('/listing/', '')) || Date.now()).toISOString()}</lastmod>` : ''}
     <changefreq>${page.startsWith('/listing/') ? 'monthly' : 'weekly'}</changefreq>
     <priority>${page === '' ? '1.0' : page.startsWith('/listing/') ? '0.8' : '0.9'}</priority>
   </url>`).join('\n')}

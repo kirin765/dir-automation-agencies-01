@@ -5,8 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 PUBLIC_SITE_URL = "https://automationagencydirectory.com"
 PUBLIC_BASE_PATH = "/"
-TURNSTILE_SECRET_KEY = ""
-TURNSTILE_SITE_KEY = ""
+# Secret key is set as a Cloudflare Pages Secret (dashboard), never here.
+TURNSTILE_SITE_KEY = "0x4AAAAAADoSPsZovZyJES1G"
 
 [[d1_databases]]
 binding = "DB"

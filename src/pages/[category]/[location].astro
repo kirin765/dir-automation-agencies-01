@@ -10,6 +10,7 @@ import {
   getPlatformLabel,
   isApprovedListing,
 } from '../../../scripts/process-data';
+import { createBreadcrumbSchema, createCollectionPageSchema } from '../../lib/seo';
 
 export function getStaticPaths() {
   const categories = getDirectoryCategories();
@@ -43,9 +44,30 @@ const hasListings = listings.length > 0;
 const titleCategory = getPlatformLabel(category);
 const pageTitle = `${titleCategory} in ${country.name} - AI Automation Agencies`;
 const pageDesc = `Top-rated ${titleCategory} agencies in ${country.name}.`;
+const pagePath = `/${category}/${country.slug}`;
+const schema = hasListings
+  ? [
+      createBreadcrumbSchema([
+        { name: 'Home', path: '/' },
+        { name: titleCategory, path: `/${category}` },
+        { name: country.name, path: `/location/${country.slug}` },
+        { name: `${titleCategory} in ${country.name}`, path: pagePath },
+      ]),
+      createCollectionPageSchema({
+        name: pageTitle,
+        description: pageDesc,
+        path: pagePath,
+        items: listings.slice(0, 20).map((listing) => ({
+          name: listing.name,
+          path: `/listing/${listing.slug}`,
+          description: listing.description,
+        })),
+      }),
+    ]
+  : [];
 ---
 
-<Layout title={pageTitle} description={pageDesc} noindex={!hasListings}>
+<Layout title={pageTitle} description={pageDesc} noindex={!hasListings} schema={schema}>
   <Header />
   
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

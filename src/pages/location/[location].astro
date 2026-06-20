@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getByCountry, getCountries, getPlatformLabel, isApprovedListing } from '../../../scripts/process-data';
+import { createBreadcrumbSchema, createCollectionPageSchema } from '../../lib/seo';
 
 export function getStaticPaths() {
   return getCountries().map((country) => ({
@@ -16,9 +17,29 @@ const listings = getByCountry(country.slug);
 const hasListings = listings.length > 0;
 const pageTitle = `${country.name} - AI Automation Agencies`;
 const pageDesc = `Find top-rated ${country.name} automation agencies and experts. ${listings.length} listings available.`;
+const pagePath = `/location/${country.slug}`;
+const schema = hasListings
+  ? [
+      createBreadcrumbSchema([
+        { name: 'Home', path: '/' },
+        { name: 'Locations', path: '/search' },
+        { name: country.name, path: pagePath },
+      ]),
+      createCollectionPageSchema({
+        name: pageTitle,
+        description: pageDesc,
+        path: pagePath,
+        items: listings.slice(0, 20).map((listing) => ({
+          name: listing.name,
+          path: `/listing/${listing.slug}`,
+          description: listing.description,
+        })),
+      }),
+    ]
+  : [];
 ---
 
-<Layout title={pageTitle} description={pageDesc} noindex={!hasListings}>
+<Layout title={pageTitle} description={pageDesc} noindex={!hasListings} schema={schema}>
   <Header />
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
