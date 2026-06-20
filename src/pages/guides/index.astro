@@ -3,11 +3,30 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { GUIDE_INDEX } from '../../lib/guides';
+import { createBreadcrumbSchema, createCollectionPageSchema } from '../../lib/seo';
+
+const schema = [
+  createBreadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+  ]),
+  createCollectionPageSchema({
+    name: 'Automation Guides',
+    description: 'Guides for selecting automation platforms, budgeting automation work, and evaluating agencies.',
+    path: '/guides',
+    items: GUIDE_INDEX.map((guide) => ({
+      name: guide.title,
+      path: `/guides/${guide.slug}`,
+      description: guide.summary,
+    })),
+  }),
+];
 ---
 
 <Layout
   title="Automation Guides | AI Automation Agencies Directory"
   description="Actionable automation guides for comparing platforms, planning budgets, and hiring agencies."
+  schema={schema}
 >
   <Header />
 

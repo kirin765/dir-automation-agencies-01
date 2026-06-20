@@ -15,6 +15,23 @@ export const SITE_URL = resolvedSiteUrl.replace(/\/+$/g, '');
 
 export const SITE_PATH = getSitePath(SITE_URL);
 
+function normalizeCanonicalPathname(pathname = '') {
+  if (!pathname) return '/';
+
+  let normalized = pathname;
+  if (normalized.endsWith('/index.html')) {
+    normalized = normalized.slice(0, -'/index.html'.length) || '/';
+  } else if (normalized.endsWith('.html')) {
+    normalized = normalized.slice(0, -'.html'.length) || '/';
+  }
+
+  if (!normalized.startsWith('/')) {
+    normalized = `/${normalized}`;
+  }
+
+  return normalized === '/index' ? '/' : normalized;
+}
+
 function getSitePath(siteUrl) {
   try {
     const pathname = new URL(siteUrl).pathname;
@@ -26,7 +43,7 @@ function getSitePath(siteUrl) {
 }
 
 export function getCanonicalUrl(pathname = '') {
-  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  const path = normalizeCanonicalPathname(pathname.startsWith('/') ? pathname : `/${pathname}`);
   const clean = SITE_PATH && SITE_PATH !== '/' && path.startsWith(SITE_PATH)
     ? `/${path.slice(SITE_PATH.length)}`
     : path;

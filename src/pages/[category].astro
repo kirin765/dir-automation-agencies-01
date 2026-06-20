@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getByCategory, getDirectoryCategories, getPlatformLabel, isApprovedListing } from '../../scripts/process-data';
+import { createBreadcrumbSchema, createCollectionPageSchema } from '../lib/seo';
 
 export function getStaticPaths() {
   const categories = getDirectoryCategories();
@@ -18,9 +19,27 @@ const categoryLabel = getPlatformLabel(category);
 const pageTitle = `${categoryLabel} Experts - AI Automation Agencies`;
 const pageDesc = `Find top-rated ${categoryLabel} automation experts and agencies. Browse ${listings.length} specialists worldwide.`;
 const hasListings = listings.length > 0;
+const schema = hasListings
+  ? [
+      createBreadcrumbSchema([
+        { name: 'Home', path: '/' },
+        { name: categoryLabel, path: `/${category}` },
+      ]),
+      createCollectionPageSchema({
+        name: pageTitle,
+        description: pageDesc,
+        path: `/${category}`,
+        items: listings.slice(0, 20).map((listing) => ({
+          name: listing.name,
+          path: `/listing/${listing.slug}`,
+          description: listing.description,
+        })),
+      }),
+    ]
+  : [];
 ---
 
-<Layout title={pageTitle} description={pageDesc} noindex={!hasListings}>
+<Layout title={pageTitle} description={pageDesc} noindex={!hasListings} schema={schema}>
   <Header />
   
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

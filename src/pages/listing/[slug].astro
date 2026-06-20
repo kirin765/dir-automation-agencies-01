@@ -5,6 +5,7 @@ import Footer from '../../components/Footer.astro';
 import { getVerified, getByCountry, getOwnershipRequestStatusBySlug } from '../../../scripts/process-data';
 import { GUIDE_DATA } from '../../lib/guides';
 import { getPlatformLabel } from '../../../scripts/process-data';
+import { createBreadcrumbSchema, createListingSchema } from '../../lib/seo';
 
 export function getStaticPaths() {
   const listings = getVerified();
@@ -26,30 +27,29 @@ const guideLinks = GUIDE_DATA
   )
   .slice(0, 2);
 
-const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: listing.name,
-  description: listing.description,
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: listing.location,
-    addressCountry: listing.country
-  },
-  priceRange: `$${listing.priceMin}-$${listing.priceMax}`,
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: listing.rating,
-    reviewCount: listing.reviewCount
-  },
-  url: listing.website,
-  mainEntityOfPage: listing.website,
-};
+const pagePath = `/listing/${listing.slug}`;
+const locationLabel = [listing.location, listing.country].filter(Boolean).join(', ');
+const pageTitle = locationLabel
+  ? `${listing.name} | ${locationLabel} Automation Agency`
+  : `${listing.name} | Automation Agency Profile`;
+const schema = [
+  createBreadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Listings', path: '/featured' },
+    { name: listing.name, path: pagePath },
+  ]),
+  createListingSchema({
+    listing,
+    path: pagePath,
+  }),
+];
 ---
 
-<Layout title={`${listing.name} - AI Automation Expert`} description={listing.description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-
+<Layout
+  title={pageTitle}
+  description={listing.description}
+  schema={schema}
+>
   <Header />
 
   <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

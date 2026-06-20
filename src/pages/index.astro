@@ -3,15 +3,35 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getCountries, getPlatformLabel, getVerified, isApprovedListing } from '../../scripts/process-data';
+import { createBreadcrumbSchema, createCollectionPageSchema } from '../lib/seo';
 
 const listings = getVerified();
 const featuredListings = listings.filter(l => l.isFeaturedActive).slice(0, 6);
 
 const platforms = ['zapier', 'make', 'n8n', 'custom'];
 const locations = getCountries();
+const schema = [
+  createBreadcrumbSchema([
+    { name: 'Home', path: '/' },
+  ]),
+  createCollectionPageSchema({
+    name: 'AI Automation Agencies Directory',
+    description: 'Browse vetted automation agencies by platform, region, and featured placement.',
+    path: '/',
+    items: featuredListings.map((listing) => ({
+      name: listing.name,
+      path: `/listing/${listing.slug}`,
+      description: listing.description,
+    })),
+  }),
+];
 ---
 
-<Layout title="AI Automation Agencies Directory | Find Zapier, Make.com & n8n Experts">
+<Layout
+  title="AI Automation Agencies Directory | Find Zapier, Make.com & n8n Experts"
+  description="Compare vetted automation agencies for Zapier, Make, n8n, and custom workflow projects by location, budget, and trust signals."
+  schema={schema}
+>
   <Header />
   
   <!-- Hero -->

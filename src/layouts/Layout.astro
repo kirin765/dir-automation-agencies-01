@@ -1,5 +1,12 @@
 ---
-import { getCanonicalUrl, SITE_URL } from '../lib/site';
+import { getCanonicalUrl } from '../lib/site';
+import {
+  createOrganizationSchema,
+  createWebSiteSchema,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  SITE_NAME,
+} from '../lib/seo';
 
 interface Props {
   title: string;
@@ -7,17 +14,37 @@ interface Props {
   canonical?: string;
   ogImage?: string;
   noindex?: boolean;
+  pageType?: 'website' | 'article';
+  schema?: Record<string, unknown> | Array<Record<string, unknown>>;
 }
 
 const {
   title,
-  description = "Find the best AI automation experts - Zapier, Make.com, and n8n specialists. Get quotes from top-rated agencies worldwide.",
+  description = DEFAULT_DESCRIPTION,
   canonical,
-  ogImage = "/og-image.png",
-  noindex = false
+  ogImage = DEFAULT_OG_IMAGE,
+  noindex = false,
+  pageType = 'website',
+  schema = [],
 } = Astro.props;
 const pageUrl = canonical || getCanonicalUrl(Astro.url.pathname);
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+const robotsContent = noindex
+  ? 'noindex, nofollow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const schemas = [createOrganizationSchema(), createWebSiteSchema()]
+  .concat(Array.isArray(schema) ? schema : schema ? [schema] : [])
+  .filter(Boolean);
+const schemaPayload =
+  schemas.length === 1
+    ? schemas[0]
+    : {
+        '@context': 'https://schema.org',
+        '@graph': schemas.map((entry) => {
+          const { '@context': _context, ...rest } = entry;
+          return rest;
+        }),
+      };
 ---
 
 <!DOCTYPE html>
@@ -27,15 +54,18 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  {noindex && <meta name="robots" content="noindex, nofollow" />}
+  <meta name="robots" content={robotsContent} />
   <link rel="canonical" href={pageUrl} />
+  <meta name="generator" content={SITE_NAME} />
   
   <!-- OpenGraph -->
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={pageUrl} />
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={pageType} />
+  <meta property="og:site_name" content={SITE_NAME} />
   <meta property="og:image" content={getCanonicalUrl(ogImage)} />
+  <meta property="og:locale" content="en_US" />
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -44,18 +74,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
   <meta name="twitter:image" content={getCanonicalUrl(ogImage)} />
   
   <!-- JSON-LD Schema -->
-  <script type="application/ld+json" set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "AI Automation Agencies Directory",
-    "description": description,
-    "url": SITE_URL,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": `${SITE_URL}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string"
-    }
-  })} />
+  <script type="application/ld+json" set:html={JSON.stringify(schemaPayload)} />
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

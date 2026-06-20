@@ -3,6 +3,7 @@ import { GUIDE_DATA } from '../../lib/guides';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import { createArticleSchema, createBreadcrumbSchema } from '../../lib/seo';
 
 export function getStaticPaths() {
   return GUIDE_DATA.map((guide) => ({
@@ -17,10 +18,29 @@ const relatedLinks = guide.relatedCategories.map((category) => ({
   label: `${category} experts`,
   href: `/${category}`,
 }));
+const pagePath = `/guides/${guide.slug}`;
+const schema = [
+  createBreadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+    { name: guide.title, path: pagePath },
+  ]),
+  createArticleSchema({
+    title: guide.title,
+    description: guide.summary,
+    path: pagePath,
+    keywords: guide.keywords,
+  }),
+];
 
 ---
 
-<Layout title={guide.title} description={guide.summary}>
+<Layout
+  title={guide.title}
+  description={guide.summary}
+  pageType="article"
+  schema={schema}
+>
   <Header />
 
   <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
