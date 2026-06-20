@@ -47,6 +47,8 @@ jobs:
         run: npm run test
 
       - name: Build static site
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       - name: Deploy to Cloudflare Pages

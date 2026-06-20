@@ -38,6 +38,8 @@ jobs:
         run: npm run sync:d1:listings
 
       - name: Build
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
